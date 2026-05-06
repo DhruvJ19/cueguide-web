@@ -24,6 +24,10 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-text: var(--primary-text);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.2);
 }
 
 :root {
@@ -35,44 +39,37 @@
   --line-strong: #3A3E4A;
   
   --content: #EDEEF1;
-  --content-muted: rgba(237, 238, 241, 0.6);
-  --content-faint: rgba(237, 238, 241, 0.32);
+  --content-muted: #9BA1B0;
+  --content-faint: #5A6070;
 
   --primary: #6366F1;
   --primary-hover: #4F46E5;
   --primary-text: #FFFFFF;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.35);
 }
 
-body.light-mode {
+/* Use a more robust selector for light mode */
+html.light-mode, body.light-mode {
   /* Premium Light Mode — Solid whites, visible borders */
-  --bg: #F0F2F5;
+  --bg: #F5F7FA;
   --panel: #FFFFFF;
-  --panel-hover: #F6F7F9;
-  --line: #DFE2E8;
-  --line-strong: #C8CDD6;
+  --panel-hover: #F8FAFC;
+  --line: #E2E8F0;
+  --line-strong: #CBD5E1;
   
-  --content: #1A1D26;
-  --content-muted: #5A6070;
-  --content-faint: #9098A8;
+  --content: #0F172A;
+  --content-muted: #475569;
+  --content-faint: #94A3B8;
 
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --primary-text: #FFFFFF;
-
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
 }
 
 body {
   overflow-x: hidden;
   background-color: var(--bg);
   color: var(--content);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -99,7 +96,6 @@ body {
   color: var(--primary-text);
 }
 
-/* Clean subtle background — no animated mesh */
 .mesh-bg {
   position: fixed;
   top: 0;
@@ -110,20 +106,19 @@ body {
   background: var(--bg);
 }
 
-/* Opaque cards with proper elevation — no glassmorphism */
 .glass-panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--shadow-sm);
 }
 
 .glass-card {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .glass-card:hover {

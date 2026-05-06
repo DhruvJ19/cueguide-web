@@ -6,7 +6,7 @@ import DeviceManager from '../components/caregiver/DeviceManager';
 import AnonymizationPipeline from '../components/caregiver/AnonymizationPipeline';
 import ReportsEngine from '../components/caregiver/ReportsEngine';
 import GlowCard from '../components/GlowCard';
-import { Plus, CheckCircle2, Circle, Clock, MoreVertical, Play, Zap, ZapOff, Sparkles, AlertCircle, LayoutDashboard, ListTodo, Activity, Settings, User, Shield, Radio, FileText } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Clock, MoreVertical, Play, Zap, ZapOff, Sparkles, AlertCircle, LayoutDashboard, ListTodo, Activity, Settings, User, Shield, Radio, FileText, HeartPulse, Sun, Moon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { AIGenerationStatus } from '../services/ai';
 import { motion, AnimatePresence } from 'motion/react';
@@ -98,10 +98,16 @@ interface Props {
   onStartSimulation: (id: string) => void;
   globalAlert?: string | null;
   clearAlert?: () => void;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
+  role: 'caregiver' | 'patient';
+  setRole: (role: 'caregiver' | 'patient') => void;
+  setIsCommandOpen: (open: boolean) => void;
 }
 
 export default function CaregiverDashboard({ 
-  onStartSimulation, globalAlert, clearAlert
+  onStartSimulation, globalAlert, clearAlert,
+  theme, setTheme, role, setRole, setIsCommandOpen
 }: Props) {
   const { routines, addRoutine, adjustments, approveAdjustment, rejectAdjustment } = useRoutineStore();
   const { completions } = useCompletionStore();
@@ -148,129 +154,142 @@ export default function CaregiverDashboard({
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden animate-in fade-in duration-700 relative">
+    <div className="flex h-full w-full overflow-hidden bg-bg">
       
-      {globalAlert && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-           <div className="bg-rose-500 text-white px-6 py-4 rounded-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(244,63,94,0.4)] backdrop-blur-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center animate-pulse">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      {/* 1. Sidebar - Fixed Full Height */}
+      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col z-30 transition-all duration-300 ${isSidebarOpen ? 'w-60' : 'w-16 overflow-hidden'}`}>
+        {/* Sidebar Logo Section */}
+        <div className={`h-14 flex items-center px-4 border-b border-line mb-4 ${isSidebarOpen ? '' : 'justify-center'}`}>
+           <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+                <HeartPulse size={18} className="text-white" />
               </div>
-              <div>
-                <h4 className="font-bold text-lg tracking-tight">Active Escalation</h4>
-                <p className="text-sm text-rose-100 font-medium">{globalAlert}</p>
-              </div>
-              <button id="dismiss-global-alert-btn" aria-label="Dismiss Alert" onClick={() => clearAlert?.()} className="ml-4 p-2 bg-panel hover:bg-panel-hover rounded-xl transition-colors">
-                Dismiss
-              </button>
+              {isSidebarOpen && <h1 className="text-lg font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>}
            </div>
         </div>
-      )}
 
-      {/* Sidebar Navigation */}
-      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col pt-5 pb-6 z-10 hidden md:flex h-full overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'w-56' : 'w-16 overflow-hidden'}`}>
-        <div className={`px-4 pb-5 mb-2 flex items-center justify-between ${isSidebarOpen ? '' : 'px-0 justify-center'}`}>
-          <div className={isSidebarOpen ? '' : 'hidden'}>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-content-faint mb-1">Workspace</p>
+        {/* Sidebar Workspace Info */}
+        {isSidebarOpen && (
+          <div className="px-4 mb-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-content-faint mb-1">Workspace</p>
             <h2 className="text-sm font-semibold text-content">Main Dashboard</h2>
           </div>
-          <button 
-             id="sidebar-toggle-btn"
-             aria-label="Toggle Sidebar"
-             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-             className={`p-1.5 rounded-md hover:bg-panel-hover text-content-muted hover:text-content border border-transparent hover:border-line transition-colors ${isSidebarOpen ? '' : ''}`}
-          >
-             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isSidebarOpen ? 'rotate-180' : ''}><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-        </div>
-        <nav className="flex flex-col gap-0.5 px-2 hide-scrollbar relative">
+        )}
+
+        {/* Sidebar Navigation */}
+        <nav className="flex-1 flex flex-col gap-0.5 px-2 overflow-y-auto">
           {[
              { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
              { id: 'routines', label: (
-               <>
-                  Routines
-                  {isSidebarOpen && <span className="bg-panel-hover border border-line text-content-muted font-semibold py-0.5 px-2 rounded text-[10px] ml-auto">{routines.length}</span>}
-               </>
+               <div className="flex items-center w-full">
+                  <span>Routines</span>
+                  {isSidebarOpen && <span className="bg-panel-hover border border-line text-content-muted font-bold py-0.5 px-2 rounded text-[10px] ml-auto">{routines.length}</span>}
+               </div>
              ), icon: <ListTodo size={18} /> },
              { id: 'analytics', label: 'Analytics', icon: <Activity size={18} /> },
              { id: 'devices', label: 'Sensors', icon: <Radio size={18} /> },
              { id: 'compliance', label: 'PHI Privacy', icon: <Shield size={18} /> },
              { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
-             { id: 'settings', label: (
-               <>
-                  Settings
-                  {aiConfig.isEnabled && isSidebarOpen && <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 ml-auto"></div>}
-               </>
-             ), icon: <Settings size={18} /> },
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
               <button
-                id={`sidebar-nav-${tab.id}-btn`}
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap overflow-hidden group border ${
-                  isActive ? 'bg-panel-hover text-content border-line' : 'border-transparent text-content-muted hover:text-content hover:bg-panel-hover'
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all group ${
+                  isActive ? 'bg-indigo-600/10 text-indigo-500 border border-indigo-500/20' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'
                 } ${isSidebarOpen ? '' : 'justify-center px-0'}`}
-                title={tab.id}
               >
-                <span className={`relative z-10 flex items-center gap-3 ${isSidebarOpen ? 'w-full' : 'justify-center'}`}>
-                  <div className={`${isActive ? 'text-indigo-500' : 'text-content-faint group-hover:text-content-muted'} transition-colors`}>{tab.icon}</div>
-                  {isSidebarOpen && tab.label}
-                </span>
+                <div className={`${isActive ? 'text-indigo-500' : 'text-content-faint group-hover:text-content-muted'} transition-colors shrink-0`}>{tab.icon}</div>
+                {isSidebarOpen && tab.label}
               </button>
             );
           })}
         </nav>
+
+        {/* Sidebar Footer Section */}
+        <div className="p-3 border-t border-line mt-auto">
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${activeTab === 'settings' ? 'bg-panel-hover text-content border border-line' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'} ${isSidebarOpen ? '' : 'justify-center px-0'}`}
+          >
+            <Settings size={18} className="shrink-0" />
+            {isSidebarOpen && <span>Settings</span>}
+          </button>
+          <button 
+             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-content-faint hover:text-content transition-all mt-1"
+          >
+             <div className={`transition-transform duration-300 ${isSidebarOpen ? 'rotate-0' : 'rotate-180'} shrink-0`}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+             </div>
+             {isSidebarOpen && <span>Collapse</span>}
+          </button>
+        </div>
       </aside>
 
-      {/* Mobile nav */}
-      <nav className="md:hidden flex overflow-x-auto p-4 gap-2 bg-panel border-b border-line shrink-0">
-          {[
-            { id: 'overview', label: 'Overview' },
-            { id: 'routines', label: 'Routines' },
-            { id: 'analytics', label: 'Trends' },
-            { id: 'devices', label: 'Sensors' },
-            { id: 'compliance', label: 'PHI' },
-            { id: 'settings', label: 'System' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap border ${activeTab === tab.id ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-panel-hover border-line text-content-muted'}`}
-            >
-              {tab.label}
-            </button>
-          ))}
-      </nav>
-      
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto bg-transparent relative">
+      {/* 2. Main Content Area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg">
         
-        {/* Universal Top Bar */}
-        <div className="h-12 px-6 flex items-center justify-between border-b border-line bg-panel sticky top-0 z-20">
+        {/* Integrated Header */}
+        <header className="h-14 px-6 flex items-center justify-between border-b border-line bg-panel z-20">
            <div className="flex items-center gap-3 text-content">
-              {activeTab === 'overview' && <LayoutDashboard size={20} className="text-indigo-500" />}
-              {activeTab === 'routines' && <ListTodo size={20} className="text-indigo-500" />}
-              {activeTab === 'analytics' && <Activity size={20} className="text-indigo-500" />}
-              {activeTab === 'devices' && <Radio size={20} className="text-indigo-500" />}
-              {activeTab === 'compliance' && <Shield size={20} className="text-indigo-500" />}
-              {activeTab === 'reports' && <FileText size={20} className="text-indigo-500" />}
-              {activeTab === 'settings' && <Settings size={20} className="text-indigo-500" />}
-               <h2 className="text-base font-semibold tracking-tight capitalize">
-                  {activeTab}
-               </h2>
+              <h2 className="text-base font-semibold tracking-tight capitalize">
+                 {activeTab}
+              </h2>
+              {aiConfig.isEnabled && (
+                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-500">
+                  <Zap size={10} className="fill-indigo-500" /> AI Active
+                </div>
+              )}
            </div>
            <div className="flex items-center gap-3">
-              <button 
-                 onClick={() => setActiveTab('settings')} 
-                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-xs transition-all duration-300 border ${aiConfig.isEnabled ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400' : 'bg-panel border-line text-content-muted hover:text-content'}`}
+              <button
+                onClick={() => setIsCommandOpen(true)}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel-hover hover:bg-line text-content-faint text-xs transition-colors"
               >
-                 {aiConfig.isEnabled ? <Zap size={14} className="text-amber-500 fill-amber-500" /> : <ZapOff size={14} />}
-                 {aiConfig.isEnabled ? 'Gemini Active' : 'AI Offline'}
+                <span>Search…</span>
+                <kbd className="text-[10px] font-bold bg-panel border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
               </button>
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <div className="flex items-center p-0.5 rounded-lg border border-line bg-panel-hover">
+                  <button 
+                    onClick={() => setRole('caregiver')} 
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
+                  >
+                    Dashboard
+                  </button>
+                  <button 
+                    onClick={() => setRole('patient')} 
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
+                  >
+                    Patient
+                  </button>
+              </div>
            </div>
-        </div>
+        </header>
+
+        {/* Scrollable Content Container */}
+        <div className="flex-1 overflow-y-auto relative p-6">
+           {globalAlert && (
+             <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="bg-rose-500 text-white px-5 py-3 rounded-xl flex items-center gap-4 shadow-lg shadow-rose-500/20">
+                   <AlertCircle size={20} />
+                   <div className="flex-1">
+                     <p className="text-sm font-bold">{globalAlert}</p>
+                   </div>
+                   <button onClick={() => clearAlert?.()} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
+                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                   </button>
+                </div>
+             </div>
+           )}
 
         <div className="p-5 md:p-6">
         
@@ -638,8 +657,9 @@ export default function CaregiverDashboard({
           </div>
         )}
         
+          </div>
         </div>
-      </div> 
+      </div>
 
       <AnimatePresence>
       {isCreating && (

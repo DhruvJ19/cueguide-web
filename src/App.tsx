@@ -101,7 +101,7 @@ export default function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => setActiveRoutineId(null)}>
-      <div className="min-h-screen relative flex flex-col selection:bg-indigo-500/30">
+      <div className={`min-h-screen h-screen relative flex flex-col selection:bg-indigo-500/30 overflow-hidden ${theme === 'light' ? 'light-mode' : ''}`}>
         <div className="mesh-bg"></div>
         <Toaster theme={theme} position="top-right" />
         
@@ -111,54 +111,10 @@ export default function App() {
           onNavigate={handleCommandNavigate}
         />
 
-        {/* Demo Header */}
-        {role === 'caregiver' && (
-          <header className="px-5 py-2.5 flex items-center justify-between border-b border-line bg-panel w-full sticky top-0 z-50">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <HeartPulse size={18} className="text-white" />
-              </div>
-              <h1 className="text-lg font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
-            </div>
-            <div className="flex items-center gap-2">
-               <button
-                 id="cmd-k-trigger-btn"
-                 onClick={() => setIsCommandOpen(true)}
-                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel-hover hover:bg-line text-content-faint text-xs transition-colors"
-               >
-                 <span>Search…</span>
-                 <kbd className="text-[10px] font-bold bg-panel border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
-               </button>
-               <button
-                 id="theme-toggle-btn"
-                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                 className="p-2 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
-                 aria-label="Toggle Theme"
-               >
-                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-               </button>
-               <div className="flex items-center p-0.5 rounded-lg border border-line bg-panel-hover">
-                  <button 
-                    id="role-switch-caregiver-btn"
-                    onClick={() => setRole('caregiver')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wide transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Dashboard
-                  </button>
-                  <button 
-                    id="role-switch-patient-btn"
-                    onClick={() => setRole('patient')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wide transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Patient View
-                  </button>
-               </div>
-            </div>
-          </header>
-        )}
+        {/* Removed global header to allow role-specific layouts */}
 
         {/* Main Content */}
-        <main className={role === 'patient' ? 'flex-1 overflow-hidden relative flex flex-col' : 'flex-1 flex flex-col overflow-hidden w-full relative'}>
+        <main className={role === 'patient' ? 'flex-1 h-full overflow-hidden relative flex flex-col' : 'flex-1 h-full flex flex-col overflow-hidden w-full relative'}>
           <AnimatePresence mode="wait">
             {role === 'caregiver' ? (
               <motion.div 
@@ -167,12 +123,17 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }} 
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="flex-1 flex flex-col overflow-hidden"
+                className="flex-1 h-full flex flex-col overflow-hidden"
               >
                 <CaregiverDashboard 
                    onStartSimulation={handleStartRoutine}
                    globalAlert={globalAlert}
                    clearAlert={() => setGlobalAlert(null)}
+                   theme={theme}
+                   setTheme={setTheme}
+                   role={role}
+                   setRole={setRole}
+                   setIsCommandOpen={setIsCommandOpen}
                 />
               </motion.div>
             ) : (
@@ -182,7 +143,7 @@ export default function App() {
                 animate={{ opacity: 1, scale: 1 }} 
                 exit={{ opacity: 0, scale: 1.02 }}
                 transition={{ duration: 0.4 }}
-                className="flex-1 flex flex-col overflow-hidden"
+                className="flex-1 h-full flex flex-col overflow-hidden"
               >
                 <PatientFocusMode 
                    routine={routines.find(r => r.id === activeRoutineId) || routines[0]} 

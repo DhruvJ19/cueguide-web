@@ -8,6 +8,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import CaregiverDashboard from './views/CaregiverDashboard';
 import PatientFocusMode from './views/PatientFocusMode';
 import { HeartPulse, Moon, Sun, AlertTriangle } from 'lucide-react';
+import { Toaster } from 'sonner';
+import { motion, AnimatePresence } from 'motion/react';
 
 import { usePatientStore } from './store/patientStore';
 import { useRoutineStore } from './store/routineStore';
@@ -37,7 +39,10 @@ function ErrorFallback({ error, resetErrorBoundary }: any) {
 
 export default function App() {
   const { role, setRole } = useAuthStore();
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const stored = localStorage.getItem('cueguide-theme');
+    return (stored === 'light' || stored === 'dark') ? stored : 'dark';
+  });
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   
   // Stores
@@ -50,6 +55,7 @@ export default function App() {
   const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
 
   useEffect(() => {
+    localStorage.setItem('cueguide-theme', theme);
     if (theme === 'light') {
       document.body.classList.add('light-mode');
     } else {
@@ -97,6 +103,7 @@ export default function App() {
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => setActiveRoutineId(null)}>
       <div className="min-h-screen relative flex flex-col selection:bg-indigo-500/30">
         <div className="mesh-bg"></div>
+        <Toaster theme={theme} position="top-right" />
         
         <CommandPalette 
           isOpen={isCommandOpen} 
@@ -113,7 +120,15 @@ export default function App() {
               </div>
               <h1 className="text-2xl font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+               <button
+                 id="cmd-k-trigger-btn"
+                 onClick={() => setIsCommandOpen(true)}
+                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel hover:bg-panel-hover text-content-faint text-sm transition-colors"
+               >
+                 <span>Search…</span>
+                 <kbd className="text-[10px] font-bold bg-panel-hover border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
+               </button>
                <button
                  id="theme-toggle-btn"
                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -144,20 +159,40 @@ export default function App() {
 
         {/* Main Content */}
         <main className={role === 'patient' ? 'flex-1 overflow-hidden relative flex flex-col' : 'flex-1 flex flex-col overflow-hidden w-full relative'}>
-          {role === 'caregiver' ? (
-            <CaregiverDashboard 
-               onStartSimulation={handleStartRoutine}
-               globalAlert={globalAlert}
-               clearAlert={() => setGlobalAlert(null)}
-            />
-          ) : (
-            <PatientFocusMode 
-               routine={routines.find(r => r.id === activeRoutineId) || routines[0]} 
-               onComplete={(status, min, steps, mood) => handleFinishRoutine(activeRoutineId || routines[0].id, status, min, steps, mood)}
-               onExit={() => setRole('caregiver')}
-               onAlert={(msg) => setGlobalAlert(msg || null)}
-            />
-          )}
+          <AnimatePresence mode="wait">
+            {role === 'caregiver' ? (
+              <motion.div 
+                key="caregiver" 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="flex-1 flex flex-col overflow-hidden"
+              >
+                <CaregiverDashboard 
+                   onStartSimulation={handleStartRoutine}
+                   globalAlert={globalAlert}
+                   clearAlert={() => setGlobalAlert(null)}
+                />
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="patient" 
+                initial={{ opacity: 0, scale: 0.98 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                exit={{ opacity: 0, scale: 1.02 }}
+                transition={{ duration: 0.4 }}
+                className="flex-1 flex flex-col overflow-hidden"
+              >
+                <PatientFocusMode 
+                   routine={routines.find(r => r.id === activeRoutineId) || routines[0]} 
+                   onComplete={(status, min, steps, mood) => handleFinishRoutine(activeRoutineId || routines[0].id, status, min, steps, mood)}
+                   onExit={() => setRole('caregiver')}
+                   onAlert={(msg) => setGlobalAlert(msg || null)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
     </ErrorBoundary>

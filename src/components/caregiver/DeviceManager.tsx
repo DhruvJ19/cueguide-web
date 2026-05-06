@@ -3,6 +3,8 @@ import { Activity, Radio, Smartphone, Watch, Wifi } from 'lucide-react';
 import { INITIAL_SENSORS } from '../../data';
 import { format, parseISO } from 'date-fns';
 
+import { motion } from 'motion/react';
+
 export default function DeviceManager() {
   const latestHeartRate = INITIAL_SENSORS.find(s => s.type === 'heart_rate')?.value || '72';
   const latestMotion = INITIAL_SENSORS.filter(s => s.type === 'motion').slice(0, 3);
@@ -84,9 +86,14 @@ export default function DeviceManager() {
         <Smartphone className="text-content-faint mb-4" size={32} />
         <h3 className="text-lg font-bold text-content mb-2">Add New Device</h3>
         <p className="text-sm text-content-muted mb-6 max-w-sm">Connect new passive tracking devices to improve AI contextual awareness and escalation accuracy.</p>
-        <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-content font-bold px-6 py-2.5 rounded-xl transition-all">
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="bg-panel-hover hover:bg-line border border-line text-content font-bold px-6 py-2.5 rounded-xl"
+        >
           Pair Device
-        </button>
+        </motion.button>
       </div>
     </div>
   );

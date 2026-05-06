@@ -14,6 +14,7 @@ import { usePatientStore } from '../store/patientStore';
 import { useRoutineStore } from '../store/routineStore';
 import { useCompletionStore } from '../store/completionStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { toast } from 'sonner';
 
 const RoutineCard = ({ routine, completion, onStart, getMoodIcon, compact = false }: any) => {
   const statusColor = 
@@ -108,7 +109,6 @@ export default function CaregiverDashboard({
   const { aiConfig, setAiConfig } = useSettingsStore();
 
   const [isCreating, setIsCreating] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'routines' | 'analytics' | 'devices' | 'compliance' | 'reports' | 'settings'>('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -128,17 +128,12 @@ export default function CaregiverDashboard({
 
   const handleApproveAdjustment = (routineId: string, newTime: string) => {
     approveAdjustment(routineId, newTime);
-    showToast('Schedule adjustment approved');
+    toast.success('Schedule adjustment approved');
   };
 
   const handleRejectAdjustment = (routineId: string) => {
     rejectAdjustment(routineId);
-    showToast('Schedule adjustment dismissed');
-  };
-
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 3000);
+    toast.success('Schedule adjustment dismissed');
   };
 
   const getMoodIcon = (mood?: string) => {
@@ -155,15 +150,6 @@ export default function CaregiverDashboard({
   return (
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden animate-in fade-in duration-700 relative">
       
-      {toastMessage && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
-           <div className="bg-emerald-500/90 text-white px-6 py-3 rounded-2xl flex items-center gap-3 shadow-lg shadow-emerald-500/20 backdrop-blur-md">
-              <CheckCircle2 size={18} className="text-white" />
-              <span className="font-medium text-sm tracking-wide">{toastMessage}</span>
-           </div>
-        </div>
-      )}
-
       {globalAlert && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
            <div className="bg-rose-500 text-white px-6 py-4 rounded-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(244,63,94,0.4)] backdrop-blur-xl">
@@ -404,38 +390,79 @@ export default function CaregiverDashboard({
                </div>
             )}
 
-            <div className="flex flex-col gap-4">
-               {routines.map(routine => {
-                 const completion = todaysCompletions.find(c => c.routineId === routine.id);
-                 return (
-                   <GlowCard key={routine.id} className="bg-panel border border-line rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-line-strong transition-colors" glowColor="rgba(255,255,255,0.05)">
-                     <div className="p-4 md:p-6 w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
-                       <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="bg-panel-hover border border-line px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest text-content-muted">{routine.category}</span>
-                            {completion && <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><CheckCircle2 size={12}/> Completed</span>}
-                          </div>
-                          <h3 className="text-xl font-bold text-content">{routine.name}</h3>
-                          <div className="flex gap-4 mt-2 text-sm text-content-muted">
-                            <span className="flex items-center gap-1"><Clock size={14}/> {routine.scheduledTime}</span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1"><ListTodo size={14}/> {routine.steps.length} Steps</span>
-                          </div>
-                       </div>
-                       
-                       <div className="flex items-center gap-3 md:justify-end">
-                          <button id={`simulate-routine-${routine.id}-btn`} aria-label="Simulate Routine" onClick={() => onStartSimulation(routine.id)} className="bg-panel-hover border border-line hover:bg-line text-content px-4 py-2 rounded-lg text-sm font-bold transition-colors">
-                            Simulate
-                          </button>
-                          <button id={`routine-options-${routine.id}-btn`} aria-label="Routine Options" className="p-2 text-content-muted hover:text-content hover:bg-panel-hover rounded-lg transition-colors border border-transparent hover:border-line">
-                            <MoreVertical size={20} />
-                          </button>
-                       </div>
-                     </div>
-                   </GlowCard>
-                 );
-               })}
-            </div>
+            <motion.div 
+               variants={{
+                 hidden: { opacity: 0 },
+                 visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+               }}
+               initial="hidden"
+               animate="visible"
+               className="flex flex-col gap-4"
+            >
+               {routines.length === 0 ? (
+                 <motion.div 
+                   variants={{
+                     hidden: { opacity: 0, y: 20 },
+                     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                   }}
+                   className="bg-panel border border-dashed border-line rounded-3xl p-12 flex flex-col items-center justify-center text-center"
+                 >
+                   <div className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+                     <ListTodo size={32} />
+                   </div>
+                   <h3 className="text-xl font-bold text-content mb-2">No routines established</h3>
+                   <p className="text-content-muted max-w-md mb-8">Start building a structured day for the patient by creating customized routines with step-by-step guidance.</p>
+                   <motion.button 
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                     onClick={() => setIsCreating(true)}
+                     className="bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center gap-2"
+                   >
+                     <Plus size={18} /> Create First Routine
+                   </motion.button>
+                 </motion.div>
+               ) : (
+                 routines.map(routine => {
+                   const completion = todaysCompletions.find(c => c.routineId === routine.id);
+                   return (
+                     <motion.div 
+                       key={routine.id}
+                       variants={{
+                         hidden: { opacity: 0, y: 20 },
+                         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                       }}
+                     >
+                       <GlowCard className="bg-panel border border-line rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-line-strong transition-colors" glowColor="rgba(255,255,255,0.05)">
+                         <div className="p-4 md:p-6 w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
+                           <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="bg-panel-hover border border-line px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest text-content-muted">{routine.category}</span>
+                                {completion && <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><CheckCircle2 size={12}/> Completed</span>}
+                              </div>
+                              <h3 className="text-xl font-bold text-content">{routine.name}</h3>
+                              <div className="flex gap-4 mt-2 text-sm text-content-muted">
+                                <span className="flex items-center gap-1"><Clock size={14}/> {routine.scheduledTime}</span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1"><ListTodo size={14}/> {routine.steps.length} Steps</span>
+                              </div>
+                           </div>
+                           
+                           <div className="flex items-center gap-3 md:justify-end">
+                              <button id={`simulate-routine-${routine.id}-btn`} aria-label="Simulate Routine" onClick={() => onStartSimulation(routine.id)} className="bg-panel-hover border border-line hover:bg-line text-content px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+                                Simulate
+                              </button>
+                              <button id={`routine-options-${routine.id}-btn`} aria-label="Routine Options" className="p-2 text-content-muted hover:text-content hover:bg-panel-hover rounded-lg transition-colors border border-transparent hover:border-line">
+                                <MoreVertical size={20} />
+                              </button>
+                           </div>
+                         </div>
+                       </GlowCard>
+                     </motion.div>
+                   );
+                 })
+               )}
+            </motion.div>
           </div>
         )}
 
@@ -452,7 +479,7 @@ export default function CaregiverDashboard({
                    import('../services/pdfExport').then(m => {
                       if (patientProfile) {
                         m.exportWeeklyReport(patientProfile, completions, routines);
-                        showToast('PDF Export started');
+                        toast.success('PDF Export started');
                       }
                    });
                 }}
@@ -620,7 +647,7 @@ export default function CaregiverDashboard({
            onSave={(r) => { 
              addRoutine(r);
              setIsCreating(false); 
-             showToast('Routine created successfully'); 
+             toast.success('Routine created successfully'); 
            }}
            onClose={() => setIsCreating(false)}
         />

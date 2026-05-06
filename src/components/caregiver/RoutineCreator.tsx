@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { X, Plus, Trash2, GripVertical, ChevronDown, Wand2, Mic, Play, Search, Sparkles, Pencil } from 'lucide-react';
 import { AIGenerationStatus, generateRoutineSteps, generateHelpExplanation, suggestRoutineCategory, suggestRoutineName } from '../../services/ai';
 import { playAudio } from '../../utils/audio';
+import { toast } from 'sonner';
 
 import { useSettingsStore } from '../../store/settingsStore';
 import { usePatientStore } from '../../store/patientStore';
@@ -125,7 +126,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
            icon: s.icon || '🌅'
         })));
      } else {
-        alert("Oops, we had trouble generating steps. Please try again.");
+        toast.error("Oops, we had trouble generating steps. Please try again.");
      }
      setIsGenerating(false);
   };
@@ -163,7 +164,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
       };
       recognition.start();
     } else {
-      alert("Voice recognition is not supported in this browser.");
+      toast.error("Voice recognition is not supported in this browser.");
     }
   };
 
@@ -402,7 +403,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                       onDrop={(e) => handleDrop(e, step.id)}
                       className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 glass-card p-4 group transition-all border ${draggedStepId === step.id ? 'opacity-50 border-indigo-500' : 'border-line hover:border-line'} focus-within:border-indigo-500/50 focus-within:bg-panel focus-within:shadow-[0_0_20px_rgba(99,102,241,0.15)] relative ${recordingStepId === step.id ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : ''}`}
                     >
-                       <div className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-white/5 rounded-lg transition-colors">
+                       <div className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-panel-hover rounded-lg transition-colors">
                          <GripVertical size={18} className="text-content-faint" />
                        </div>
                        
@@ -416,7 +417,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                           </button>
                           
                           {showIconPicker === step.id && (
-                             <div className="absolute top-14 left-0 z-20 glass-card p-4 w-72 sm:w-80 border border-white/20 shadow-2xl flex flex-col gap-3 rounded-xl">
+                             <div className="absolute top-14 left-0 z-20 glass-card p-4 w-72 sm:w-80 border border-line shadow-2xl flex flex-col gap-3 rounded-xl">
                                 <div className="relative">
                                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-faint" />
                                   <input 

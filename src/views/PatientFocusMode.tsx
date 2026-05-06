@@ -182,7 +182,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
         >
            <div className="absolute top-8 right-8">
              <div className="relative group">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-white/20 glass-card">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-line glass-card">
                   {patientProfile.avatar ? (
                      <img src={patientProfile.avatar} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
@@ -246,13 +246,13 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                  {aiData?.encouragement || 'All done!'}
               </h1>
               
-              <div className="mt-12 border-t border-white/10 pt-12">
+              <div className="mt-12 border-t border-line pt-12">
                  <h2 className="font-display text-3xl text-content-muted font-light mb-12">How are you feeling right now?</h2>
                  <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
                     {[
                       { icon: '😄', label: 'Great', color: 'hover:bg-emerald-500/20 hover:border-emerald-500/40' },
                       { icon: '🙂', label: 'Good', color: 'hover:bg-blue-500/20 hover:border-blue-500/40' },
-                      { icon: '😐', label: 'Okay', color: 'hover:bg-white/20 hover:border-white/40' },
+                      { icon: '😐', label: 'Okay', color: 'hover:bg-panel-hover hover:border-line' },
                       { icon: '😕', label: 'Confused', color: 'hover:bg-amber-500/20 hover:border-amber-500/40' },
                       { icon: '😔', label: 'Tired', color: 'hover:bg-rose-500/20 hover:border-rose-500/40' },
                     ].map(mood => (
@@ -359,7 +359,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                        animate={{ opacity: 1, y: 0 }}
                        exit={{ opacity: 0, y: -20 }}
                        transition={{ duration: 0.3 }}
-                       className="flex-1 glass-panel border border-white/10 rounded-3xl p-8 sm:p-16 flex flex-col justify-center items-center text-center relative overflow-y-auto"
+                       className="flex-1 glass-panel border border-line rounded-3xl p-8 sm:p-16 flex flex-col justify-center items-center text-center relative overflow-y-auto"
                      >
                         <button 
                            id="read-aloud-btn"

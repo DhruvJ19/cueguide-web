@@ -1,0 +1,8 @@
+# CueGuide
+CueGuide is a premium, institutional-grade clinical platform designed to provide AI-driven memory assistance, task scheduling, and passive sensor monitoring for caregivers and patients.
+
+## Features
+- **Caregiver Dashboard**: A comprehensive command center to view routines, manage devices, and generate clinical reports.
+- **Patient Focus Mode**: An immersive, accessible interface for patients featuring a dynamic AI voice assistant (Gemini integration), micro-interactions, and mood tracking.
+- **Reports Engine**: Generates anonymized (zero-trust PHI) clinical PDFs detailing weekly engagement.
+- **Passive Monitoring**: Integrates with Apple Health and smart home sensors for comprehensive telemetry.

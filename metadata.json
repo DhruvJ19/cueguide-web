@@ -1,0 +1,6 @@
+{
+  "name": "CueGuide",
+  "description": "AI-Driven Daily Routine Assistant for Early Dementia",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}

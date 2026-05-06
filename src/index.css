@@ -27,44 +27,52 @@
 }
 
 :root {
-  /* Ultra-Premium Dark Mode */
-  --bg: #05050A; /* Extremely deep slate/blue */
-  --panel: rgba(15, 17, 26, 0.6);
-  --panel-hover: rgba(25, 28, 41, 0.8);
-  --line: rgba(255, 255, 255, 0.06);
-  --line-strong: rgba(255, 255, 255, 0.15);
+  /* Premium Dark Mode — Solid, not transparent */
+  --bg: #0C0D12;
+  --panel: #15171E;
+  --panel-hover: #1C1F28;
+  --line: #262933;
+  --line-strong: #3A3E4A;
   
-  --content: #FFFFFF;
-  --content-muted: rgba(255, 255, 255, 0.65);
-  --content-faint: rgba(255, 255, 255, 0.35);
+  --content: #EDEEF1;
+  --content-muted: rgba(237, 238, 241, 0.6);
+  --content-faint: rgba(237, 238, 241, 0.32);
 
-  --primary: #6366F1; /* Indigo 500 */
+  --primary: #6366F1;
   --primary-hover: #4F46E5;
   --primary-text: #FFFFFF;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.35);
 }
 
 body.light-mode {
-  /* Ultra-Premium Light Mode */
-  --bg: #FAFAFC;
-  --panel: rgba(255, 255, 255, 0.7);
-  --panel-hover: rgba(255, 255, 255, 0.95);
-  --line: rgba(0, 0, 0, 0.05);
-  --line-strong: rgba(0, 0, 0, 0.12);
+  /* Premium Light Mode — Solid whites, visible borders */
+  --bg: #F0F2F5;
+  --panel: #FFFFFF;
+  --panel-hover: #F6F7F9;
+  --line: #DFE2E8;
+  --line-strong: #C8CDD6;
   
-  --content: #0F172A;
-  --content-muted: #64748B;
-  --content-faint: #94A3B8;
+  --content: #1A1D26;
+  --content-muted: #5A6070;
+  --content-faint: #9098A8;
 
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --primary-text: #FFFFFF;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
 }
 
 body {
   overflow-x: hidden;
   background-color: var(--bg);
   color: var(--content);
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -72,8 +80,8 @@ body {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -91,13 +99,7 @@ body {
   color: var(--primary-text);
 }
 
-/* Animated Ultra-Premium Mesh */
-@keyframes meshPan {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
-}
-
+/* Clean subtle background — no animated mesh */
 .mesh-bg {
   position: fixed;
   top: 0;
@@ -105,44 +107,26 @@ body {
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(244, 63, 94, 0.08) 0%, transparent 50%),
-    radial-gradient(var(--line) 1px, transparent 1px);
-  background-size: 150% 150%, 150% 150%, 150% 150%, 24px 24px;
-  animation: meshPan 30s ease-in-out infinite;
+  background: var(--bg);
 }
 
-body.light-mode .mesh-bg {
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(244, 63, 94, 0.04) 0%, transparent 50%),
-    radial-gradient(var(--line) 1px, transparent 1px);
-}
-
+/* Opaque cards with proper elevation — no glassmorphism */
 .glass-panel {
   background: var(--panel);
-  backdrop-filter: blur(40px) saturate(150%);
   border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .glass-card {
   background: var(--panel);
-  backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
   border-color: var(--line-strong);
 }
-
-

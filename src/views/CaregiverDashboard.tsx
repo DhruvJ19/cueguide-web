@@ -30,14 +30,14 @@ const RoutineCard = ({ routine, completion, onStart, getMoodIcon, compact = fals
     completion?.status === 'partial' ? 'text-amber-500' : 'text-content-muted';
 
   return (
-    <div className={`p-6 ${!compact && 'md:p-8'} flex flex-col justify-between h-full rounded-2xl ${statusColor} border hover:-translate-y-1 transition-all duration-300 group`}>
+    <div className={`p-5 ${!compact && 'md:p-6'} flex flex-col justify-between h-full rounded-xl ${statusColor} border hover:shadow-md transition-all duration-300 group`}>
       <div className="flex justify-between items-start mb-6">
         <div>
-            <div className={`inline-block px-3 py-1 rounded-lg bg-panel border border-line text-xs font-bold text-content-muted mb-4 capitalize`}>
+            <div className={`inline-block px-2.5 py-0.5 rounded-md bg-panel-hover border border-line text-[10px] font-bold text-content-muted mb-2 capitalize`}>
               {routine.category || 'General'}
             </div>
-            <h3 className={`font-semibold ${compact ? 'text-xl' : 'text-2xl'} text-content tracking-tight leading-tight mb-2 group-hover:text-indigo-500 transition-colors`}>{routine.name}</h3>
-            <div className={`flex items-center ${compact ? 'text-xs' : 'text-sm'} font-medium text-content-muted bg-panel border-line border inline-flex px-2.5 py-1 rounded-lg`}>
+            <h3 className={`font-semibold ${compact ? 'text-lg' : 'text-xl'} text-content tracking-tight leading-tight mb-2 group-hover:text-indigo-500 transition-colors`}>{routine.name}</h3>
+            <div className={`flex items-center ${compact ? 'text-[10px]' : 'text-xs'} font-medium text-content-muted bg-panel-hover border-line border inline-flex px-2 py-0.5 rounded-md`}>
               <Clock size={14} className="mr-2 opacity-70" />
               {routine.scheduledTime}
             </div>
@@ -168,11 +168,11 @@ export default function CaregiverDashboard({
       )}
 
       {/* Sidebar Navigation */}
-      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col pt-8 z-10 hidden md:flex h-full overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20 overflow-hidden'}`}>
-        <div className={`px-6 pb-8 mb-4 flex items-center justify-between ${isSidebarOpen ? '' : 'px-0 justify-center'}`}>
+      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col pt-5 pb-6 z-10 hidden md:flex h-full overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'w-56' : 'w-16 overflow-hidden'}`}>
+        <div className={`px-4 pb-5 mb-2 flex items-center justify-between ${isSidebarOpen ? '' : 'px-0 justify-center'}`}>
           <div className={isSidebarOpen ? '' : 'hidden'}>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-content-faint mb-2">Workspace</p>
-            <h2 className="text-base font-semibold text-content">Main Dashboard</h2>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-content-faint mb-1">Workspace</p>
+            <h2 className="text-sm font-semibold text-content">Main Dashboard</h2>
           </div>
           <button 
              id="sidebar-toggle-btn"
@@ -183,7 +183,7 @@ export default function CaregiverDashboard({
              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={isSidebarOpen ? 'rotate-180' : ''}><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>
-        <nav className="flex flex-col gap-2 px-3 hide-scrollbar relative">
+        <nav className="flex flex-col gap-0.5 px-2 hide-scrollbar relative">
           {[
              { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
              { id: 'routines', label: (
@@ -209,8 +209,8 @@ export default function CaregiverDashboard({
                 id={`sidebar-nav-${tab.id}-btn`}
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`relative flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap overflow-hidden group border ${
-                  isActive ? 'bg-panel-hover text-content border-line' : 'border-transparent text-content-muted hover:text-content hover:bg-panel hover:border-line'
+                className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap overflow-hidden group border ${
+                  isActive ? 'bg-panel-hover text-content border-line' : 'border-transparent text-content-muted hover:text-content hover:bg-panel-hover'
                 } ${isSidebarOpen ? '' : 'justify-center px-0'}`}
                 title={tab.id}
               >
@@ -248,8 +248,8 @@ export default function CaregiverDashboard({
       <div className="flex-1 overflow-y-auto bg-transparent relative">
         
         {/* Universal Top Bar */}
-        <div className="h-20 px-8 flex items-center justify-between border-b border-line bg-panel/70 backdrop-blur-xl sticky top-0 z-20">
-           <div className="flex items-center gap-4 text-content">
+        <div className="h-12 px-6 flex items-center justify-between border-b border-line bg-panel sticky top-0 z-20">
+           <div className="flex items-center gap-3 text-content">
               {activeTab === 'overview' && <LayoutDashboard size={20} className="text-indigo-500" />}
               {activeTab === 'routines' && <ListTodo size={20} className="text-indigo-500" />}
               {activeTab === 'analytics' && <Activity size={20} className="text-indigo-500" />}
@@ -257,9 +257,9 @@ export default function CaregiverDashboard({
               {activeTab === 'compliance' && <Shield size={20} className="text-indigo-500" />}
               {activeTab === 'reports' && <FileText size={20} className="text-indigo-500" />}
               {activeTab === 'settings' && <Settings size={20} className="text-indigo-500" />}
-              <h2 className="text-2xl font-semibold tracking-tight capitalize">
-                 {activeTab}
-              </h2>
+               <h2 className="text-base font-semibold tracking-tight capitalize">
+                  {activeTab}
+               </h2>
            </div>
            <div className="flex items-center gap-3">
               <button 
@@ -272,34 +272,34 @@ export default function CaregiverDashboard({
            </div>
         </div>
 
-        <div className="p-8 md:p-12 max-w-7xl mx-auto">
+        <div className="p-5 md:p-6">
         
         {activeTab === 'overview' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-12">
+          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-6">
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-               <GlowCard className="md:col-span-2 glass-card flex flex-col justify-center border-l-4" glowColor="rgba(99, 102, 241, 0.15)">
-                 <div className="p-10" style={{borderLeftColor: 'var(--primary)', height: '100%'}}>
-                   <h2 className="text-4xl md:text-5xl font-display font-light text-content tracking-tight leading-tight">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+               <GlowCard className="md:col-span-2 glass-card flex flex-col justify-center" glowColor="rgba(99, 102, 241, 0.08)">
+                 <div className="p-6">
+                   <h2 className="text-2xl md:text-3xl font-display font-light text-content tracking-tight leading-tight">
                       Good morning, <span className="font-semibold text-content">{patientProfile?.primaryCaregiverName || 'Caregiver'}</span>
                    </h2>
-                   <p className="text-content-muted mt-4 text-lg max-w-lg">
+                   <p className="text-content-muted mt-2 text-sm max-w-lg">
                       {patientProfile?.name || 'The patient'} is currently tracking on schedule. All morning sensor readings look stable.
                    </p>
-                   <div className="mt-8 flex gap-4">
-                      <motion.button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 17 }} className="bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-indigo-500/20">Manage Routine</motion.button>
+                   <div className="mt-5 flex gap-3">
+                      <motion.button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 17 }} className="bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm">Manage Routine</motion.button>
                    </div>
                  </div>
                </GlowCard>
                
                {/* Patient Mini-Profile */}
-               <GlowCard className="glass-card" glowColor="rgba(16, 185, 129, 0.1)">
-                 <div className="p-8 flex flex-col items-center justify-center text-center h-full">
-                   <div className="w-20 h-20 bg-panel-hover rounded-full border border-line flex items-center justify-center mb-4">
+               <GlowCard className="glass-card" glowColor="rgba(16, 185, 129, 0.06)">
+                 <div className="p-6 flex flex-col items-center justify-center text-center h-full">
+                   <div className="w-14 h-14 bg-panel-hover rounded-full border border-line flex items-center justify-center mb-3">
                       <User size={32} className="text-content-faint" />
                    </div>
-                   <h3 className="font-display font-semibold text-xl text-content">{patientProfile?.preferredName || 'Patient'}</h3>
-                   <p className="text-sm text-content-muted mt-1 uppercase tracking-widest font-bold">{patientProfile?.stage || 'Monitoring'}</p>
+                   <h3 className="font-display font-semibold text-lg text-content">{patientProfile?.preferredName || 'Patient'}</h3>
+                   <p className="text-xs text-content-muted mt-1 uppercase tracking-widest font-bold">{patientProfile?.stage || 'Monitoring'}</p>
                  </div>
                </GlowCard>
             </div>
@@ -342,12 +342,12 @@ export default function CaregiverDashboard({
               </div>
             )}
 
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-line pb-4">
-                <h2 className="font-display text-2xl font-semibold text-content tracking-tight">Today's Queue</h2>
-                <button onClick={() => setActiveTab('routines')} className="text-sm font-semibold text-content-muted hover:text-content transition-colors">View All</button>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-line pb-3">
+                <h2 className="font-display text-lg font-semibold text-content tracking-tight">Today's Queue</h2>
+                <button onClick={() => setActiveTab('routines')} className="text-xs font-semibold text-content-muted hover:text-content transition-colors">View All</button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                  {routines.slice(0, 3).map(routine => {
                    const completion = todaysCompletions.find(c => c.routineId === routine.id);
                    return <RoutineCard key={routine.id} routine={routine} completion={completion} onStart={() => onStartSimulation(routine.id)} getMoodIcon={getMoodIcon} compact />;
@@ -359,11 +359,11 @@ export default function CaregiverDashboard({
 
         {/* Routines Listing */}
         {activeTab === 'routines' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-6 gap-4">
+          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-4 gap-3">
               <div>
-                 <h2 className="font-display text-3xl font-light text-content tracking-tight">All Routines</h2>
-                 <p className="text-content-muted text-sm mt-1">{routines.length} established routines</p>
+                 <h2 className="font-display text-xl font-semibold text-content tracking-tight">All Routines</h2>
+                 <p className="text-content-muted text-xs mt-1">{routines.length} established routines</p>
               </div>
               <motion.button 
                 id="new-routine-btn"

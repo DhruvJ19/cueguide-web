@@ -113,42 +113,42 @@ export default function App() {
 
         {/* Demo Header */}
         {role === 'caregiver' && (
-          <header className="px-8 py-5 flex items-center justify-between border-b border-line bg-panel/50 backdrop-blur-xl w-full sticky top-0 z-50">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-500/20">
-                <HeartPulse size={24} className="text-white" />
+          <header className="px-5 py-2.5 flex items-center justify-between border-b border-line bg-panel w-full sticky top-0 z-50">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <HeartPulse size={18} className="text-white" />
               </div>
-              <h1 className="text-2xl font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
+              <h1 className="text-lg font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
             </div>
             <div className="flex items-center gap-2">
                <button
                  id="cmd-k-trigger-btn"
                  onClick={() => setIsCommandOpen(true)}
-                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel hover:bg-panel-hover text-content-faint text-sm transition-colors"
+                 className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel-hover hover:bg-line text-content-faint text-xs transition-colors"
                >
                  <span>Search…</span>
-                 <kbd className="text-[10px] font-bold bg-panel-hover border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
+                 <kbd className="text-[10px] font-bold bg-panel border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
                </button>
                <button
                  id="theme-toggle-btn"
                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                 className="p-2.5 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
+                 className="p-2 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
                  aria-label="Toggle Theme"
                >
-                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                </button>
-               <div className="flex items-center space-x-1 p-1 rounded-xl border border-line bg-panel">
+               <div className="flex items-center p-0.5 rounded-lg border border-line bg-panel-hover">
                   <button 
                     id="role-switch-caregiver-btn"
                     onClick={() => setRole('caregiver')} 
-                    className={`px-5 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'hover:bg-panel-hover text-content-muted hover:text-content'}`}
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wide transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
                   >
                     Dashboard
                   </button>
                   <button 
                     id="role-switch-patient-btn"
                     onClick={() => setRole('patient')} 
-                    className={`px-5 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'hover:bg-panel-hover text-content-muted hover:text-content'}`}
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wide transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
                   >
                     Patient View
                   </button>

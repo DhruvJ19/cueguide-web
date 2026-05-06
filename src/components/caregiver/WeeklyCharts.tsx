@@ -61,7 +61,7 @@ export default function WeeklyCharts({ completions }: Props) {
                    className={`w-4 sm:w-6 h-10 sm:h-12 rounded-md transition-all duration-300 hover:scale-110 ${
                       d.count > 3 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
                       d.count > 1 ? 'bg-emerald-500/60' :
-                      d.count === 1 ? 'bg-emerald-500/30' : 'bg-black/20 border border-white/5'
+                      d.count === 1 ? 'bg-emerald-500/30' : 'bg-panel border border-line'
                    }`}
                  />
               ))}
@@ -74,14 +74,14 @@ export default function WeeklyCharts({ completions }: Props) {
           <div className="p-6 md:p-8 flex flex-col h-full">
             <div className="flex flex-col md:flex-row justify-between mb-8">
               <div>
-                 <h2 className="font-display text-2xl font-light text-white flex items-center gap-2 tracking-tight">
+                 <h2 className="font-display text-2xl font-light text-content flex items-center gap-2 tracking-tight">
                    <Activity size={22} className="text-indigo-400" /> Completion Rate
                  </h2>
-                 <p className="text-xs font-bold uppercase tracking-widest text-white/60 mt-2">Past 7 Days</p>
+                 <p className="text-xs font-bold uppercase tracking-widest text-content-muted mt-2">Past 7 Days</p>
               </div>
               <div className="mt-4 md:mt-0 flex gap-6">
                 <div>
-                  <div className="font-display text-5xl font-light text-white">{completionRate}<span className="text-2xl text-white/70">%</span></div>
+                  <div className="font-display text-5xl font-light text-content">{completionRate}<span className="text-2xl text-content-muted">%</span></div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mt-1">Full Compl.</div>
                 </div>
               </div>
@@ -116,14 +116,14 @@ export default function WeeklyCharts({ completions }: Props) {
           <div className="p-6 md:p-8 flex flex-col h-full">
             <div className="flex flex-col md:flex-row justify-between mb-8">
               <div>
-                 <h2 className="font-display text-2xl font-light text-white flex items-center gap-2 tracking-tight">
+                 <h2 className="font-display text-2xl font-light text-content flex items-center gap-2 tracking-tight">
                    <Clock size={22} className="text-indigo-400" /> Engagement Time
                  </h2>
-                 <p className="text-xs font-bold uppercase tracking-widest text-white/60 mt-2">Minutes per routine</p>
+                 <p className="text-xs font-bold uppercase tracking-widest text-content-muted mt-2">Minutes per routine</p>
               </div>
               <div className="mt-4 md:mt-0 flex gap-6">
                 <div>
-                  <div className="font-display text-5xl font-light text-white">{Math.round(weeklyData.reduce((acc, curr) => acc + curr.avgMinutes, 0) / 7)}<span className="text-2xl text-white/70">m</span></div>
+                  <div className="font-display text-5xl font-light text-content">{Math.round(weeklyData.reduce((acc, curr) => acc + curr.avgMinutes, 0) / 7)}<span className="text-2xl text-content-muted">m</span></div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mt-1">7-Day Avg</div>
                 </div>
               </div>

@@ -62,16 +62,16 @@ export default function CameraCapture({ onCapture, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-bg/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
       <div className="glass-panel w-full max-w-lg overflow-hidden flex flex-col p-6 space-y-6 relative">
         <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-light text-white">Update <span className="font-bold">Profile Photo</span></h2>
-            <button onClick={onClose} className="p-2 text-white/40 hover:text-white rounded-full hover:bg-white/10 transition-colors">
+            <h2 className="text-2xl font-light text-content">Update <span className="font-bold">Profile Photo</span></h2>
+            <button onClick={onClose} className="p-2 text-content-faint hover:text-content rounded-full hover:bg-panel-hover transition-colors">
               <X size={24} />
             </button>
         </div>
 
-        <div className="relative aspect-video bg-black/50 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">
+        <div className="relative aspect-video bg-panel rounded-2xl overflow-hidden border border-line flex items-center justify-center">
             {error && <p className="text-red-400 p-4 text-center">{error}</p>}
             
             {!photoData && !error && (
@@ -103,7 +103,7 @@ export default function CameraCapture({ onCapture, onClose }: Props) {
                 <>
                   <button 
                     onClick={retryPhoto}
-                    className="bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
+                    className="bg-panel hover:bg-panel-hover text-content px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
                   >
                     <RefreshCw size={20} /> Retake
                   </button>

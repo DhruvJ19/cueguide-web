@@ -86,7 +86,7 @@ export default function AnonymizationPipeline() {
                   </h3>
                   <p className="text-content-muted text-sm mb-4">{step.desc}</p>
                   
-                  <div className="bg-black/40 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-hidden relative group">
+                  <div className="bg-panel border border-line rounded-xl p-4 font-mono text-xs overflow-hidden relative group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500/50" />
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}

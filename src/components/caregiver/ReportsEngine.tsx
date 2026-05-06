@@ -56,7 +56,7 @@ export default function ReportsEngine() {
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Time Range</label>
-              <select className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none">
+              <select className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none">
                 <option value="7">Last 7 Days (Standard)</option>
                 <option value="30">Last 30 Days (Clinical)</option>
                 <option value="custom">Custom Range</option>

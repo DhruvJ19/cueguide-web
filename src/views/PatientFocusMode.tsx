@@ -166,7 +166,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
         >
            <div className="glass-panel p-12 flex flex-col items-center">
                <Loader2 size={48} className="text-indigo-400 animate-spin mb-6" />
-               <h2 className="font-display text-2xl font-light text-white">Preparing today's guide...</h2>
+               <h2 className="font-display text-2xl font-light text-content">Preparing today's guide...</h2>
            </div>
         </motion.div>
       )}
@@ -186,7 +186,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                   {patientProfile.avatar ? (
                      <img src={patientProfile.avatar} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                     <div className="w-full h-full flex items-center justify-center bg-white/5 text-white/50 text-2xl font-light">
+                     <div className="w-full h-full flex items-center justify-center bg-panel text-content-faint text-2xl font-light">
                         {patientProfile.preferredName.charAt(0)}
                      </div>
                   )}
@@ -203,21 +203,24 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
            </div>
            
            <div className="glass-panel max-w-4xl w-full text-center p-12 sm:p-20 space-y-12 shadow-2xl mt-12 sm:mt-0">
-              <h1 className="font-display text-4xl sm:text-6xl font-light text-white leading-tight">
+              <h1 className="font-display text-4xl sm:text-6xl font-light text-content leading-tight">
                  {aiData?.greeting}
               </h1>
               
-              <button 
+              <motion.button 
                  id="begin-routine-btn"
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                  onClick={() => {
                     setStatus('step');
                     const firstAudio = aiData?.steps[0]?.audio_text;
                     if (firstAudio) playAudio(firstAudio, patientProfile.preferences.voice);
                  }}
-                 className="mx-auto mt-12 bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-6 rounded-2xl text-2xl font-bold shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 flex items-center justify-center gap-4"
+                 className="mx-auto mt-12 bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-6 rounded-2xl text-2xl font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-4"
               >
                  Let's Begin <ArrowRight size={36} />
-              </button>
+              </motion.button>
            </div>
            {showCamera && (
              <CameraCapture 
@@ -239,12 +242,12 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
           className="h-full w-full flex flex-col items-center justify-center p-8 sm:p-12 absolute inset-0 bg-transparent"
         >
            <div className="glass-panel p-12 sm:p-20 rounded-3xl shadow-2xl text-center max-w-4xl w-full">
-              <h1 className="font-display text-4xl sm:text-6xl font-light text-white leading-tight mb-8">
+              <h1 className="font-display text-4xl sm:text-6xl font-light text-content leading-tight mb-8">
                  {aiData?.encouragement || 'All done!'}
               </h1>
               
               <div className="mt-12 border-t border-white/10 pt-12">
-                 <h2 className="font-display text-3xl text-white/80 font-light mb-12">How are you feeling right now?</h2>
+                 <h2 className="font-display text-3xl text-content-muted font-light mb-12">How are you feeling right now?</h2>
                  <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
                     {[
                       { icon: '😄', label: 'Great', color: 'hover:bg-emerald-500/20 hover:border-emerald-500/40' },
@@ -253,15 +256,18 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                       { icon: '😕', label: 'Confused', color: 'hover:bg-amber-500/20 hover:border-amber-500/40' },
                       { icon: '😔', label: 'Tired', color: 'hover:bg-rose-500/20 hover:border-rose-500/40' },
                     ].map(mood => (
-                       <button
+                       <motion.button
                          id={`mood-btn-${mood.label.toLowerCase()}`}
                          key={mood.label}
+                         whileHover={{ scale: 1.1, y: -5 }}
+                         whileTap={{ scale: 0.9 }}
+                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                          onClick={() => submitMood(mood.label)}
-                         className={`flex flex-col items-center gap-4 p-6 sm:p-8 rounded-3xl border border-white/5 bg-white/5 transition-all duration-300 transform hover:scale-110 ${mood.color}`}
+                         className={`flex flex-col items-center gap-4 p-6 sm:p-8 rounded-3xl border border-line bg-panel ${mood.color}`}
                        >
                           <span className="text-6xl sm:text-7xl">{mood.icon}</span>
-                          <span className="text-xl font-medium text-white/80">{mood.label}</span>
-                       </button>
+                          <span className="text-xl font-medium text-content-muted">{mood.label}</span>
+                       </motion.button>
                     ))}
                  </div>
               </div>
@@ -281,7 +287,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
               <div className="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-10 shadow-[0_0_30px_rgba(52,211,153,0.3)]">
                 <CheckCircle2 size={48} />
               </div>
-              <h1 className="font-display text-5xl font-light text-white leading-tight mb-8">
+              <h1 className="font-display text-5xl font-light text-content leading-tight mb-8">
                  Thank you!
               </h1>
               <p className="text-2xl text-emerald-400/80 font-light">Taking you back to the home screen...</p>
@@ -298,11 +304,11 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
           className="h-full w-full flex flex-col relative overflow-hidden absolute inset-0 bg-transparent"
         >
           {/* Progress Stepper Top */}
-          <div className="w-full bg-black/40 backdrop-blur-xl border-b border-white/10 relative z-20 px-6 py-6 sm:px-12">
+          <div className="w-full bg-panel backdrop-blur-xl border-b border-line relative z-20 px-6 py-6 sm:px-12">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between relative">
                  {/* Progress background line */}
-                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-white/10 rounded-full" />
+                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-line rounded-full" />
                  {/* Progress fill line */}
                  <div 
                    className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-indigo-500 rounded-full transition-all duration-700 ease-in-out shadow-[0_0_10px_rgba(99,102,241,0.5)]"
@@ -321,7 +327,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                              ? 'bg-indigo-600 border-indigo-400 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] scale-110' 
                              : isCompleted 
                                ? 'bg-emerald-500 border-emerald-400 text-white shadow-lg' 
-                               : 'bg-black border-white/20 text-white/30'
+                               : 'bg-panel border-line text-content-muted'
                          }`}
                        >
                          {isCompleted ? <CheckCircle2 size={24} /> : step.icon}
@@ -358,7 +364,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                         <button 
                            id="read-aloud-btn"
                            onClick={handleReadAloud} 
-                           className="absolute top-8 right-8 p-4 bg-white/5 text-white/50 hover:text-white border border-white/10 hover:bg-white/10 rounded-full transition-all"
+                           className="absolute top-8 right-8 p-4 bg-panel text-content-faint hover:text-content border border-line hover:bg-panel-hover rounded-full transition-all"
                            aria-label="Read Aloud"
                         >
                            <Volume2 size={36} />
@@ -369,7 +375,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                               <div className="text-8xl sm:text-[140px] mb-8 filter drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">{originalStep.icon}</div>
                            )}
                            
-                           <h2 className="font-display text-4xl sm:text-7xl font-light text-white leading-tight mb-8 max-w-4xl tracking-tight">
+                           <h2 className="font-display text-4xl sm:text-7xl font-light text-content leading-tight mb-8 max-w-4xl tracking-tight">
                               {currentStep?.text}
                            </h2>
 
@@ -397,10 +403,10 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                            <motion.div 
                              initial={{ opacity: 0, scale: 0.9 }}
                              animate={{ opacity: 1, scale: 1 }}
-                             className="mt-12 bg-black/40 border flex items-start text-left border-indigo-500/30 p-8 rounded-2xl max-w-3xl"
+                             className="mt-12 bg-panel border flex items-start text-left border-indigo-500/30 p-8 rounded-2xl max-w-3xl"
                            >
                               <Lightbulb size={32} className="text-indigo-400 mr-6 flex-shrink-0 mt-1" />
-                              <p className="text-2xl text-white/80 leading-relaxed font-light">{helpText}</p>
+                              <p className="text-2xl text-content-muted leading-relaxed font-light">{helpText}</p>
                            </motion.div>
                         )}
                         {isHelpLoading && (
@@ -416,13 +422,13 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
           </div>
 
           {/* Bottom Action Bar */}
-          <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 bg-gradient-to-t from-[#05070a] to-transparent flex flex-wrap items-center justify-between gap-4 z-20">
+          <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 bg-gradient-to-t from-bg to-transparent flex flex-wrap items-center justify-between gap-4 z-20">
              <div className="flex gap-4 w-full md:w-auto">
                 {currentStepIndex > 0 && (
                   <button 
                     id="prev-step-btn"
                     onClick={handlePrevStep} 
-                    className="bg-black/60 border border-white/10 text-white/80 hover:text-white px-6 py-6 rounded-2xl text-xl font-bold transition-all flex items-center justify-center gap-2 flex-1 md:flex-none"
+                    className="bg-panel border border-line text-content-muted hover:text-content px-6 py-6 rounded-2xl text-xl font-bold transition-all flex items-center justify-center gap-2 flex-1 md:flex-none"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
                     Back
@@ -432,7 +438,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                   id="help-step-btn"
                   onClick={handleHelp} 
                   disabled={!!helpText || isHelpLoading}
-                  className="bg-black/60 border border-white/10 text-white/80 hover:text-white px-8 py-6 rounded-2xl text-2xl font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-3 flex-1 md:flex-none"
+                  className="bg-panel border border-line text-content-muted hover:text-content px-8 py-6 rounded-2xl text-2xl font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-3 flex-1 md:flex-none"
                 >
                   <Lightbulb size={28} /> Help
                 </button>
@@ -454,37 +460,40 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
                <button 
                  id="skip-step-btn"
                  onClick={() => handleNextStep(true)} 
-                 className="text-white/40 hover:text-white/80 px-8 py-6 rounded-2xl text-xl font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-3 w-full sm:w-auto"
+                 className="text-content-faint hover:text-content px-8 py-6 rounded-2xl text-xl font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-3 w-full sm:w-auto"
                >
                  Skip <FastForward size={24} />
                </button>
 
-               <button 
+               <motion.button 
                  id="complete-step-btn"
+                 whileHover={{ scale: 1.05, y: -2 }}
+                 whileTap={{ scale: 0.95 }}
+                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                  onClick={() => handleNextStep(false)} 
-                 className="flex-1 w-full max-w-sm bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white px-8 py-8 rounded-3xl text-4xl font-bold shadow-[0_0_30px_rgba(79,70,229,0.3)] border border-indigo-400/30 transition-transform hover:scale-105 hover:-translate-y-1 flex items-center justify-center gap-4"
+                 className="flex-1 w-full max-w-sm bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white px-8 py-8 rounded-3xl text-4xl font-bold shadow-[0_0_30px_rgba(79,70,229,0.3)] border border-indigo-400/30 flex items-center justify-center gap-4"
                >
                  <CheckCircle2 size={40} /> Done
-               </button>
+               </motion.button>
              </div>
           </div>
 
           {/* Video Call Modal */}
           {showVideoCall && (
-            <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-3xl flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
-               <div className="w-[90%] max-w-2xl aspect-[4/3] bg-gray-900 rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative flex items-center justify-center">
+            <div className="fixed inset-0 z-50 bg-bg/95 backdrop-blur-3xl flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
+               <div className="w-[90%] max-w-2xl aspect-[4/3] bg-panel rounded-3xl border border-line shadow-2xl overflow-hidden relative flex items-center justify-center">
                   <div className="text-center animate-pulse">
                     <div className="w-24 h-24 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(244,63,94,0.3)]">
                       <PhoneCall size={48} />
                     </div>
-                    <h3 className="font-display text-3xl text-white font-light tracking-tight">Calling Caregiver ({patientProfile?.primaryCaregiverName || 'Primary Contact'})...</h3>
-                    <p className="text-white/40 mt-3 text-lg">Hang tight, connection will drop-in shortly.</p>
+                    <h3 className="font-display text-3xl text-content font-light tracking-tight">Calling Caregiver ({patientProfile?.primaryCaregiverName || 'Primary Contact'})...</h3>
+                    <p className="text-content-muted mt-3 text-lg">Hang tight, connection will drop-in shortly.</p>
                   </div>
 
                   {/* Fake Drop-in Avatar */}
-                  <div className="absolute top-4 right-4 w-32 h-40 bg-black/40 rounded-xl border border-white/20 flex flex-col items-center justify-center z-10 backdrop-blur-md">
-                    <Video size={30} className="text-white/20 mb-2" />
-                    <span className="text-xs text-white/40 font-bold uppercase tracking-widest">You</span>
+                  <div className="absolute top-4 right-4 w-32 h-40 bg-panel rounded-xl border border-line flex flex-col items-center justify-center z-10 backdrop-blur-md">
+                    <Video size={30} className="text-content-faint mb-2" />
+                    <span className="text-xs text-content-muted font-bold uppercase tracking-widest">You</span>
                   </div>
 
                   {/* Controls */}

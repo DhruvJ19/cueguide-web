@@ -71,13 +71,16 @@ const RoutineCard = ({ routine, completion, onStart, getMoodIcon, compact = fals
         </div>
         
         {!completion && (
-          <button 
+          <motion.button 
             id={`routine-play-btn-${routine.id}`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             onClick={() => onStart(routine.id)}
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-indigo-500 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-600 transition-all shadow-lg hover:shadow-indigo-500/25"
+            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-indigo-500 text-white px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/25"
           >
               <Play size={14} className="fill-current" /> Play
-          </button>
+          </motion.button>
         )}
         {completion?.mood && (
             <div className="flex items-center gap-2 bg-panel border border-line px-3 py-1.5 rounded-lg">
@@ -171,7 +174,7 @@ export default function CaregiverDashboard({
                 <h4 className="font-bold text-lg tracking-tight">Active Escalation</h4>
                 <p className="text-sm text-rose-100 font-medium">{globalAlert}</p>
               </div>
-              <button id="dismiss-global-alert-btn" aria-label="Dismiss Alert" onClick={() => clearAlert?.()} className="ml-4 p-2 bg-black/20 hover:bg-black/40 rounded-xl transition-colors">
+              <button id="dismiss-global-alert-btn" aria-label="Dismiss Alert" onClick={() => clearAlert?.()} className="ml-4 p-2 bg-panel hover:bg-panel-hover rounded-xl transition-colors">
                 Dismiss
               </button>
            </div>
@@ -298,7 +301,7 @@ export default function CaregiverDashboard({
                       {patientProfile?.name || 'The patient'} is currently tracking on schedule. All morning sensor readings look stable.
                    </p>
                    <div className="mt-8 flex gap-4">
-                      <button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} className="bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/20">Manage Routine</button>
+                      <motion.button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 17 }} className="bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-indigo-500/20">Manage Routine</motion.button>
                    </div>
                  </div>
                </GlowCard>
@@ -376,17 +379,20 @@ export default function CaregiverDashboard({
                  <h2 className="font-display text-3xl font-light text-content tracking-tight">All Routines</h2>
                  <p className="text-content-muted text-sm mt-1">{routines.length} established routines</p>
               </div>
-              <button 
+              <motion.button 
                 id="new-routine-btn"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => setIsCreating(true)}
-                className="flex items-center justify-center gap-2 bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/20 px-5 py-2.5 rounded-xl font-bold transition-all text-sm"
+                className="flex items-center justify-center gap-2 bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 px-5 py-2.5 rounded-xl font-bold text-sm"
               >
                 <Plus size={16} /> New Routine
-              </button>
+              </motion.button>
             </div>
 
             {aiConfig.isEnabled && (
-               <div className="bg-amber-50/50 dark:bg-black/20 mb-2 border border-amber-500/30 p-5 rounded-2xl flex items-start sm:items-center gap-4 relative overflow-hidden">
+               <div className="bg-amber-50/50 dark:bg-panel mb-2 border border-amber-500/30 p-5 rounded-2xl flex items-start sm:items-center gap-4 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
                      <AlertCircle size={20} className="text-amber-600 dark:text-amber-500" />

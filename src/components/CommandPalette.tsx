@@ -57,7 +57,7 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999]"
+            className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-[999]"
           />
           <div className="fixed inset-0 flex items-start justify-center pt-[15vh] z-[1000] pointer-events-none">
             <motion.div 
@@ -65,25 +65,25 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-              className="w-full max-w-2xl bg-[#0f111a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
+              className="w-full max-w-2xl bg-panel backdrop-blur-2xl border border-line rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
             >
-              <div className="flex items-center px-4 py-4 border-b border-white/5 relative">
-                <Search className="text-white/40 mr-3" size={20} />
+              <div className="flex items-center px-4 py-4 border-b border-line relative">
+                <Search className="text-content-faint mr-3" size={20} />
                 <input
                   ref={inputRef}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Type a command or search..."
-                  className="w-full bg-transparent text-lg text-white placeholder:text-white/30 outline-none font-light"
+                  className="w-full bg-transparent text-lg text-content placeholder:text-content-faint outline-none font-light"
                 />
-                <button onClick={onClose} className="p-1 rounded-md text-white/30 hover:text-white hover:bg-white/10 transition-colors">
+                <button onClick={onClose} className="p-1 rounded-md text-content-faint hover:text-content hover:bg-panel-hover transition-colors">
                   <X size={20} />
                 </button>
               </div>
 
               <div className="max-h-[60vh] overflow-y-auto p-2 custom-scrollbar">
                 {filteredCommands.length === 0 ? (
-                  <div className="p-8 text-center text-white/40">No results found.</div>
+                  <div className="p-8 text-center text-content-muted">No results found.</div>
                 ) : (
                   Object.entries(
                     filteredCommands.reduce((acc, cmd) => {
@@ -103,9 +103,9 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                               cmd.action();
                               onClose();
                             }}
-                            className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-300 text-white/70 transition-all group text-left"
+                            className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-300 text-content transition-all group text-left"
                           >
-                            <span className="text-white/30 group-hover:text-indigo-400 mr-3 transition-colors">
+                            <span className="text-content-muted group-hover:text-indigo-400 mr-3 transition-colors">
                               {React.cloneElement(cmd.icon as React.ReactElement, { size: 18 })}
                             </span>
                             <span className="font-medium">{cmd.title}</span>
@@ -116,9 +116,9 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                   ))
                 )}
               </div>
-              <div className="px-4 py-3 bg-white/5 border-t border-white/5 text-xs text-white/30 flex items-center justify-between">
-                <span>Use <kbd className="bg-white/10 px-1.5 py-0.5 rounded font-mono">↑</kbd> <kbd className="bg-white/10 px-1.5 py-0.5 rounded font-mono">↓</kbd> to navigate</span>
-                <span>Press <kbd className="bg-white/10 px-1.5 py-0.5 rounded font-mono">esc</kbd> to close</span>
+              <div className="px-4 py-3 bg-panel-hover border-t border-line text-xs text-content-faint flex items-center justify-between">
+                <span>Use <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">↑</kbd> <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">↓</kbd> to navigate</span>
+                <span>Press <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">esc</kbd> to close</span>
               </div>
             </motion.div>
           </div>

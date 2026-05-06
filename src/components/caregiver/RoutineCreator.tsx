@@ -224,12 +224,12 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in">
+    <div className="fixed inset-0 bg-bg/80 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in">
       <div className="glass-panel w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
          {/* Header */}
-         <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-            <h2 className="font-display text-3xl font-light text-white tracking-tight">Create New <span className="font-semibold">Routine</span></h2>
-            <button id="close-routine-creator-btn" onClick={handleClose} className="p-2 text-white/40 hover:text-white rounded-full hover:bg-white/10 transition-colors">
+         <div className="px-8 py-6 border-b border-line flex justify-between items-center bg-panel">
+            <h2 className="font-display text-3xl font-light text-content tracking-tight">Create New <span className="font-semibold">Routine</span></h2>
+            <button id="close-routine-creator-btn" onClick={handleClose} className="p-2 text-content-faint hover:text-content rounded-full hover:bg-panel-hover transition-colors">
               <X size={20} />
             </button>
          </div>
@@ -240,7 +240,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                <div className="md:col-span-2 flex flex-col md:flex-row gap-4">
                  <div className="flex-1 relative">
                    <div className="flex items-center justify-between mb-2">
-                     <label className="block text-xs font-bold uppercase tracking-widest text-white/40">Routine Name</label>
+                     <label className="block text-xs font-bold uppercase tracking-widest text-content-muted">Routine Name</label>
                      {aiConfig?.isEnabled && (
                        <button
                          id="ai-suggest-name-btn"
@@ -259,7 +259,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                      onChange={e => setName(e.target.value)}
                      onBlur={handleNameBlur}
                      placeholder="e.g. Afternoon Tea"
-                     className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                     className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                    />
                  </div>
                  {aiConfig?.isEnabled && name.trim() && (
@@ -291,12 +291,12 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                
                <div className="md:col-span-2 flex flex-col md:flex-row gap-4">
                  <div className="flex-1">
-                   <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">Category</label>
+                   <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Category</label>
                    <div className="relative">
                      <select 
                        value={category}
                        onChange={e => setCategory(e.target.value)}
-                       className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                       className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                      >
                         <option value="hygiene" className="bg-gray-900">Hygiene</option>
                         <option value="medication" className="bg-gray-900">Medication</option>
@@ -305,28 +305,28 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                         <option value="meals" className="bg-gray-900">Meals</option>
                         <option value="other" className="bg-gray-900">Other</option>
                      </select>
-                     <ChevronDown size={18} className="absolute right-4 top-3.5 text-white/40 pointer-events-none" />
+                     <ChevronDown size={18} className="absolute right-4 top-3.5 text-content-faint pointer-events-none" />
                    </div>
                  </div>
                  
                  <div className="flex-1">
-                   <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">Scheduled Time</label>
+                   <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Scheduled Time</label>
                    <input 
                      type="time" 
                      value={time}
                      onChange={e => setTime(e.target.value)}
-                     className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                     className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                    />
                  </div>
                </div>
                
                <div className="md:col-span-2">
-                 <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">Recurrence</label>
+                 <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Recurrence</label>
                  <div className="relative">
                    <select 
                      value={recurrenceOption}
                      onChange={e => setRecurrenceOption(e.target.value)}
-                     className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                     className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                    >
                       <option value="daily" className="bg-gray-900">Daily</option>
                       <option value="weekdays" className="bg-gray-900">Weekdays</option>
@@ -334,7 +334,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                         <option value="custom" className="bg-gray-900">Specific Days of the Week</option>
                       <option value="specific_dates" className="bg-gray-900">Specific Dates of the Month</option>
                    </select>
-                   <ChevronDown size={18} className="absolute right-4 top-3.5 text-white/40 pointer-events-none" />
+                   <ChevronDown size={18} className="absolute right-4 top-3.5 text-content-faint pointer-events-none" />
                  </div>
                  
                  {recurrenceOption === 'custom' && (
@@ -343,7 +343,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                           <button
                             key={day}
                             onClick={() => handleDayToggle(day)}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all border ${selectedDays.includes(day) ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-black/20 border-white/10 text-white/60 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all border ${selectedDays.includes(day) ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-panel border-line text-content-muted hover:text-content'}`}
                           >
                              {day}
                           </button>
@@ -356,7 +356,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                           <button
                             key={date}
                             onClick={() => handleDayToggle(date)}
-                            className={`aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all border ${selectedDays.includes(date) ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-black/20 border-white/10 text-white/60 hover:text-white'}`}
+                            className={`aspect-square flex items-center justify-center rounded-lg text-sm font-bold transition-all border ${selectedDays.includes(date) ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-panel border-line text-content-muted hover:text-content'}`}
                           >
                              {date}
                           </button>
@@ -364,7 +364,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                        <button
                          key="Last Day"
                          onClick={() => handleDayToggle("Last Day")}
-                         className={`col-span-3 aspect-[3/1] flex items-center justify-center rounded-lg text-sm font-bold transition-all border ${selectedDays.includes("Last Day") ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-black/20 border-white/10 text-white/60 hover:text-white'}`}
+                         className={`col-span-3 aspect-[3/1] flex items-center justify-center rounded-lg text-sm font-bold transition-all border ${selectedDays.includes("Last Day") ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-panel border-line text-content-muted hover:text-content'}`}
                        >
                          Last Day
                        </button>
@@ -373,24 +373,24 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                </div>
                
                <div className="md:col-span-2">
-                 <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-2">Caregiver Escalation Policy</label>
+                 <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Caregiver Escalation Policy</label>
                  <div className="relative">
                    <select 
-                     className="w-full px-4 py-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                     className="w-full px-4 py-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-content focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all appearance-none cursor-pointer"
                    >
                       <option value="none" className="bg-gray-900">Do not alert caregiver</option>
                       <option value="15" className="bg-gray-900">Alert Caregiver if 15 mins late</option>
                       <option value="30" className="bg-gray-900">Alert Caregiver if 30 mins late</option>
                       <option value="auto" className="bg-gray-900">Smart Alert (AI determines urgency based on missed steps)</option>
                    </select>
-                   <ChevronDown size={18} className="absolute right-4 top-3.5 text-white/40 pointer-events-none" />
+                   <ChevronDown size={18} className="absolute right-4 top-3.5 text-content-faint pointer-events-none" />
                  </div>
                </div>
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-4">
-                 <label className="block text-xs font-bold uppercase tracking-widest text-white/40">Steps</label>
+                 <label className="block text-xs font-bold uppercase tracking-widest text-content-muted">Steps</label>
               </div>
               <div className="space-y-4 relative">
                  {steps.map((step, i) => (
@@ -400,16 +400,16 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                       onDragStart={(e) => handleDragStart(e, step.id)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, step.id)}
-                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 glass-card p-4 group transition-all border ${draggedStepId === step.id ? 'opacity-50 border-indigo-500' : 'border-white/10 hover:border-white/20'} focus-within:border-indigo-500/50 focus-within:bg-black/20 focus-within:shadow-[0_0_20px_rgba(99,102,241,0.15)] relative ${recordingStepId === step.id ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : ''}`}
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 glass-card p-4 group transition-all border ${draggedStepId === step.id ? 'opacity-50 border-indigo-500' : 'border-line hover:border-line'} focus-within:border-indigo-500/50 focus-within:bg-panel focus-within:shadow-[0_0_20px_rgba(99,102,241,0.15)] relative ${recordingStepId === step.id ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : ''}`}
                     >
                        <div className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-white/5 rounded-lg transition-colors">
-                         <GripVertical size={18} className="text-white/30" />
+                         <GripVertical size={18} className="text-content-faint" />
                        </div>
                        
                        <div className="relative">
                           <button 
                             onClick={() => setShowIconPicker(showIconPicker === step.id ? null : step.id)}
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm transition-all border ${showIconPicker === step.id ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] scale-110 relative z-30' : 'bg-black/20 hover:bg-black/40 border-white/10 hover:border-white/30'}`}
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm transition-all border ${showIconPicker === step.id ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.3)] scale-110 relative z-30' : 'bg-panel hover:bg-panel-hover border-line hover:border-line'}`}
                             title="Choose Icon"
                           >
                             {step.icon || '🌅'}
@@ -418,13 +418,13 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                           {showIconPicker === step.id && (
                              <div className="absolute top-14 left-0 z-20 glass-card p-4 w-72 sm:w-80 border border-white/20 shadow-2xl flex flex-col gap-3 rounded-xl">
                                 <div className="relative">
-                                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-faint" />
                                   <input 
                                     type="text" 
                                     placeholder="Search icons..." 
                                     value={iconSearch}
                                     onChange={e => setIconSearch(e.target.value)}
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500"
+                                    className="w-full bg-panel border border-line rounded-lg pl-9 pr-3 py-2 text-sm text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500"
                                     autoFocus
                                   />
                                 </div>
@@ -433,13 +433,13 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                                      <button
                                        key={icon}
                                        onClick={() => updateStepIcon(step.id, icon)}
-                                       className={`w-10 h-10 flex items-center justify-center text-2xl rounded-lg transition-all ${step.icon === icon ? 'bg-indigo-600 shadow-md shadow-indigo-500/20 scale-110' : 'hover:bg-white/10'}`}
+                                       className={`w-10 h-10 flex items-center justify-center text-2xl rounded-lg transition-all ${step.icon === icon ? 'bg-indigo-600 shadow-md shadow-indigo-500/20 scale-110' : 'hover:bg-panel-hover'}`}
                                      >
                                        {icon}
                                      </button>
                                   ))}
                                   {filteredIcons.length === 0 && (
-                                     <div className="col-span-full py-4 text-center text-white/40 text-sm">
+                                     <div className="col-span-full py-4 text-center text-content-faint text-sm">
                                        No icons found
                                      </div>
                                   )}
@@ -454,10 +454,10 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                            value={step.instruction}
                            onChange={e => updateStepText(step.id, e.target.value)}
                            placeholder="Short, clear instruction"
-                           className="w-full bg-black/20 border border-white/5 hover:border-white/20 focus:bg-black/40 focus:border-indigo-500 focus:shadow-[0_0_15px_rgba(99,102,241,0.2)] rounded-xl pl-4 pr-10 py-3 text-white placeholder:text-white/30 text-lg sm:text-xl font-display font-light outline-none transition-all"
+                           className="w-full bg-panel border border-line hover:border-line focus:bg-panel-hover focus:border-indigo-500 focus:shadow-[0_0_15px_rgba(99,102,241,0.2)] rounded-xl pl-4 pr-10 py-3 text-content placeholder:text-content-faint text-lg sm:text-xl font-display font-light outline-none transition-all"
                            autoFocus={i === steps.length - 1 && steps.length > 1}
                          />
-                         <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover/input:opacity-100 pointer-events-none text-white/30 transition-opacity flex items-center">
+                         <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover/input:opacity-100 pointer-events-none text-content-faint transition-opacity flex items-center">
                            <Pencil size={16} />
                          </div>
                        </div>
@@ -476,7 +476,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
 
                          <button 
                            onClick={() => step.instruction && playAudio(step.instruction)} 
-                           className="p-2.5 text-white/30 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/10 transition-colors"
+                           className="p-2.5 text-content-faint hover:text-emerald-400 rounded-lg hover:bg-emerald-500/10 transition-colors"
                            title="Listen to Instruction"
                            disabled={!step.instruction}
                          >
@@ -485,7 +485,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
 
                          <button 
                            onClick={() => handleDictate(step.id)} 
-                           className={`p-2.5 rounded-lg transition-colors ${recordingStepId === step.id ? 'text-red-400 bg-red-500/10' : 'text-white/30 hover:text-white hover:bg-white/5'}`}
+                           className={`p-2.5 rounded-lg transition-colors ${recordingStepId === step.id ? 'text-red-400 bg-red-500/10' : 'text-content-faint hover:text-content hover:bg-panel-hover'}`}
                            title="Dictate Instruction"
                          >
                            <Mic size={20} className={recordingStepId === step.id ? "animate-pulse" : ""} />
@@ -493,7 +493,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
 
                          <button 
                            onClick={() => removeStep(step.id)} 
-                           className="p-2.5 text-white/30 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 ml-1"
+                           className="p-2.5 text-content-faint hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 ml-1"
                            title="Remove Step"
                          >
                            <Trash2 size={20} />
@@ -505,7 +505,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                  <button 
                    id="add-step-btn"
                    onClick={addStep}
-                   className="w-full py-5 border-2 border-dashed border-white/10 rounded-xl text-white/40 hover:text-white hover:border-white/30 transition-all flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-xs mt-6 hover:bg-white/5"
+                   className="w-full py-5 border-2 border-dashed border-line rounded-xl text-content-faint hover:text-content hover:border-line transition-all flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-xs mt-6 hover:bg-panel-hover"
                  >
                    <Plus size={18} /> Add Another Step
                  </button>
@@ -514,8 +514,8 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
          </div>
 
          {/* Footer */}
-         <div className="px-8 py-6 border-t border-white/10 flex justify-end gap-4 bg-black/20 backdrop-blur-xl relative z-20">
-            <button id="cancel-routine-btn" onClick={handleClose} className="px-6 py-3 text-white/60 font-bold hover:text-white hover:bg-white/5 rounded-xl transition-colors">
+         <div className="px-8 py-6 border-t border-line flex justify-end gap-4 bg-panel backdrop-blur-xl relative z-20">
+            <button id="cancel-routine-btn" onClick={handleClose} className="px-6 py-3 text-content-muted font-bold hover:text-content hover:bg-panel-hover rounded-xl transition-colors">
               Cancel
             </button>
             <button 

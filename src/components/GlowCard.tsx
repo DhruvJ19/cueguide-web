@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { motion } from 'motion/react';
 
 interface GlowCardProps {
   children: React.ReactNode;
@@ -22,11 +23,13 @@ export default function GlowCard({ children, className = '', glowColor = 'rgba(9
   };
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.01, y: -2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={`relative overflow-hidden ${className}`}
       style={{
         transformStyle: 'preserve-3d',
@@ -42,6 +45,6 @@ export default function GlowCard({ children, className = '', glowColor = 'rgba(9
       <div className="relative z-10 h-full w-full">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

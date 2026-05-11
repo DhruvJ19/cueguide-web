@@ -1,13 +1,16 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import CaregiverDashboard from './views/CaregiverDashboard';
 import PatientFocusMode from './views/PatientFocusMode';
-import { HeartPulse, Moon, Sun, AlertTriangle } from 'lucide-react';
+import LoginPage from './pages/Login';
+import SignupPage from './pages/Signup';
+import AuthCallbackPage from './pages/AuthCallback';
+import OnboardingPage from './pages/Onboarding';
+import SettingsPage from './pages/Settings';
+import PrivacyPage from './pages/Privacy';
+import TermsPage from './pages/Terms';
+import { HeartPulse, AlertTriangle } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -19,6 +22,7 @@ import { useAuthStore } from './store/authStore';
 import { useSettingsStore } from './store/settingsStore';
 
 import CommandPalette from './components/CommandPalette';
+import { supabase, db } from './services/supabase';
 
 function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
@@ -37,15 +41,14 @@ function ErrorFallback({ error, resetErrorBoundary }: any) {
   );
 }
 
-export default function App() {
-  const { role, setRole } = useAuthStore();
+function AppShell() {
+  const { role, setRole, isAuthenticated } = useAuthStore();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const stored = localStorage.getItem('cueguide-theme');
     return (stored === 'light' || stored === 'dark') ? stored : 'dark';
   });
   const [isCommandOpen, setIsCommandOpen] = useState(false);
-  
-  // Stores
+
   const { profile, updatePreferences } = usePatientStore();
   const { routines, adjustments } = useRoutineStore();
   const { completions, addCompletion } = useCompletionStore();
@@ -82,6 +85,7 @@ export default function App() {
   const handleFinishRoutine = (routineId: string, status: 'completed' | 'partial' | 'missed', minutes: number, stepsCompleted: number, mood?: string) => {
     addCompletion({
       id: Math.random().toString(36).substr(2, 9),
+      patientId: profile?.id || '',
       routineId,
       date: new Date().toISOString().split('T')[0],
       status,
@@ -89,13 +93,14 @@ export default function App() {
       stepsCompleted,
       stepsTotal: routines.find(r => r.id === routineId)?.steps.length || 0,
       mood,
+      createdAt: new Date().toISOString(),
     });
     setActiveRoutineId(null);
-    setRole('caregiver'); 
+    setRole('caregiver');
   };
 
   const handleCommandNavigate = (tab: string) => {
-    setRole('caregiver'); // ensure we are in caregiver view
+    setRole('caregiver');
     window.dispatchEvent(new CustomEvent('nav-tab', { detail: tab }));
   };
 
@@ -104,28 +109,25 @@ export default function App() {
       <div className={`min-h-screen h-screen relative flex flex-col selection:bg-indigo-500/30 overflow-hidden ${theme === 'light' ? 'light-mode' : ''}`}>
         <div className="mesh-bg"></div>
         <Toaster theme={theme} position="top-right" />
-        
-        <CommandPalette 
-          isOpen={isCommandOpen} 
-          onClose={() => setIsCommandOpen(false)} 
+
+        <CommandPalette
+          isOpen={isCommandOpen}
+          onClose={() => setIsCommandOpen(false)}
           onNavigate={handleCommandNavigate}
         />
 
-        {/* Removed global header to allow role-specific layouts */}
-
-        {/* Main Content */}
         <main className={role === 'patient' ? 'flex-1 h-full overflow-hidden relative flex flex-col' : 'flex-1 h-full flex flex-col overflow-hidden w-full relative'}>
           <AnimatePresence mode="wait">
             {role === 'caregiver' ? (
-              <motion.div 
-                key="caregiver" 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }} 
+              <motion.div
+                key="caregiver"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
                 className="flex-1 h-full flex flex-col overflow-hidden"
               >
-                <CaregiverDashboard 
+                <CaregiverDashboard
                    onStartSimulation={handleStartRoutine}
                    globalAlert={globalAlert}
                    clearAlert={() => setGlobalAlert(null)}
@@ -137,16 +139,16 @@ export default function App() {
                 />
               </motion.div>
             ) : (
-              <motion.div 
-                key="patient" 
-                initial={{ opacity: 0, scale: 0.98 }} 
-                animate={{ opacity: 1, scale: 1 }} 
+              <motion.div
+                key="patient"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.02 }}
                 transition={{ duration: 0.4 }}
                 className="flex-1 h-full flex flex-col overflow-hidden"
               >
-                <PatientFocusMode 
-                   routine={routines.find(r => r.id === activeRoutineId) || routines[0]} 
+                <PatientFocusMode
+                   routine={routines.find(r => r.id === activeRoutineId) || routines[0]}
                    onComplete={(status, min, steps, mood) => handleFinishRoutine(activeRoutineId || routines[0].id, status, min, steps, mood)}
                    onExit={() => setRole('caregiver')}
                    onAlert={(msg) => setGlobalAlert(msg || null)}
@@ -157,5 +159,49 @@ export default function App() {
         </main>
       </div>
     </ErrorBoundary>
+  );
+}
+
+export default function App() {
+  const { isAuthenticated, setRole } = useAuthStore();
+  const { profile } = usePatientStore();
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const existing = await db.caregivers.getByUserId(session.user.id);
+        if (existing) {
+          setRole('caregiver');
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setRole(null);
+      }
+    });
+  }, [setRole]);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setRole('caregiver');
+      }
+    };
+    checkSession();
+  }, [setRole]);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/dashboard" element={<AppShell />} />
+        <Route path="/" element={<AppShell />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

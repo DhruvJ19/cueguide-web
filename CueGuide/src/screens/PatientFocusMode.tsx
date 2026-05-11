@@ -30,7 +30,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
     if (hour >= 12 && hour < 17) timeGreeting = 'Good afternoon';
     else if (hour >= 17) timeGreeting = 'Good evening';
     
-    return `${timeGreeting}, ${profile.preferredName}. It's ${format(now, 'EEEE, MMMM d')}. Let's get started with your ${routine.name}.`;
+    return `${timeGreeting}, ${profile?.preferredName || 'there'}. It's ${format(now, 'EEEE, MMMM d')}. Let's get started with your ${routine.name}.`;
   };
   
   const handleNext = () => {
@@ -82,7 +82,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
         <Text style={styles.celebrationEmoji}>✨</Text>
         <Text style={styles.completionTitle}>All done!</Text>
         <Text style={styles.completionText}>
-          Great job completing your {routine.name}, {profile.preferredName}!
+          Great job completing your {routine.name}, {profile?.preferredName || 'there'}!
         </Text>
       </View>
     );

@@ -2,16 +2,25 @@ export type RoutineStatus = 'upcoming' | 'in_progress' | 'completed' | 'partial'
 
 export interface Caregiver {
   id: string;
+  userId: string;
   name: string;
   email: string;
   phone?: string;
-  role: 'primary' | 'secondary' | 'admin';
+  patientCallName?: string;
+  notificationPrefs?: {
+    smsEnabled: boolean;
+    pushEnabled: boolean;
+    quietHoursStart: string;
+    quietHoursEnd: string;
+    maxAlertsPerHour: number;
+  };
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface PatientProfile {
   id: string;
-  caregiverId?: string;
+  caregiverId: string;
   name: string;
   preferredName: string;
   primaryCaregiverName?: string;
@@ -30,10 +39,12 @@ export interface PatientProfile {
 
 export interface Step {
   id: string;
-  routineId: string;
+  routineId?: string;
   position: number;
   instruction: string;
+  helpText?: string;
   icon: string;
+  estimatedSeconds?: number;
 }
 
 export interface Routine {

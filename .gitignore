@@ -6,4 +6,22 @@ coverage/
 *.log
 .env*
 !.env.example
-.vercel
+.vercel/
+
+# CueGuide mobile app
+CueGuide/.env.local
+CueGuide/.env.production
+CueGuide/.env.development
+CueGuide/android/
+CueGuide/ios/
+CueGuide/node_modules/
+CueGuide/.expo/
+
+# Environment files — never commit real keys
+*.env.local
+*.env.production
+!.env.example
+
+# Production keys — never commit
+.env
+.env*.local

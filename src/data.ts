@@ -4,6 +4,7 @@ import { subDays, format } from 'date-fns';
 
 export const PATIENT_PROFILE: PatientProfile = {
   id: 'patient-1',
+  caregiverId: 'caregiver-1',
   name: 'Robert Chen',
   preferredName: 'Dad',
   primaryCaregiverName: 'Sarah',
@@ -14,12 +15,15 @@ export const PATIENT_PROFILE: PatientProfile = {
     fontSize: 28,
     theme: 'warm',
     voice: 'female'
-  }
+  },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
 };
 
 export const INITIAL_ROUTINES: Routine[] = [
   {
     id: 'routine-1',
+    patientId: 'patient-1',
     name: 'Morning Hygiene',
     category: 'hygiene',
     scheduledTime: '08:00',
@@ -31,10 +35,13 @@ export const INITIAL_ROUTINES: Routine[] = [
       { id: uuidv4(), position: 3, instruction: 'Comb your hair', icon: '💇' },
       { id: uuidv4(), position: 4, instruction: 'Put on your clothes for the day', icon: '👔' },
       { id: uuidv4(), position: 5, instruction: 'Put on your watch and glasses', icon: '👓' }
-    ]
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'routine-2',
+    patientId: 'patient-1',
     name: 'Morning Medication',
     category: 'medication',
     scheduledTime: '08:30',
@@ -44,10 +51,13 @@ export const INITIAL_ROUTINES: Routine[] = [
       { id: uuidv4(), position: 1, instruction: 'Take your small blue heart pill from the yellow box', icon: '💊' },
       { id: uuidv4(), position: 2, instruction: 'Take your vitamin D — the white round one', icon: '☀️' },
       { id: uuidv4(), position: 3, instruction: 'Drink a full glass of water', icon: '🥤' }
-    ]
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'routine-3',
+    patientId: 'patient-1',
     name: 'Afternoon Walk',
     category: 'exercise',
     scheduledTime: '14:00',
@@ -59,10 +69,13 @@ export const INITIAL_ROUTINES: Routine[] = [
       { id: uuidv4(), position: 3, instruction: 'Take your phone and house key', icon: '🔑' },
       { id: uuidv4(), position: 4, instruction: 'Walk around the block — about 15 minutes', icon: '🚶' },
       { id: uuidv4(), position: 5, instruction: 'When you get home, have a glass of water', icon: '💧' }
-    ]
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: 'routine-4',
+    patientId: 'patient-1',
     name: 'Bedtime Routine',
     category: 'hygiene',
     scheduledTime: '21:00',
@@ -74,7 +87,9 @@ export const INITIAL_ROUTINES: Routine[] = [
       { id: uuidv4(), position: 3, instruction: 'Make sure the front door is locked', icon: '🔒' },
       { id: uuidv4(), position: 4, instruction: 'Set your phone on the nightstand to charge', icon: '🔌' },
       { id: uuidv4(), position: 5, instruction: 'Turn off the lights — goodnight, Dad', icon: '🌙' }
-    ]
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -102,16 +117,18 @@ export const INITIAL_COMPLETIONS: Completion[] = (() => {
          minutes = 5 + Math.floor(Math.random() * 5);
        }
 
-       completions.push({
-         id: uuidv4(),
-         date: d,
-         routineId: rId,
-         status,
-         minutes,
-         stepsCompleted,
-         stepsTotal: 5,
-         mood: status === 'completed' ? moods[Math.floor(Math.random() * 3)] : moods[2 + Math.floor(Math.random() * 3)]
-       });
+completions.push({
+          id: uuidv4(),
+          patientId: 'patient-1',
+          date: d,
+          routineId: rId,
+          status,
+          minutes,
+          stepsCompleted,
+          stepsTotal: 5,
+          mood: status === 'completed' ? moods[Math.floor(Math.random() * 3)] : moods[2 + Math.floor(Math.random() * 3)],
+          createdAt: new Date().toISOString()
+        });
     });
   }
   return completions;
@@ -123,7 +140,7 @@ export const INITIAL_SENSORS: SensorReading[] = (() => {
      readings.push({
         id: uuidv4(),
         patientId: 'patient-1',
-        type: i % 3 === 0 ? 'motion' : i % 3 === 1 ? 'heart_rate' : 'door',
+        sensorType: i % 3 === 0 ? 'motion' : i % 3 === 1 ? 'heart_rate' : 'door',
         value: i % 3 === 1 ? (65 + Math.floor(Math.random() * 20)).toString() : 'active',
         unit: i % 3 === 1 ? 'bpm' : 'state',
         timestamp: new Date(Date.now() - (i * 3600000)).toISOString()
@@ -134,12 +151,16 @@ export const INITIAL_SENSORS: SensorReading[] = (() => {
 
 export const INITIAL_ADJUSTMENTS: ScheduleAdjustment[] = [
   {
+    id: 'adj-1',
+    patientId: 'patient-1',
     routineId: 'routine-1',
     routineName: 'Morning Hygiene',
     currentTime: '08:00',
     suggestedTime: '08:15',
     reason: 'Robert consistently starts his morning hygiene around 8:12-8:18 AM. Adjusting to 8:15 would better match his natural rhythm.',
     dataPoints: 12,
-    confidence: 0.85
+    confidence: 0.85,
+    status: 'pending',
+    createdAt: new Date().toISOString()
   }
 ];

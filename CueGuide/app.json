@@ -5,27 +5,60 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "cueguide",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0f0f1a"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.CueGuide"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.cueguide.app",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "CueGuide needs access to your health data to track activity, sleep, and heart rate alongside your care routines.",
+        "NSHealthUpdateUsageDescription": "CueGuide can save care-related health data to Apple Health.",
+        "NSCameraUsageDescription": "CueGuide uses the camera to let you capture moments during routines.",
+        "NSMicrophoneUsageDescription": "CueGuide uses the microphone for voice input during routine creation."
+      },
+      "associatedDomains": ["applinks:cueguide.app"]
     },
     "android": {
+      "package": "com.cueguide.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0f0f1a"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#6366f1",
+          "sounds": []
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cueguide-production"
+      }
     }
   }
 }

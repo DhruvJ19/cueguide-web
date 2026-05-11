@@ -15,7 +15,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       role: 'caregiver',
-      isAuthenticated: true, // Default to true for MVP (demo mode)
+      isAuthenticated: false,
       setRole: (role) => set({ role }),
       setAuthenticated: (value) => set({ isAuthenticated: value }),
     }),

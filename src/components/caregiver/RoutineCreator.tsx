@@ -214,7 +214,10 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
       scheduledTime: time,
       recurrence: finalRecurrence,
       isActive: true,
-      steps
+      steps,
+      patientId: 'patient-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     });
   };
 

@@ -28,6 +28,8 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
   const [helpText, setHelpText] = useState<string | null>(null);
   const [isHelpLoading, setIsHelpLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // If profile is somehow missing, render fallback
   if (!patientProfile) return <div className="p-12">Loading profile...</div>;
@@ -98,12 +100,9 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
      }
   };
 
-  const [completionStatus, setCompletionStatus] = useState<'completed' | 'partial' | 'missed'>('completed');
-  const [showVideoCall, setShowVideoCall] = useState(false);
-
-  const finishRoutine = (resultStatus: 'completed' | 'partial' | 'missed') => {
-     setCompletionStatus(resultStatus);
-     setStatus('mood');
+const finishRoutine = (resultStatus: 'completed' | 'partial' | 'missed') => {
+      const finalStatus = resultStatus;
+      setStatus('mood');
      
      if (resultStatus === 'completed') {
         confetti({
@@ -119,14 +118,14 @@ export default function PatientFocusMode({ routine, onComplete, onExit, onAlert 
      }
   };
 
-  const submitMood = (moodValue: string) => {
-     setStatus('finished');
-     // Auto close after 3 seconds
-     setTimeout(() => {
-        const minutes = Math.round((Date.now() - startTime) / 60000) || 1; // min 1 min
-        onComplete(completionStatus, minutes, stepsCompleted + (completionStatus === 'completed' ? 1 : 0), moodValue);
-     }, 3000);
-  };
+const submitMood = (moodValue: string) => {
+      setStatus('finished');
+      setTimeout(() => {
+         const minutes = Math.round((Date.now() - startTime) / 60000) || 1;
+         const finalStatus = 'completed';
+         onComplete(finalStatus, minutes, stepsCompleted + 1, moodValue);
+      }, 3000);
+   };
 
   const handleHelp = async () => {
      if (helpText) return; // already showing

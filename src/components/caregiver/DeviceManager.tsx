@@ -6,8 +6,8 @@ import { format, parseISO } from 'date-fns';
 import { motion } from 'motion/react';
 
 export default function DeviceManager() {
-  const latestHeartRate = INITIAL_SENSORS.find(s => s.type === 'heart_rate')?.value || '72';
-  const latestMotion = INITIAL_SENSORS.filter(s => s.type === 'motion').slice(0, 3);
+  const latestHeartRate = INITIAL_SENSORS.find(s => s.sensorType === 'heart_rate')?.value || '72';
+  const latestMotion = INITIAL_SENSORS.filter(s => s.sensorType === 'motion').slice(0, 3);
 
   return (
     <div className="space-y-8 animate-in slide-in-from-bottom-2 fade-in duration-500">

@@ -1,3 +1,6 @@
 {
-  "name": "cueguide-web"
+  "name": "cueguide-web",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

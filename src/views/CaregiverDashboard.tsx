@@ -6,6 +6,7 @@ import DeviceManager from '../components/caregiver/DeviceManager';
 import AnonymizationPipeline from '../components/caregiver/AnonymizationPipeline';
 import ReportsEngine from '../components/caregiver/ReportsEngine';
 import GlowCard from '../components/GlowCard';
+import SettingsPage from '../pages/Settings';
 import { Plus, CheckCircle2, Circle, Clock, MoreVertical, Play, Zap, ZapOff, Sparkles, AlertCircle, LayoutDashboard, ListTodo, Activity, Settings, User, Shield, Radio, FileText, HeartPulse, Sun, Moon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { AIGenerationStatus } from '../services/ai';
@@ -582,78 +583,10 @@ export default function CaregiverDashboard({
           </div>
         )}
 
-        {/* Settings */}
+{/* Settings */}
         {activeTab === 'settings' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-12 max-w-4xl">
-             <div className="border-b border-line pb-6">
-                <h2 className="font-display font-light text-3xl text-content">System Settings</h2>
-             </div>
-             
-             <div className="bg-panel border border-line rounded-2xl p-8 space-y-8">
-                <div>
-                  <h3 className="font-semibold text-lg text-content mb-2">AI Capabilities</h3>
-                  <p className="text-sm text-content-muted mb-6">Connect CueGuide to Gemini for dynamic memory assistance, mood analysis, and adaptive scheduling.</p>
-                  
-                  <div className="flex items-center gap-4 bg-panel-hover p-4 rounded-xl border border-line">
-                     <label className="flex items-center gap-4 text-sm font-bold tracking-wide text-content cursor-pointer select-none w-full">
-                        <div className="relative">
-                          <input id="ai-toggle-switch" type="checkbox" checked={aiConfig.isEnabled} onChange={e => setAiConfig({ ...aiConfig, isEnabled: e.target.checked })} className="sr-only peer"/>
-                          <div className="w-11 h-6 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
-                        </div>
-                        <span className="flex flex-col">
-                          Enable Live AI Prompts 
-                          <span className="text-xs font-normal text-content-muted mt-1">Generates dynamic sub-steps and verbal cues (Powered by Gemini API)</span>
-                        </span>
-                     </label>
-                  </div>
-                  
-                  {aiConfig.isEnabled && (
-                    <div className="mt-6">
-                       <label className="block text-xs font-bold uppercase tracking-widest text-content-muted mb-2">Gemini API Key</label>
-                       <input 
-                         type="password" 
-                         value={aiConfig.apiKey} 
-                         onChange={e => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
-                         placeholder="AI Studio API key injected by default" 
-                         className="w-full md:w-2/3 px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:border-indigo-500 focus:outline-none transition-all" 
-                       />
-                    </div>
-                  )}
-                </div>
-             </div>
-
-             <div className="bg-panel border border-line rounded-2xl p-8">
-                 <h3 className="font-semibold text-lg text-content mb-2">Connected Devices</h3>
-                 <p className="text-content-muted text-sm mb-6">Passive tracking devices connect patient context automatically.</p>
-                 
-                 <div className="space-y-4">
-                    <div className="bg-panel-hover p-5 rounded-xl border border-line flex items-center justify-between">
-                       <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-panel rounded-lg border border-line flex items-center justify-center text-content-muted">
-                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                          </div>
-                          <div>
-                             <h4 className="font-bold text-content text-sm">Apple Health</h4>
-                             <p className="text-xs text-content-muted mt-0.5">Sleep staging connected</p>
-                          </div>
-                       </div>
-                       <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-400/10 border border-emerald-200 dark:border-transparent px-2.5 py-1 rounded-md">Connected</span>
-                    </div>
-
-                    <div className="bg-panel-hover p-5 rounded-xl border border-line flex items-center justify-between">
-                       <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-panel rounded-lg border border-line flex items-center justify-center text-content-muted">
-                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                          </div>
-                          <div>
-                             <h4 className="font-bold text-content text-sm">Smart Sensors</h4>
-                             <p className="text-xs text-content-muted mt-0.5">Not configured</p>
-                          </div>
-                       </div>
-                       <button className="text-xs font-bold text-content border border-line bg-panel hover:bg-panel-hover px-3 py-1.5 rounded-md transition-colors">Setup</button>
-                    </div>
-                 </div>
-             </div>
+          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 max-w-5xl">
+             <SettingsPage />
           </div>
         )}
         

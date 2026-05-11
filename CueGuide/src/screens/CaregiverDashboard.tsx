@@ -42,11 +42,11 @@ export default function CaregiverDashboard({ onStartRoutine, onNavigateToPatient
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Good morning</Text>
-            <Text style={styles.caregiverName}>{profile.primaryCaregiverName || 'Caregiver'}</Text>
+            <Text style={styles.caregiverName}>{profile?.primaryCaregiverName || 'Caregiver'}</Text>
           </View>
           <View style={styles.patientInfo}>
             <Text style={styles.patientLabel}>Patient</Text>
-            <Text style={styles.patientName}>{profile.name}</Text>
+            <Text style={styles.patientName}>{profile?.name || 'Patient'}</Text>
           </View>
         </View>
 

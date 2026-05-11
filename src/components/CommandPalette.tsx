@@ -14,7 +14,6 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
   const [search, setSearch] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const { setRole } = useAuthStore();
-  const { theme, setTheme } = useSettingsStore();
 
   useEffect(() => {
     if (isOpen) {
@@ -39,11 +38,19 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
     { id: 'nav-compliance', icon: <Shield />, title: 'PHI Compliance', section: 'Navigation', action: () => onNavigate('compliance') },
     { id: 'nav-reports', icon: <Search />, title: 'Generate Reports', section: 'Navigation', action: () => onNavigate('reports') },
     
-    { id: 'action-patient', icon: <User />, title: 'Switch to Patient Mode', section: 'Actions', action: () => setRole('patient') },
-    { id: 'action-theme', icon: <Settings />, title: `Toggle Theme (${theme})`, section: 'Actions', action: () => setTheme(theme === 'dark' ? 'light' : 'dark') },
+    { id: 'action-patient', icon: <User size={18} />, title: 'Switch to Patient Mode', section: 'Actions', action: () => setRole('patient') },
+    { id: 'action-logout', icon: <Shield size={18} />, title: 'View Privacy Settings', section: 'Actions', action: () => onNavigate('compliance') },
   ];
 
-  const filteredCommands = commands.filter(cmd => 
+  interface CommandItem {
+    id: string;
+    icon: React.ReactElement;
+    title: string;
+    section: string;
+    action: () => void;
+  }
+
+  const filteredCommands = commands.filter((cmd: CommandItem) => 
     cmd.title.toLowerCase().includes(search.toLowerCase()) || 
     cmd.section.toLowerCase().includes(search.toLowerCase())
   );
@@ -106,7 +113,7 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                             className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-300 text-content transition-all group text-left"
                           >
                             <span className="text-content-muted group-hover:text-indigo-400 mr-3 transition-colors">
-                              {React.cloneElement(cmd.icon as React.ReactElement, { size: 18 })}
+                              {React.createElement(cmd.icon.type, { size: 18 })}
                             </span>
                             <span className="font-medium">{cmd.title}</span>
                           </button>

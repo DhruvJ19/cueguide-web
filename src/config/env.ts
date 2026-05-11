@@ -8,5 +8,9 @@ export const config = {
   },
   elevenlabs: {
     apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY || '',
+  },
+  vapid: {
+    publicKey: import.meta.env.VITE_VAPID_PUBLIC_KEY || '',
+    privateKey: import.meta.env.VITE_VAPID_PRIVATE_KEY || '',
   }
 };

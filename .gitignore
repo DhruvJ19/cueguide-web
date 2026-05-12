@@ -25,3 +25,6 @@ CueGuide/.expo/
 # Production keys — never commit
 .env
 .env*.local
+
+# Ignore accidental SDK files from home directory
+~/

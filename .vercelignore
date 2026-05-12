@@ -1,0 +1,28 @@
+# Ignore Android/iOS build artifacts
+~/
+CueGuide/android
+CueGuide/ios
+CueGuide/.expo
+
+# Ignore large SDK and build files
+*.apk
+*.aab
+*.hbc
+*.jar
+*.aar
+
+# Ignore node_modules everywhere
+node_modules
+**/node_modules
+
+# Ignore test files
+test-*.cjs
+test-*.js
+cueguide-test.png
+
+# Ignore temp files
+supabase/functions
+
+# Ignore local env
+.env.local
+.env.*.local

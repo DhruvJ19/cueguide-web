@@ -10,6 +10,7 @@ import OnboardingPage from './pages/Onboarding';
 import SettingsPage from './pages/Settings';
 import PrivacyPage from './pages/Privacy';
 import TermsPage from './pages/Terms';
+import NotFound from './pages/NotFound';
 import { HeartPulse, AlertTriangle } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
@@ -203,6 +204,7 @@ export default function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/dashboard" element={<AppShell />} />
         <Route path="/" element={<AppShell />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <SyncStatus />
       <ManagementPanel />

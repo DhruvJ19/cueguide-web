@@ -22,6 +22,8 @@ import { useAuthStore } from './store/authStore';
 import { useSettingsStore } from './store/settingsStore';
 
 import CommandPalette from './components/CommandPalette';
+import { ManagementPanel } from './components/ManagementPanel';
+import { SyncStatus } from './components/SyncStatus';
 import { supabase, db } from './services/supabase';
 
 function ErrorFallback({ error, resetErrorBoundary }: any) {
@@ -202,6 +204,8 @@ export default function App() {
         <Route path="/dashboard" element={<AppShell />} />
         <Route path="/" element={<AppShell />} />
       </Routes>
+      <SyncStatus />
+      <ManagementPanel />
     </BrowserRouter>
   );
 }

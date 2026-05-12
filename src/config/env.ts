@@ -3,6 +3,9 @@ export const config = {
     url: import.meta.env.VITE_SUPABASE_URL || 'https://mock-supabase-url.supabase.co',
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key',
   },
+  openrouter: {
+    apiKey: import.meta.env.VITE_OPENROUTER_API_KEY || '',
+  },
   gemini: {
     apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
   },

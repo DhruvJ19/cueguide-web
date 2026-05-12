@@ -1,4 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
+import { config } from '../config/env';
+
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const DEFAULT_MODEL = 'openai/gpt-4o';
 
 interface AIPromptContext {
   patientName: string;
@@ -19,12 +22,41 @@ export interface AIGenerationStatus {
   apiKey: string;
 }
 
+async function callOpenRouter(prompt: string, model = DEFAULT_MODEL) {
+  const apiKey = config.openrouter.apiKey;
+  if (!apiKey) {
+    throw new Error('OpenRouter API key not configured');
+  }
+
+  const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://cueguide.app',
+      'X-Title': 'CueGuide',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenRouter API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
 export async function generateCueData(contextData: AIPromptContext, aiConfig: AIGenerationStatus) {
-  if (aiConfig.isEnabled && aiConfig.apiKey) {
+  const apiKey = aiConfig.apiKey || config.openrouter.apiKey;
+  
+  if (aiConfig.isEnabled && apiKey) {
     try {
-      const ai = new GoogleGenAI({ apiKey: aiConfig.apiKey });
-      const prompt = `
-You are CueGuide, a compassionate AI assistant helping people with early-stage
+      const prompt = `You are CueGuide, a compassionate AI assistant helping people with early-stage
 dementia complete daily routines. You generate step-by-step prompts.
 
 Patient Name: ${contextData.patientName}
@@ -49,27 +81,17 @@ Output format ONLY JSON, no markdown formatting blocks, no extra text:
     }
   ],
   "encouragement": "warm finish statement, very conversational, use the preferred name, encourage them"
-}
-`;
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-pro',
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json"
-        }
-      });
-      
-      const text = response.text;
+}`;
+
+      const text = await callOpenRouter(prompt);
       if (text) {
         return JSON.parse(text);
       }
     } catch (e) {
       console.error("AI Generation failed", e);
-      // fallback on error
     }
   }
 
-  // Fallback / Pre-generated
   return {
     "greeting": `Good morning, ${contextData.preferredName}. It's a nice ${contextData.context.day}, ${contextData.context.date}. The weather is ${contextData.context.weather.toLowerCase()} today.`,
     "steps": contextData.steps.map(step => ({
@@ -81,10 +103,11 @@ Output format ONLY JSON, no markdown formatting blocks, no extra text:
 }
 
 export async function generateRoutineSteps(routineName: string, category: string, stepCount: string | number, aiConfig: AIGenerationStatus) {
-  if (aiConfig.isEnabled && aiConfig.apiKey) {
-     try {
-       const ai = new GoogleGenAI({ apiKey: aiConfig.apiKey });
-       const prompt = `Generate exactly ${stepCount} simple, clear steps for a routine for someone with early dementia.
+  const apiKey = aiConfig.apiKey || config.openrouter.apiKey;
+  
+  if (aiConfig.isEnabled && apiKey) {
+    try {
+      const prompt = `Generate exactly ${stepCount} simple, clear steps for a routine for someone with early dementia.
 Routine Name: ${routineName}
 Category: ${category}
 
@@ -92,33 +115,25 @@ Output JSON format ONLY (array of objects):
 [
   { "instruction": "Step text (short, clear)", "icon": "a single distinct emoji representing the step" }
 ]`;
-       const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json"
-          }
-       });
-       if (response.text) return JSON.parse(response.text);
-     } catch (e) {
-       console.error("AI Routine Generation failed", e);
-     }
+      const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
+      if (text) return JSON.parse(text);
+    } catch (e) {
+      console.error("AI Routine Generation failed", e);
+    }
   }
   return null;
 }
 
 export async function suggestRoutineCategory(routineName: string, aiConfig: AIGenerationStatus) {
-  if (aiConfig.isEnabled && aiConfig.apiKey && routineName.trim()) {
+  const apiKey = aiConfig.apiKey || config.openrouter.apiKey;
+  
+  if (aiConfig.isEnabled && apiKey && routineName.trim()) {
     try {
-      const ai = new GoogleGenAI({ apiKey: aiConfig.apiKey });
       const prompt = `Categorize this routine name: "${routineName}"
 Choose the single most appropriate category from this list: hygiene, medication, exercise, social, meals, other.
 Only reply with the category name, nothing else.`;
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
-      const cat = response.text?.trim().toLowerCase();
+      const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
+      const cat = text?.trim().toLowerCase();
       if (['hygiene', 'medication', 'exercise', 'social', 'meals', 'other'].includes(cat || '')) {
         return cat;
       }
@@ -130,17 +145,15 @@ Only reply with the category name, nothing else.`;
 }
 
 export async function suggestRoutineName(contextNotes: string, aiConfig: AIGenerationStatus) {
-  if (aiConfig.isEnabled && aiConfig.apiKey) {
+  const apiKey = aiConfig.apiKey || config.openrouter.apiKey;
+  
+  if (aiConfig.isEnabled && apiKey) {
     try {
-      const ai = new GoogleGenAI({ apiKey: aiConfig.apiKey });
       const prompt = `Based on this patient context, suggest a comforting short routine name (max 3-4 words).
 Context: ${contextNotes || 'General early stage dementia.'}
 Only return the routine name, nothing else.`;
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
-      return response.text?.trim().replace(/"/g, '');
+      const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
+      return text?.trim().replace(/"/g, '');
     } catch (e) {
       console.error("AI Name suggestion failed", e);
     }
@@ -149,17 +162,16 @@ Only return the routine name, nothing else.`;
 }
 
 export async function generateHelpExplanation(stepInstruction: string, aiConfig: AIGenerationStatus) {
-  if (aiConfig.isEnabled && aiConfig.apiKey) {
-     try {
-       const ai = new GoogleGenAI({ apiKey: aiConfig.apiKey });
-       const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: `Please provide a calm, simple 1-2 sentence expanded explanation for this step for someone with early dementia: "${stepInstruction}"`
-       });
-       return response.text;
-     } catch (e) {
-       console.error("AI Help failed", e);
-     }
+  const apiKey = aiConfig.apiKey || config.openrouter.apiKey;
+  
+  if (aiConfig.isEnabled && apiKey) {
+    try {
+      const prompt = `Please provide a calm, simple 1-2 sentence expanded explanation for this step for someone with early dementia: "${stepInstruction}"`;
+      const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
+      return text;
+    } catch (e) {
+      console.error("AI Help failed", e);
+    }
   }
   return "Take your time. Expand gently on what needs to be done. We are here to help.";
 }

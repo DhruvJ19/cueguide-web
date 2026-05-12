@@ -45,9 +45,4 @@ export function clearUser() {
   Sentry.setUser(null);
 }
 
-export function startTransaction(name: string, op: string) {
-  if (!SENTRY_DSN) return null;
-  return Sentry.startTransaction({ name, op });
-}
-
 export { Sentry };

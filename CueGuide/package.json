@@ -17,6 +17,7 @@
     "date-fns": "^4.1.0",
     "expo": "~54.0.33",
     "expo-av": "^16.0.8",
+    "expo-constants": "~16.0.1",
     "expo-healthkit-module": "^1.0.35",
     "expo-linking": "^55.0.15",
     "expo-notifications": "^55.0.22",

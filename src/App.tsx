@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import CaregiverDashboard from './views/CaregiverDashboard';
-import PatientFocusMode from './views/PatientFocusMode';
-import LoginPage from './pages/Login';
-import SignupPage from './pages/Signup';
-import AuthCallbackPage from './pages/AuthCallback';
-import OnboardingPage from './pages/Onboarding';
-import SettingsPage from './pages/Settings';
-import PrivacyPage from './pages/Privacy';
-import TermsPage from './pages/Terms';
-import NotFound from './pages/NotFound';
+import { initMonitoring } from './services/monitoring';
+import { PageLoading } from './components/LoadingSpinner';
+
+// Initialize crash reporting
+initMonitoring();
+
+// Lazy-loaded views for code splitting
+const CaregiverDashboard = lazy(() => import('./views/CaregiverDashboard'));
+const PatientFocusMode = lazy(() => import('./views/PatientFocusMode'));
+const LoginPage = lazy(() => import('./pages/Login'));
+const SignupPage = lazy(() => import('./pages/Signup'));
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallback'));
+const OnboardingPage = lazy(() => import('./pages/Onboarding'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const PrivacyPage = lazy(() => import('./pages/Privacy'));
+const TermsPage = lazy(() => import('./pages/Terms'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 import { HeartPulse, AlertTriangle } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
@@ -194,6 +201,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -208,6 +216,7 @@ export default function App() {
       </Routes>
       <SyncStatus />
       <ManagementPanel />
+      </Suspense>
     </BrowserRouter>
   );
 }

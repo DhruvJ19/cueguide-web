@@ -2,12 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+
+    <!-- Primary Meta Tags -->
     <title>CueGuide | AI-Powered Dementia Companion & Caregiver Dashboard</title>
+    <meta name="title" content="CueGuide | AI-Powered Dementia Companion & Caregiver Dashboard" />
     <meta name="description" content="CueGuide is a contextual AI companion that guides patients with early dementia through daily routines using personalized, multimodal cues while keeping caregivers informed in real-time." />
+    <meta name="keywords" content="dementia care, caregiver, AI companion, daily routines, Alzheimer's, elderly care" />
+    <meta name="author" content="CueGuide" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#4F46E5" />
+    <meta name="application-name" content="CueGuide" />
+    <meta name="apple-mobile-web-app-title" content="CueGuide" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cueguide-web.vercel.app" />
+    <meta property="og:title" content="CueGuide | AI-Powered Dementia Companion & Caregiver Dashboard" />
+    <meta property="og:description" content="AI companion that guides dementia patients through daily routines while keeping caregivers informed in real-time." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CueGuide | AI-Powered Dementia Companion" />
+    <meta name="twitter:description" content="AI companion for dementia patients and their caregivers." />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Preconnect to critical origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://kueqtpekkqapclczvahc.supabase.co" />
+    <link rel="dns-prefetch" href="https://openrouter.ai" />
+
+    <!-- Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/push-sw.js');
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

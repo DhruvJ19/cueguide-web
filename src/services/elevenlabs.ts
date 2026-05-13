@@ -1,7 +1,3 @@
-import { config } from '../config/env';
-
-const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
-
 export interface VoiceSettings {
   stability: number;
   similarity_boost: number;
@@ -33,12 +29,9 @@ let cachedVoices: Voice[] | null = null;
 
 export async function fetchVoices(): Promise<Voice[]> {
   if (cachedVoices) return cachedVoices;
-  if (!config.elevenlabs.apiKey) return [];
 
   try {
-    const res = await fetch(`${ELEVENLABS_BASE}/voices`, {
-      headers: { 'xi-api-key': config.elevenlabs.apiKey },
-    });
+    const res = await fetch('/api/elevenlabs/voices');
     if (!res.ok) return [];
     const data = await res.json();
     cachedVoices = data.voices || [];
@@ -54,29 +47,20 @@ export async function speakWithElevenLabs(
   gentle: boolean = false,
   onEnd?: () => void,
 ): Promise<void> {
-  if (!config.elevenlabs.apiKey) {
-    console.warn('ElevenLabs API key not configured, falling back to browser TTS');
-    speakWithBrowserTTS(text, gentle);
-    return;
-  }
-
   try {
-    const response = await fetch(
-      `${ELEVENLABS_BASE}/text-to-speech/${voiceId}/stream`,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': config.elevenlabs.apiKey,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_monolingual_v1',
-          voice_settings: gentle ? GENTLE_SETTINGS : DEFAULT_SETTINGS,
-        }),
-      }
-    );
+    const response = await fetch('/api/elevenlabs/tts', {
+      method: 'POST',
+      headers: {
+        Accept: 'audio/mpeg',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        voiceId,
+        gentle,
+        voice_settings: gentle ? GENTLE_SETTINGS : DEFAULT_SETTINGS,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`ElevenLabs API error: ${response.status}`);
@@ -139,11 +123,8 @@ export function isSpeaking(): boolean {
 }
 
 export async function testElevenLabs(): Promise<boolean> {
-  if (!config.elevenlabs.apiKey) return false;
   try {
-    const res = await fetch(`${ELEVENLABS_BASE}/voices`, {
-      headers: { 'xi-api-key': config.elevenlabs.apiKey },
-    });
+    const res = await fetch('/api/elevenlabs/voices');
     return res.ok;
   } catch {
     return false;

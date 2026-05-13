@@ -1,611 +1,435 @@
-import React, { useState } from 'react';
-import { Routine, Completion, ScheduleAdjustment } from '../types';
-import WeeklyCharts from '../components/caregiver/WeeklyCharts';
-import RoutineCreator from '../components/caregiver/RoutineCreator';
-import DeviceManager from '../components/caregiver/DeviceManager';
-import AnonymizationPipeline from '../components/caregiver/AnonymizationPipeline';
-import ReportsEngine from '../components/caregiver/ReportsEngine';
-import GlowCard from '../components/GlowCard';
-import SettingsPage from '../pages/Settings';
-import { Plus, CheckCircle2, Circle, Clock, MoreVertical, Play, Zap, ZapOff, Sparkles, AlertCircle, LayoutDashboard, ListTodo, Activity, Settings, User, Shield, Radio, FileText, HeartPulse, Sun, Moon } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
-import { AIGenerationStatus } from '../services/ai';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useMemo, useState } from 'react';
+import {
+  Activity,
+  Bell,
+  CalendarClock,
+  CheckCircle2,
+  ClipboardList,
+  FileText,
+  HeartPulse,
+  LayoutDashboard,
+  Moon,
+  Pill,
+  Plus,
+  Radio,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sun,
+  UserRound,
+} from 'lucide-react';
+import { format } from 'date-fns';
 import { usePatientStore } from '../store/patientStore';
 import { useRoutineStore } from '../store/routineStore';
 import { useCompletionStore } from '../store/completionStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { toast } from 'sonner';
+import { useMedicationStore } from '../store/medicationStore';
+import { useAlertStore } from '../store/alertStore';
+import { validateMedicationDraft } from '../services/careAlerts';
+import { buildMedicationRoutine, getMedicationScheduleTimes } from '../services/medicationRoutine';
+import type { Medication, Routine } from '../types';
 
-const RoutineCard = ({ routine, completion, onStart, getMoodIcon, compact = false }: any) => {
-  const statusColor = 
-    completion?.status === 'completed' ? 'border-emerald-500/30 bg-emerald-500/5' :
-    completion?.status === 'in_progress' ? 'border-indigo-500/30 bg-indigo-500/5' :
-    completion?.status === 'missed' ? 'border-red-500/30 bg-red-500/5' :
-    completion?.status === 'partial' ? 'border-amber-500/30 bg-amber-500/5' : 'border-line glass-card';
-  
-  const textColor = 
-    completion?.status === 'completed' ? 'text-emerald-500' :
-    completion?.status === 'in_progress' ? 'text-indigo-500' :
-    completion?.status === 'missed' ? 'text-red-500' :
-    completion?.status === 'partial' ? 'text-amber-500' : 'text-content-muted';
-
-  return (
-    <div className={`p-5 ${!compact && 'md:p-6'} flex flex-col justify-between h-full rounded-xl ${statusColor} border hover:shadow-md transition-all duration-300 group`}>
-      <div className="flex justify-between items-start mb-6">
-        <div>
-            <div className={`inline-block px-2.5 py-0.5 rounded-md bg-panel-hover border border-line text-[10px] font-bold text-content-muted mb-2 capitalize`}>
-              {routine.category || 'General'}
-            </div>
-            <h3 className={`font-semibold ${compact ? 'text-lg' : 'text-xl'} text-content tracking-tight leading-tight mb-2 group-hover:text-indigo-500 transition-colors`}>{routine.name}</h3>
-            <div className={`flex items-center ${compact ? 'text-[10px]' : 'text-xs'} font-medium text-content-muted bg-panel-hover border-line border inline-flex px-2 py-0.5 rounded-md`}>
-              <Clock size={14} className="mr-2 opacity-70" />
-              {routine.scheduledTime}
-            </div>
-        </div>
-        <button id={`routine-more-btn-${routine.id}`} aria-label="Routine Options" className="text-content-muted hover:text-content transition-colors bg-panel hover:bg-panel-hover rounded-xl p-2 border border-line">
-          <MoreVertical size={18} />
-        </button>
-      </div>
-      
-      <div className="flex-grow mt-4">
-        <div className="flex justify-between items-center mb-3">
-          <p className="text-[10px] uppercase font-black text-content-faint tracking-widest">{routine.steps.length} Steps</p>
-          {completion && <span className="text-[10px] uppercase font-bold text-content-muted">{completion.stepsCompleted} / {routine.steps.length} completed</span>}
-        </div>
-        <div className="flex gap-2 w-full h-2 bg-panel-hover border border-line rounded-sm overflow-hidden p-0.5">
-          {routine.steps.map((s: any, i: number) => (
-              <div key={s.id} className={`h-full flex-1 rounded-sm transition-all duration-500 ${completion && (completion.stepsCompleted > i || completion.status === 'completed') ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-line-strong'}`}></div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-8 flex items-center justify-between pt-6 border-t border-line">
-        <div className={`flex items-center text-xs font-bold tracking-widest uppercase ${textColor}`}>
-            {completion ? (
-              <div className="flex items-center gap-1.5 bg-panel px-2.5 py-1 border border-line rounded-md">
-                {completion.status === 'completed' && <CheckCircle2 size={14} />}
-                {completion.status.replace('_', ' ')}
-              </div>
-            ) : (
-              <span className="flex items-center gap-2"><Circle size={10} className="fill-content-faint" /> Ready</span>
-            )}
-        </div>
-        
-        {!completion && (
-          <motion.button 
-            id={`routine-play-btn-${routine.id}`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            onClick={() => onStart(routine.id)}
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-indigo-500 text-white px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/25"
-          >
-              <Play size={14} className="fill-current" /> Play
-          </motion.button>
-        )}
-        {completion?.mood && (
-            <div className="flex items-center gap-2 bg-panel border border-line px-3 py-1.5 rounded-lg">
-              <span className="text-content-faint text-xs font-medium">Mood:</span>
-              <span className="text-sm font-bold text-content flex items-center gap-1.5">{getMoodIcon(completion.mood)} {completion.mood}</span>
-            </div>
-        )}
-      </div>
-    </div>
-  );
-};
+type Tab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
 
 interface Props {
-  onStartSimulation: (id: string) => void;
-  globalAlert?: string | null;
-  clearAlert?: () => void;
+  onStartSimulation: (routine: Routine) => void;
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
-  role: 'caregiver' | 'patient';
-  setRole: (role: 'caregiver' | 'patient') => void;
   setIsCommandOpen: (open: boolean) => void;
 }
 
-export default function CaregiverDashboard({ 
-  onStartSimulation, globalAlert, clearAlert,
-  theme, setTheme, role, setRole, setIsCommandOpen
-}: Props) {
-  const { routines, addRoutine, adjustments, approveAdjustment, rejectAdjustment } = useRoutineStore();
-  const { completions } = useCompletionStore();
-  const { profile: patientProfile } = usePatientStore();
-  const { aiConfig, setAiConfig } = useSettingsStore();
+const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode }> = [
+  { id: 'today', label: 'Today', icon: <LayoutDashboard size={18} /> },
+  { id: 'medications', label: 'Medications', icon: <Pill size={18} /> },
+  { id: 'routines', label: 'Routines', icon: <ClipboardList size={18} /> },
+  { id: 'session', label: 'Live Session', icon: <Radio size={18} /> },
+  { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
+  { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
+];
 
-  const [isCreating, setIsCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'routines' | 'analytics' | 'devices' | 'compliance' | 'reports' | 'settings'>('overview');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const emptyMedication: Omit<Medication, 'id' | 'createdAt' | 'updatedAt'> = {
+  patientId: 'patient-1',
+  name: '',
+  purpose: '',
+  dosage: '',
+  pillColor: 'blue',
+  pillShape: 'small round',
+  times: ['08:00'],
+  instructions: '',
+  location: 'the yellow pill box on the kitchen counter',
+  refillDate: '',
+  isActive: true,
+};
+
+function Section({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <section className="cg-section">
+      <div className="cg-section-header">
+        <h2>{title}</h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function StatCard({ label, value, note }: { label: string; value: string; note: string }) {
+  return (
+    <div className="cg-stat">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{note}</small>
+    </div>
+  );
+}
+
+function EmptyState({ title, body, action }: { title: string; body: string; action?: React.ReactNode }) {
+  return (
+    <div className="cg-empty">
+      <strong>{title}</strong>
+      <p>{body}</p>
+      {action}
+    </div>
+  );
+}
+
+export default function CaregiverDashboard({ onStartSimulation, theme, setTheme, setIsCommandOpen }: Props) {
+  const { profile } = usePatientStore();
+  const { routines } = useRoutineStore();
+  const { completions } = useCompletionStore();
+  const { aiConfig, setAiConfig } = useSettingsStore();
+  const { medications, addMedication, toggleMedication } = useMedicationStore();
+  const { alerts, acknowledgeAlert } = useAlertStore();
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const stored = localStorage.getItem('cueguide-active-tab') as Tab | null;
+    return stored && tabs.some((item) => item.id === stored) ? stored : 'today';
+  });
+  const [isAddingMedication, setIsAddingMedication] = useState(false);
+  const [draftMedication, setDraftMedication] = useState(emptyMedication);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   React.useEffect(() => {
-    const handleNav = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail) {
-        setActiveTab(customEvent.detail as any);
-      }
+    const handleNav = (event: Event) => {
+      const tab = (event as CustomEvent).detail as Tab;
+      if (tabs.some((item) => item.id === tab)) setActiveTab(tab);
     };
     window.addEventListener('nav-tab', handleNav);
     return () => window.removeEventListener('nav-tab', handleNav);
   }, []);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todaysCompletions = completions.filter(c => c.date === todayStr);
+  React.useEffect(() => {
+    localStorage.setItem('cueguide-active-tab', activeTab);
+  }, [activeTab]);
 
-  const handleApproveAdjustment = (routineId: string, newTime: string) => {
-    approveAdjustment(routineId, newTime);
-    toast.success('Schedule adjustment approved');
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const todaysCompletions = completions.filter((completion) => completion.date === today);
+  const activeMedications = medications.filter((medication) => medication.isActive);
+  const medTimes = getMedicationScheduleTimes(medications);
+  const medicationRoutines = useMemo(
+    () =>
+      profile
+        ? medTimes.map((time) => buildMedicationRoutine({ patient: profile, medications, scheduledTime: time }))
+        : [],
+    [profile, medications, medTimes]
+  );
+  const allRoutines = [...medicationRoutines, ...routines.filter((routine) => routine.category !== 'medication')];
+  const unreadAlerts = alerts.filter((alert) => alert.status === 'unread');
+  const latestCompletion = [...todaysCompletions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  const latestRoutine = latestCompletion ? allRoutines.find((routine) => routine.id === latestCompletion.routineId) : undefined;
+
+  const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
+    setDraftMedication((current) => ({ ...current, [field]: value }));
+    setFormErrors((current) => ({ ...current, [field]: '' }));
   };
 
-  const handleRejectAdjustment = (routineId: string) => {
-    rejectAdjustment(routineId);
-    toast.success('Schedule adjustment dismissed');
-  };
-
-  const getMoodIcon = (mood?: string) => {
-    switch(mood) {
-      case 'Great': return '😄';
-      case 'Good': return '🙂';
-      case 'Okay': return '😐';
-      case 'Confused': return '😕';
-      case 'Tired': return '😔';
-      default: return '';
+  const handleAddMedication = () => {
+    const now = new Date().toISOString();
+    const validation = validateMedicationDraft({
+      ...draftMedication,
+      id: 'draft-medication',
+      patientId: profile?.id || 'patient-1',
+      createdAt: now,
+      updatedAt: now,
+    });
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
     }
+    const { id, createdAt, updatedAt, ...medication } = validation.normalized;
+    addMedication({ ...medication, patientId: profile?.id || 'patient-1' });
+    setDraftMedication(emptyMedication);
+    setFormErrors({});
+    setIsAddingMedication(false);
+  };
+
+  const renderToday = () => (
+    <div className="cg-content-grid">
+      <div className="cg-main-stack">
+        <div className="cg-hero">
+          <div>
+            <p className="cg-eyebrow">Care plan for {profile?.preferredName || 'patient'}</p>
+            <h1>Medication guidance and routine monitoring for today.</h1>
+            <p>
+              {profile?.name || 'The patient'} has {activeMedications.length} active medications and {allRoutines.length}{' '}
+              scheduled care routines.
+            </p>
+          </div>
+          <button className="cg-primary" disabled={!medicationRoutines[0]} onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>
+            <Pill size={18} /> Start medication session
+          </button>
+        </div>
+
+        <div className="cg-stats-grid">
+          <StatCard label="Medication doses" value={`${activeMedications.reduce((sum, med) => sum + med.times.length, 0)}`} note="scheduled today" />
+          <StatCard label="Completed routines" value={`${todaysCompletions.filter((item) => item.status === 'completed').length}`} note="logged today" />
+          <StatCard label="Care alerts" value={`${unreadAlerts.length}`} note="need review" />
+        </div>
+
+        <Section title="Today's Schedule">
+          <div className="cg-schedule">
+            {allRoutines.length === 0 && (
+              <EmptyState
+                title="No care sessions scheduled yet"
+                body="Add a medication time to create the first patient-ready session automatically."
+                action={<button className="cg-secondary" onClick={() => setActiveTab('medications')}>Add medication</button>}
+              />
+            )}
+            {allRoutines.map((routine) => {
+              const completion = todaysCompletions.find((item) => item.routineId === routine.id);
+              return (
+                <div key={routine.id} className="cg-schedule-row">
+                  <div className="cg-time">{routine.scheduledTime}</div>
+                  <div className="cg-schedule-body">
+                    <strong>{routine.name}</strong>
+                    <span>{routine.steps.length} guided steps</span>
+                  </div>
+                  <span className={`cg-status ${completion?.status || 'upcoming'}`}>{completion?.status || 'upcoming'}</span>
+                  <button className="cg-secondary" onClick={() => onStartSimulation(routine)}>
+                    Start
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </Section>
+      </div>
+
+      <aside className="cg-side-stack">
+        <Section title="Alert Feed">
+          <div className="cg-alert-list">
+            {alerts.length === 0 && (
+              <EmptyState title="No alerts yet" body="Help requests, skipped steps, longer-than-usual steps, and completion summaries will appear here." />
+            )}
+            {alerts.slice(0, 6).map((alert) => (
+              <button key={alert.id} className={`cg-alert ${alert.status}`} onClick={() => acknowledgeAlert(alert.id)}>
+                <Bell size={16} />
+                <span>
+                  <strong>{alert.title}</strong>
+                  <small>{alert.message}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        </Section>
+        <Section title="Patient Profile">
+          <div className="cg-profile">
+            <div className="cg-avatar"><UserRound size={30} /></div>
+            <strong>{profile?.name}</strong>
+            <span>Stage: {profile?.stage}</span>
+            <p>{profile?.context}</p>
+          </div>
+        </Section>
+      </aside>
+    </div>
+  );
+
+  const renderMedications = () => (
+    <div className="cg-content-grid">
+      <Section
+        title="Medication List"
+        action={
+          <button className="cg-primary" onClick={() => setIsAddingMedication(true)}>
+            <Plus size={16} /> Add medication
+          </button>
+        }
+      >
+        <div className="cg-med-grid">
+          {medications.length === 0 && (
+            <EmptyState
+              title="No medications entered"
+              body="Add the first medication with pill appearance, schedule, purpose, and instructions."
+              action={<button className="cg-secondary" onClick={() => setIsAddingMedication(true)}>Add medication</button>}
+            />
+          )}
+          {medications.map((medication) => (
+            <article key={medication.id} className={`cg-med-card ${!medication.isActive ? 'inactive' : ''}`}>
+              <div className="cg-med-top">
+                <div className={`cg-pill ${medication.pillColor}`} />
+                <button className="cg-toggle" onClick={() => toggleMedication(medication.id)}>
+                  {medication.isActive ? 'Active' : 'Inactive'}
+                </button>
+              </div>
+              <h3>{medication.name}</h3>
+              <p>{medication.dosage} · {medication.pillShape} {medication.pillColor}</p>
+              <p>{medication.purpose}</p>
+              <div className="cg-chip-row">
+                {medication.times.map((time) => <span key={time}>{time}</span>)}
+              </div>
+              {medication.refillDate && <small>Refill by {medication.refillDate}</small>}
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      {isAddingMedication && (
+        <Section title="Add Medication">
+          <div className="cg-form">
+            <input value={draftMedication.name} onChange={(event) => handleMedicationChange('name', event.target.value)} placeholder="Medication name" />
+            {formErrors.name && <small className="cg-field-error">{formErrors.name}</small>}
+            <input value={draftMedication.dosage} onChange={(event) => handleMedicationChange('dosage', event.target.value)} placeholder="Dosage, e.g. 10 mg" />
+            {formErrors.dosage && <small className="cg-field-error">{formErrors.dosage}</small>}
+            <input value={draftMedication.purpose} onChange={(event) => handleMedicationChange('purpose', event.target.value)} placeholder="Plain-language purpose" />
+            {formErrors.purpose && <small className="cg-field-error">{formErrors.purpose}</small>}
+            <div className="cg-form-row">
+              <input value={draftMedication.pillColor} onChange={(event) => handleMedicationChange('pillColor', event.target.value)} placeholder="Pill color" />
+              <input value={draftMedication.pillShape} onChange={(event) => handleMedicationChange('pillShape', event.target.value)} placeholder="Pill shape" />
+            </div>
+            <input value={draftMedication.times.join(', ')} onChange={(event) => handleMedicationChange('times', event.target.value.split(',').map((item) => item.trim()).filter(Boolean))} placeholder="Times, comma separated" />
+            {formErrors.times && <small className="cg-field-error">{formErrors.times}</small>}
+            <input value={draftMedication.location} onChange={(event) => handleMedicationChange('location', event.target.value)} placeholder="Where the patient finds it" />
+            <textarea value={draftMedication.instructions} onChange={(event) => handleMedicationChange('instructions', event.target.value)} placeholder="Caregiver notes or instructions" />
+            <div className="cg-form-actions">
+              <button className="cg-secondary" onClick={() => setIsAddingMedication(false)}>Cancel</button>
+              <button className="cg-primary" onClick={handleAddMedication}>Save medication</button>
+            </div>
+          </div>
+        </Section>
+      )}
+    </div>
+  );
+
+  const renderRoutines = () => (
+    <Section title="Routine Library">
+      <div className="cg-routine-grid">
+        {allRoutines.map((routine) => (
+          <article key={routine.id} className="cg-routine-card">
+            <span>{routine.category}</span>
+            <h3>{routine.name}</h3>
+            <p>{routine.scheduledTime} · {routine.steps.length} steps · {routine.recurrence.join(', ')}</p>
+            <button className="cg-secondary" onClick={() => onStartSimulation(routine)}>Launch patient mode</button>
+          </article>
+        ))}
+      </div>
+    </Section>
+  );
+
+  const renderSession = () => (
+    <Section title="Live Patient Session">
+      {latestCompletion ? (
+        <div className="cg-session-summary">
+          <div>
+            <p className="cg-eyebrow">Most recent patient session</p>
+            <h2>{latestRoutine?.name || 'Medication session'}</h2>
+            <p>{latestCompletion.stepsCompleted} of {latestCompletion.stepsTotal} steps completed in about {latestCompletion.minutes} minute{latestCompletion.minutes === 1 ? '' : 's'}.</p>
+          </div>
+          <div className="cg-session-metrics">
+            <StatCard label="Session status" value={latestCompletion.status} note="caregiver language only" />
+            <StatCard label="Step events" value={`${latestCompletion.stepEvents?.length || 0}`} note="patient actions logged" />
+          </div>
+          <div className="cg-event-list">
+            {(latestCompletion.stepEvents || []).slice(-6).map((event) => (
+              <span key={`${event.stepId}-${event.status}-${event.completedAt || event.startedAt}`}>
+                {event.status.replace('_', ' ')} · {Math.max(1, event.elapsedSeconds)}s
+              </span>
+            ))}
+          </div>
+          <button className="cg-primary" onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>Start next medication session</button>
+        </div>
+      ) : (
+        <div className="cg-live-panel">
+          <Activity size={28} />
+          <h2>No session logged today</h2>
+          <p>Start a scheduled routine to see completion, help requests, skipped steps, and timing details here.</p>
+          <button className="cg-primary" disabled={!medicationRoutines[0]} onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>Start next medication session</button>
+        </div>
+      )}
+    </Section>
+  );
+
+  const renderReports = () => (
+    <div className="cg-content-grid">
+      <Section title="Weekly Care Summary">
+        <div className="cg-report">
+          <CheckCircle2 size={22} />
+          <div>
+            <strong>{todaysCompletions.length} routines logged today</strong>
+            <p>Reports combine completion, skipped-step, help-request, medication, and mood data for caregiver and clinician review.</p>
+          </div>
+        </div>
+      </Section>
+      <Section title="Production Readiness">
+        <div className="cg-checklist">
+          <span><ShieldCheck size={16} /> Supabase RLS target</span>
+          <span><Bell size={16} /> Realtime alert model</span>
+          <span><CalendarClock size={16} /> Adaptive scheduling ready</span>
+        </div>
+      </Section>
+    </div>
+  );
+
+  const renderSettings = () => (
+    <Section title="Settings">
+      <div className="cg-settings">
+        <label>
+          <span>Live AI cue generation</span>
+          <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />
+        </label>
+        <p>AI uses the server-side OpenRouter key only. When AI is disabled or unavailable, CueGuide uses reviewed fallback prompts so patient workflows keep working.</p>
+      </div>
+    </Section>
+  );
+
+  const renderActiveTab = () => {
+    if (activeTab === 'today') return renderToday();
+    if (activeTab === 'medications') return renderMedications();
+    if (activeTab === 'routines') return renderRoutines();
+    if (activeTab === 'session') return renderSession();
+    if (activeTab === 'reports') return renderReports();
+    return renderSettings();
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-bg">
-      
-      {/* 1. Sidebar - Fixed Full Height */}
-      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col z-30 transition-all duration-300 ${isSidebarOpen ? 'w-60' : 'w-16 overflow-hidden'}`}>
-        {/* Sidebar Logo Section */}
-        <div className={`h-14 flex items-center px-4 border-b border-line mb-4 ${isSidebarOpen ? '' : 'justify-center'}`}>
-           <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-                <HeartPulse size={18} className="text-white" />
-              </div>
-              {isSidebarOpen && <h1 className="text-lg font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>}
-           </div>
+    <div className="cg-app">
+      <aside className="cg-nav">
+        <div className="cg-brand">
+          <div><HeartPulse size={20} /></div>
+          <span>CueGuide</span>
         </div>
-
-        {/* Sidebar Workspace Info */}
-        {isSidebarOpen && (
-          <div className="px-4 mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-content-faint mb-1">Workspace</p>
-            <h2 className="text-sm font-semibold text-content">Main Dashboard</h2>
-          </div>
-        )}
-
-        {/* Sidebar Navigation */}
-        <nav className="flex-1 flex flex-col gap-0.5 px-2 overflow-y-auto">
-          {[
-             { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
-             { id: 'routines', label: (
-               <div className="flex items-center w-full">
-                  <span>Routines</span>
-                  {isSidebarOpen && <span className="bg-panel-hover border border-line text-content-muted font-bold py-0.5 px-2 rounded text-[10px] ml-auto">{routines.length}</span>}
-               </div>
-             ), icon: <ListTodo size={18} /> },
-             { id: 'analytics', label: 'Analytics', icon: <Activity size={18} /> },
-             { id: 'devices', label: 'Sensors', icon: <Radio size={18} /> },
-             { id: 'compliance', label: 'PHI Privacy', icon: <Shield size={18} /> },
-             { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
-          ].map(tab => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all group ${
-                  isActive ? 'bg-indigo-600/10 text-indigo-500 border border-indigo-500/20' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'
-                } ${isSidebarOpen ? '' : 'justify-center px-0'}`}
-              >
-                <div className={`${isActive ? 'text-indigo-500' : 'text-content-faint group-hover:text-content-muted'} transition-colors shrink-0`}>{tab.icon}</div>
-                {isSidebarOpen && tab.label}
-              </button>
-            );
-          })}
+        <nav>
+          {tabs.map((tab) => (
+            <button key={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </nav>
-
-        {/* Sidebar Footer Section */}
-        <div className="p-3 border-t border-line mt-auto">
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${activeTab === 'settings' ? 'bg-panel-hover text-content border border-line' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'} ${isSidebarOpen ? '' : 'justify-center px-0'}`}
-          >
-            <Settings size={18} className="shrink-0" />
-            {isSidebarOpen && <span>Settings</span>}
-          </button>
-          <button 
-             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-content-faint hover:text-content transition-all mt-1"
-          >
-             <div className={`transition-transform duration-300 ${isSidebarOpen ? 'rotate-0' : 'rotate-180'} shrink-0`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-             </div>
-             {isSidebarOpen && <span>Collapse</span>}
-          </button>
-        </div>
       </aside>
 
-      {/* 2. Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg">
-        
-        {/* Integrated Header */}
-        <header className="h-14 px-6 flex items-center justify-between border-b border-line bg-panel z-20">
-           <div className="flex items-center gap-3 text-content">
-              <h2 className="text-base font-semibold tracking-tight capitalize">
-                 {activeTab}
-              </h2>
-              {aiConfig.isEnabled && (
-                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-500">
-                  <Zap size={10} className="fill-indigo-500" /> AI Active
-                </div>
-              )}
-           </div>
-           <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsCommandOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel-hover hover:bg-line text-content-faint text-xs transition-colors"
-              >
-                <span>Search…</span>
-                <kbd className="text-[10px] font-bold bg-panel border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
-              </button>
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <div className="flex items-center p-0.5 rounded-lg border border-line bg-panel-hover">
-                  <button 
-                    onClick={() => setRole('caregiver')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Dashboard
-                  </button>
-                  <button 
-                    onClick={() => setRole('patient')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Patient
-                  </button>
-              </div>
-           </div>
+      <main className="cg-main">
+        <header className="cg-topbar">
+          <div>
+            <p>{format(new Date(), 'EEEE, MMMM d')}</p>
+            <h1>{tabs.find((tab) => tab.id === activeTab)?.label}</h1>
+          </div>
+          <div className="cg-top-actions">
+            <button className="cg-search" onClick={() => setIsCommandOpen(true)}><Search size={16} /> Search</button>
+            <button className="cg-icon-button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
         </header>
-
-        {/* Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto relative p-6">
-           {globalAlert && (
-             <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="bg-rose-500 text-white px-5 py-3 rounded-xl flex items-center gap-4 shadow-lg shadow-rose-500/20">
-                   <AlertCircle size={20} />
-                   <div className="flex-1">
-                     <p className="text-sm font-bold">{globalAlert}</p>
-                   </div>
-                   <button onClick={() => clearAlert?.()} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                   </button>
-                </div>
-             </div>
-           )}
-
-        <div className="p-5 md:p-6">
-        
-        {activeTab === 'overview' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-6">
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-               <GlowCard className="md:col-span-2 glass-card flex flex-col justify-center" glowColor="rgba(99, 102, 241, 0.08)">
-                 <div className="p-6">
-                   <h2 className="text-2xl md:text-3xl font-display font-light text-content tracking-tight leading-tight">
-                      Good morning, <span className="font-semibold text-content">{patientProfile?.primaryCaregiverName || 'Caregiver'}</span>
-                   </h2>
-                   <p className="text-content-muted mt-2 text-sm max-w-lg">
-                      {patientProfile?.name || 'The patient'} is currently tracking on schedule. All morning sensor readings look stable.
-                   </p>
-                   <div className="mt-5 flex gap-3">
-                      <motion.button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 17 }} className="bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm">Manage Routine</motion.button>
-                   </div>
-                 </div>
-               </GlowCard>
-               
-               {/* Patient Mini-Profile */}
-               <GlowCard className="glass-card" glowColor="rgba(16, 185, 129, 0.06)">
-                 <div className="p-6 flex flex-col items-center justify-center text-center h-full">
-                   <div className="w-14 h-14 bg-panel-hover rounded-full border border-line flex items-center justify-center mb-3">
-                      <User size={32} className="text-content-faint" />
-                   </div>
-                   <h3 className="font-display font-semibold text-lg text-content">{patientProfile?.preferredName || 'Patient'}</h3>
-                   <p className="text-xs text-content-muted mt-1 uppercase tracking-widest font-bold">{patientProfile?.stage || 'Monitoring'}</p>
-                 </div>
-               </GlowCard>
-            </div>
-
-            {adjustments.length > 0 && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                   <h2 className="font-display text-2xl font-semibold text-content tracking-tight">Adaptive Suggestions</h2>
-                   <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest flex items-center gap-1">
-                     <Zap size={10} className="fill-amber-500" /> Insight
-                   </span>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {adjustments.map(adj => (
-                    <div key={adj.routineId} className="bg-panel border border-line p-6 flex flex-col justify-between rounded-2xl relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                      <div className="relative z-10 flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-lg text-content">{adj.routineName}</h3>
-                          <div className="flex items-center text-sm mt-3 mb-4 font-mono bg-panel-hover inline-flex px-3 py-1.5 rounded-lg border border-line">
-                            <Clock size={14} className="mr-2 text-content-muted" />
-                            <span className="text-content-muted line-through opacity-70">{adj.currentTime}</span> 
-                            <span className="mx-2 text-content-faint">→</span> 
-                            <span className="text-amber-600 dark:text-amber-500 font-bold">{adj.suggestedTime}</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button id={`approve-adj-${adj.routineId}-btn`} onClick={() => handleApproveAdjustment(adj.routineId, adj.suggestedTime)} className="px-4 bg-amber-500 text-white font-bold py-2 rounded-xl transition-colors text-sm shadow-md shadow-amber-500/20 hover:bg-amber-600">
-                            Approve
-                          </button>
-                          <button id={`dismiss-adj-${adj.routineId}-btn`} onClick={() => handleRejectAdjustment(adj.routineId)} className="px-4 bg-panel border border-line hover:bg-panel-hover text-content-muted font-bold py-2 rounded-xl transition-colors text-sm">
-                            Dismiss
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-sm text-content-muted leading-relaxed relative z-10 border-t border-line pt-4 mt-2">{adj.reason}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-line pb-3">
-                <h2 className="font-display text-lg font-semibold text-content tracking-tight">Today's Queue</h2>
-                <button onClick={() => setActiveTab('routines')} className="text-xs font-semibold text-content-muted hover:text-content transition-colors">View All</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 {routines.slice(0, 3).map(routine => {
-                   const completion = todaysCompletions.find(c => c.routineId === routine.id);
-                   return <RoutineCard key={routine.id} routine={routine} completion={completion} onStart={() => onStartSimulation(routine.id)} getMoodIcon={getMoodIcon} compact />;
-                 })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Routines Listing */}
-        {activeTab === 'routines' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-4 gap-3">
-              <div>
-                 <h2 className="font-display text-xl font-semibold text-content tracking-tight">All Routines</h2>
-                 <p className="text-content-muted text-xs mt-1">{routines.length} established routines</p>
-              </div>
-              <motion.button 
-                id="new-routine-btn"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                onClick={() => setIsCreating(true)}
-                className="flex items-center justify-center gap-2 bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 px-5 py-2.5 rounded-xl font-bold text-sm"
-              >
-                <Plus size={16} /> New Routine
-              </motion.button>
-            </div>
-
-            {aiConfig.isEnabled && (
-               <div className="bg-amber-50/50 dark:bg-panel mb-2 border border-amber-500/30 p-5 rounded-2xl flex items-start sm:items-center gap-4 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                     <AlertCircle size={20} className="text-amber-600 dark:text-amber-500" />
-                  </div>
-                  <div className="flex-1">
-                     <h4 className="text-content font-bold text-sm tracking-wide">Dehydration Risk</h4>
-                     <p className="text-content-muted text-sm mt-0.5">Based on heat index (84°F) and incomplete water intake in Morning Routine.</p>
-                  </div>
-               </div>
-            )}
-
-            <motion.div 
-               variants={{
-                 hidden: { opacity: 0 },
-                 visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-               }}
-               initial="hidden"
-               animate="visible"
-               className="flex flex-col gap-4"
-            >
-               {routines.length === 0 ? (
-                 <motion.div 
-                   variants={{
-                     hidden: { opacity: 0, y: 20 },
-                     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                   }}
-                   className="bg-panel border border-dashed border-line rounded-3xl p-12 flex flex-col items-center justify-center text-center"
-                 >
-                   <div className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
-                     <ListTodo size={32} />
-                   </div>
-                   <h3 className="text-xl font-bold text-content mb-2">No routines established</h3>
-                   <p className="text-content-muted max-w-md mb-8">Start building a structured day for the patient by creating customized routines with step-by-step guidance.</p>
-                   <motion.button 
-                     whileHover={{ scale: 1.05 }}
-                     whileTap={{ scale: 0.95 }}
-                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                     onClick={() => setIsCreating(true)}
-                     className="bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center gap-2"
-                   >
-                     <Plus size={18} /> Create First Routine
-                   </motion.button>
-                 </motion.div>
-               ) : (
-                 routines.map(routine => {
-                   const completion = todaysCompletions.find(c => c.routineId === routine.id);
-                   return (
-                     <motion.div 
-                       key={routine.id}
-                       variants={{
-                         hidden: { opacity: 0, y: 20 },
-                         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                       }}
-                     >
-                       <GlowCard className="bg-panel border border-line rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-line-strong transition-colors" glowColor="rgba(255,255,255,0.05)">
-                         <div className="p-4 md:p-6 w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
-                           <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="bg-panel-hover border border-line px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest text-content-muted">{routine.category}</span>
-                                {completion && <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><CheckCircle2 size={12}/> Completed</span>}
-                              </div>
-                              <h3 className="text-xl font-bold text-content">{routine.name}</h3>
-                              <div className="flex gap-4 mt-2 text-sm text-content-muted">
-                                <span className="flex items-center gap-1"><Clock size={14}/> {routine.scheduledTime}</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><ListTodo size={14}/> {routine.steps.length} Steps</span>
-                              </div>
-                           </div>
-                           
-                           <div className="flex items-center gap-3 md:justify-end">
-                              <button id={`simulate-routine-${routine.id}-btn`} aria-label="Simulate Routine" onClick={() => onStartSimulation(routine.id)} className="bg-panel-hover border border-line hover:bg-line text-content px-4 py-2 rounded-lg text-sm font-bold transition-colors">
-                                Simulate
-                              </button>
-                              <button id={`routine-options-${routine.id}-btn`} aria-label="Routine Options" className="p-2 text-content-muted hover:text-content hover:bg-panel-hover rounded-lg transition-colors border border-transparent hover:border-line">
-                                <MoreVertical size={20} />
-                              </button>
-                           </div>
-                         </div>
-                       </GlowCard>
-                     </motion.div>
-                   );
-                 })
-               )}
-            </motion.div>
-          </div>
-        )}
-
-        {/* Analytics */}
-        {activeTab === 'analytics' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-12">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-6 gap-4">
-              <div>
-                <h2 className="font-display text-3xl font-light text-content tracking-tight">Analytics & Trends</h2>
-                <p className="text-content-muted mt-1">Deep insights over the past week</p>
-              </div>
-              <button 
-                onClick={() => {
-                   import('../services/pdfExport').then(m => {
-                      if (patientProfile) {
-                        m.exportWeeklyReport(patientProfile, completions, routines);
-                        toast.success('PDF Export started');
-                      }
-                   });
-                }}
-                className="flex items-center justify-center gap-2 bg-panel-hover border border-line text-content-muted hover:text-content px-5 py-2.5 rounded-xl font-bold transition-all text-sm"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Export PDF
-              </button>
-            </div>
-            
-            <WeeklyCharts completions={completions} />
-            
-            {aiConfig.isEnabled && (
-              <div className="bg-panel border border-line rounded-2xl p-6 md:p-8 relative overflow-hidden">
-                 <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                 <div className="flex items-center gap-3 mb-8">
-                   <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
-                      <Sparkles size={18} className="fill-indigo-500" />
-                   </div>
-                   <div>
-                     <h3 className="text-xl font-bold text-content tracking-tight">AI Cognitive Check-in</h3>
-                     <p className="text-xs text-content-faint mt-0.5 font-medium uppercase tracking-widest">Generative Insight</p>
-                   </div>
-                 </div>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Mood Correlation</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        {patientProfile?.name || 'The patient'} exhibits a <strong className="text-content font-bold">30% stronger completion rate</strong> when expressing "Great" or "Good" in the morning.
-                     </p>
-                   </div>
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Task Complexity</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        He is pausing for an average of <strong className="text-amber-500 font-bold">4.2 mins</strong> on "Prepare Coffee" steps. Consider breaking this down into smaller sub-steps.
-                     </p>
-                   </div>
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Schedule Drift</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        Evening routines are starting later than scheduled (avg 42 mins drift). Recommend shifting medication times to align with eating habits.
-                     </p>
-                   </div>
-                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Devices */}
-        {activeTab === 'devices' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-            <div className="border-b border-line pb-6">
-              <h2 className="font-display font-light text-3xl text-content">Connected Devices & Sensors</h2>
-              <p className="text-content-muted mt-1 text-sm">Passive context gathering from Apple Health and Smart Home.</p>
-            </div>
-            <DeviceManager />
-          </div>
-        )}
-
-        {/* Compliance */}
-        {activeTab === 'compliance' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-             <div className="border-b border-line pb-6">
-                <h2 className="font-display font-light text-3xl text-content">HIPAA & PHI Compliance</h2>
-                <p className="text-content-muted mt-1 text-sm">Live view of the zero-trust anonymization pipeline.</p>
-             </div>
-             <AnonymizationPipeline />
-          </div>
-        )}
-
-        {/* Reports Engine */}
-        {activeTab === 'reports' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-             <div className="border-b border-line pb-6">
-                <h2 className="font-display font-light text-3xl text-content">Reports Engine</h2>
-                <p className="text-content-muted mt-1 text-sm">Generate and export clinical PDFs.</p>
-             </div>
-             <ReportsEngine />
-          </div>
-        )}
-
-{/* Settings */}
-        {activeTab === 'settings' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 max-w-5xl">
-             <SettingsPage />
-          </div>
-        )}
-        
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-      {isCreating && (
-        <RoutineCreator 
-           onSave={(r) => { 
-             addRoutine(r);
-             setIsCreating(false); 
-             toast.success('Routine created successfully'); 
-           }}
-           onClose={() => setIsCreating(false)}
-        />
-      )}
-      </AnimatePresence>
+        <div className="cg-page">{renderActiveTab()}</div>
+      </main>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { speakWithElevenLabs, cancelSpeech, isSpeaking, DEFAULT_VOICE_ID } from '../services/elevenlabs';
+import { speakWithElevenLabs, speakWithBrowserTTS, cancelSpeech, isSpeaking, DEFAULT_VOICE_ID } from '../services/elevenlabs';
 import { config } from '../config/env';
 
 export interface AudioConfig {
@@ -36,10 +36,9 @@ export async function playAudio(
   const transformed = gentle ? transformToGentle(text) : text;
   const voiceId = getGentleVoiceId();
 
-  if (config.elevenlabs.apiKey) {
+  if (config.elevenlabs.enabled) {
     await speakWithElevenLabs(transformed, voiceId, gentle);
   } else {
-    const { speakWithBrowserTTS } = await import('../services/elevenlabs');
     speakWithBrowserTTS(transformed, gentle);
   }
 }

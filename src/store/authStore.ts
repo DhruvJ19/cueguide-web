@@ -50,9 +50,9 @@ export const useAuthStore = create<AuthState>()(
             return { success: false, error: error.message };
           }
 
-          if (data.user) {
+          if ((data as any).user) {
             const session = useSessionStore.getState().addSession({
-              userId: data.user.id,
+              userId: (data as any).user.id,
               role: 'caregiver',
             });
             

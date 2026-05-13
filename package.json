@@ -8,7 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsx src/__tests__/careflows.test.ts",
+    "security:audit": "npm audit --audit-level=moderate && npm audit signatures",
+    "security:lockfile": "tsx scripts/check-lockfile-security.ts",
+    "security:secrets": "tsx scripts/check-secret-exposure.ts",
+    "security:all": "npm run security:lockfile && npm run security:secrets && npm run security:audit"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

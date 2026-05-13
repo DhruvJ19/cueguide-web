@@ -1,4 +1,4 @@
-import { PatientProfile, Routine, Completion, ScheduleAdjustment, SensorReading } from './types';
+import { PatientProfile, Routine, Completion, ScheduleAdjustment, SensorReading, Medication, CareAlert } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { subDays, format } from 'date-fns';
 
@@ -91,6 +91,70 @@ export const INITIAL_ROUTINES: Routine[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
+];
+
+export const INITIAL_MEDICATIONS: Medication[] = [
+  {
+    id: 'med-lisinopril',
+    patientId: 'patient-1',
+    name: 'Lisinopril',
+    purpose: 'helps keep your blood pressure steady',
+    dosage: '10 mg',
+    pillColor: 'blue',
+    pillShape: 'small round',
+    times: ['08:00'],
+    instructions: 'Take with breakfast and water.',
+    location: 'the yellow pill box on the kitchen counter',
+    refillDate: format(new Date(Date.now() + 1000 * 60 * 60 * 24 * 10), 'yyyy-MM-dd'),
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'med-vitamin-d',
+    patientId: 'patient-1',
+    name: 'Vitamin D',
+    purpose: 'helps keep your bones strong',
+    dosage: '1000 IU',
+    pillColor: 'white',
+    pillShape: 'round',
+    times: ['08:00'],
+    instructions: 'Take one tablet after breakfast.',
+    location: 'the yellow pill box on the kitchen counter',
+    refillDate: format(new Date(Date.now() + 1000 * 60 * 60 * 24 * 22), 'yyyy-MM-dd'),
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'med-melatonin',
+    patientId: 'patient-1',
+    name: 'Melatonin',
+    purpose: 'supports your bedtime routine',
+    dosage: '3 mg',
+    pillColor: 'white',
+    pillShape: 'oval',
+    times: ['21:00'],
+    instructions: 'Take with a small sip of water.',
+    location: 'the nightstand pill organizer',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+export const INITIAL_ALERTS: CareAlert[] = [
+  {
+    id: 'alert-demo-1',
+    patientId: 'patient-1',
+    routineId: 'routine-2',
+    type: 'routine_completed',
+    severity: 'info',
+    title: 'Morning medication completed',
+    message: 'Robert completed both scheduled morning medications with no skipped steps.',
+    status: 'unread',
+    createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+  },
 ];
 
 export const INITIAL_COMPLETIONS: Completion[] = (() => {

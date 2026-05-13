@@ -1,14 +1,14 @@
 import https from 'node:https';
 
-const DEFAULT_MODEL = process.env.ELEVENLABS_MODEL_ID || 'eleven_flash_v2_5';
+const DEFAULT_MODEL = process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_flash_v2_5';
 const MAX_TTS_CHARS = 700;
 
 function getApiKey(): string {
-  return process.env.ELEVENLABS_API_KEY || '';
+  return process.env.ELEVENLABS_API_KEY?.trim() || '';
 }
 
 function getLocalAddress(): string {
-  return process.env.ELEVENLABS_LOCAL_ADDRESS || '';
+  return process.env.ELEVENLABS_LOCAL_ADDRESS?.trim() || '';
 }
 
 function isValidVoiceId(voiceId: unknown): voiceId is string {

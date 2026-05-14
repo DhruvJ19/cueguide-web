@@ -1,7 +1,7 @@
 const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
 
 function getApiKey(): string {
-  return process.env.ELEVENLABS_API_KEY || '';
+  return process.env.ELEVENLABS_API_KEY?.trim() || '';
 }
 
 export default async function handler(req: any, res: any) {

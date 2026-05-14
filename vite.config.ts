@@ -45,6 +45,10 @@ function isValidText(text: unknown): text is string {
   return typeof text === 'string' && text.trim().length > 0 && text.length <= MAX_TTS_CHARS;
 }
 
+function readEnvValue(value: string | undefined): string {
+  return value?.trim() || '';
+}
+
 function postElevenLabsTts({
   apiKey,
   voiceId,
@@ -102,11 +106,12 @@ export default defineConfig(({mode}) => {
         configureServer(server) {
           server.middlewares.use('/api/elevenlabs/voices', async (req, res) => {
             if (req.method !== 'GET') return sendJson(res, 405, { error: 'Method not allowed' });
-            if (!env.ELEVENLABS_API_KEY) return sendJson(res, 503, { error: 'ElevenLabs is not configured' });
+            const apiKey = readEnvValue(env.ELEVENLABS_API_KEY);
+            if (!apiKey) return sendJson(res, 503, { error: 'ElevenLabs is not configured' });
 
             try {
               const response = await fetch(`${ELEVENLABS_BASE}/voices`, {
-                headers: { 'xi-api-key': env.ELEVENLABS_API_KEY },
+                headers: { 'xi-api-key': apiKey },
               });
               res.statusCode = response.status;
               res.setHeader('Content-Type', response.headers.get('Content-Type') || 'application/json');
@@ -118,7 +123,8 @@ export default defineConfig(({mode}) => {
 
           server.middlewares.use('/api/elevenlabs/tts', async (req, res) => {
             if (req.method !== 'POST') return sendJson(res, 405, { error: 'Method not allowed' });
-            if (!env.ELEVENLABS_API_KEY) return sendJson(res, 503, { error: 'ElevenLabs is not configured' });
+            const apiKey = readEnvValue(env.ELEVENLABS_API_KEY);
+            if (!apiKey) return sendJson(res, 503, { error: 'ElevenLabs is not configured' });
 
             try {
               const body = await readRequestBody(req);
@@ -130,13 +136,13 @@ export default defineConfig(({mode}) => {
 
               const payload = JSON.stringify({
                 text: text.trim(),
-                model_id: env.ELEVENLABS_MODEL_ID || 'eleven_flash_v2_5',
+                model_id: readEnvValue(env.ELEVENLABS_MODEL_ID) || 'eleven_flash_v2_5',
                 voice_settings: body.voice_settings,
               });
               const response = await postElevenLabsTts({
-                apiKey: env.ELEVENLABS_API_KEY,
+                apiKey,
                 voiceId,
-                localAddress: env.ELEVENLABS_LOCAL_ADDRESS || '',
+                localAddress: readEnvValue(env.ELEVENLABS_LOCAL_ADDRESS),
                 payload,
               });
 

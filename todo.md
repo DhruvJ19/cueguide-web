@@ -62,3 +62,4 @@ updated: 2026-05-14
 - [x] Verified the hardening pass locally with tests, lint, build, security checks, dry-run install, and care-flow smoke. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
 - [x] Deployed production and verified strict ElevenLabs `audio/mpeg` smoke. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
 - [x] Selected a production ElevenLabs stock voice and verified local TTS sample generation. See [[qa-log#2026-05-14 - Production Voice Hardening Local Gate]].
+- [x] Deployed production voice hardening and verified strict production ElevenLabs smoke. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].

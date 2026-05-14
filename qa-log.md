@@ -98,5 +98,36 @@ Evidence:
 
 Next production requirement:
 
-- Redeploy with `ELEVENLABS_VOICE_ID=hpp4J3VqNfWAUOO0d1Us`.
-- Run strict production `npm run smoke:careflow` and record all TTS responses.
+- Completed in [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
+
+## 2026-05-14 - Production Voice Hardening Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-a9ncb1rmh-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU`
+
+Selected production voice:
+
+- Voice: `Bella - Professional, Bright, Warm`
+- Voice id: `hpp4J3VqNfWAUOO0d1Us`
+- Model: `eleven_flash_v2_5`
+
+Verified:
+
+- Production `/api/elevenlabs/voices` returned selected voice metadata.
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778751634810`
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Caregiver Settings required `ElevenLabs active`.
+- ElevenLabs production proxy returned six `200 audio/mpeg` TTS responses.
+- Mobile-width caregiver view had no horizontal overflow.
+- `npm run security:secrets`
+
+Known caveat:
+
+- Final subjective voice quality still needs human-ear review in a real browser or from `/tmp/cueguide-elevenlabs-voice-sample.mp3`.

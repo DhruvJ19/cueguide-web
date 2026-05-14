@@ -44,6 +44,7 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - Production voice must be ElevenLabs through `/api/elevenlabs/tts`.
 - Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
 - Settings must show `ElevenLabs active` from a live server check before stakeholder use.
+- Patient voice should play from explicit `Read aloud` actions, not automatic step transitions.
 - Browser TTS is only an emergency fallback; it is not production-ready voice quality.
 
 ## Demo Walkthrough
@@ -64,5 +65,6 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - Mobile-width smoke reports horizontal overflow.
 - Provider secrets appear in tracked files or `dist`.
 - Supabase RLS migration is incomplete when claiming production data readiness.
+- Supabase production env names exist but live migrations/RLS have not been verified with an authenticated Supabase session.
 
 Linked: [[plans#Quality Gates]], [[todo#P0 - Demo-Critical]], [[qa-log]], [[source-map]]

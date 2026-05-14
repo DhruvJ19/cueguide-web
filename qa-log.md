@@ -131,3 +131,44 @@ Verified:
 Known caveat:
 
 - Final subjective voice quality still needs human-ear review in a real browser or from `/tmp/cueguide-elevenlabs-voice-sample.mp3`.
+
+## 2026-05-14 - Stakeholder Alpha Local Gate
+
+Status: passed locally.
+
+Code and UX changes verified:
+
+- Patient Focus Mode now sends ElevenLabs audio only when the patient taps `Read aloud`; greeting, Begin, Help, and step transitions no longer trigger unsolicited TTS calls.
+- Caregiver Settings now reports `Local fallback active` when cloud persistence is not configured in the running build.
+- README and [[dashboard]] now frame the current milestone as a stakeholder alpha instead of a generic demo shell.
+- Som's written voice target is captured in [[source-map]] and [[production-voice]]: Google Maps-like directions that sound human, soft, and gentle.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3004 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Smoke evidence:
+
+- Medication created and edited: `Smoke Omega 1778753072082`.
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Local smoke observed one `200 audio/mpeg` ElevenLabs TTS response after reducing automatic voice calls.
+- Mobile-width caregiver view had no horizontal overflow.
+- Desktop caregiver, mobile caregiver, and tablet Patient Focus Mode screenshots showed no horizontal overflow or console problems.
+
+Production env posture checked:
+
+- Vercel production has `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_USE_ELEVENLABS`, `ELEVENLABS_API_KEY`, `ELEVENLABS_MODEL_ID`, and `ELEVENLABS_VOICE_ID` configured.
+- Supabase CLI is installed, but the local session is not authenticated; live migration/RLS application could not be verified from this machine in this pass.
+- Local migrations cover medications, completions, care alerts, RLS policies, and realtime publication entries.
+
+Known caveats:
+
+- Production smoke must be rerun after deploying this reduced-audio build.
+- Full public GTM is still blocked by live Supabase migration verification, auth lifecycle QA, monitoring, legal/compliance review, and real caregiver beta evidence.
+- Subjective human-ear voice acceptance remains a real-person QA item; automated checks only prove ElevenLabs audio delivery.
+- Build still reports a large bundle warning.

@@ -26,12 +26,16 @@ ElevenLabs is the production patient voice path. Browser speech is only an emerg
 
 ## Tone Rules
 
+- Match Som's written target: Google Maps-style voice directions that sound human, soft, and gentle.
 - Ask instead of command.
 - Use short, warm, physical directions.
 - Avoid robotic phrasing, urgency, blame, and celebration effects.
 - Medication prompts should sound like gentle navigation: calm, specific, and non-scolding.
+- Trigger audio from explicit `Read aloud` actions so the patient controls when voice plays and one walkthrough does not overload the voice provider.
 
 ## Source
+
+Som email, 2026-05-14: "Think about Google Maps' voice directions. Sounds human, soft, and gentle."
 
 Som feedback in [[Som_Evaluation/1st Call with Suman & Som - 6_5_26]]: the old voice felt robotic/scolding, and dementia patients should be asked gently rather than ordered.
 

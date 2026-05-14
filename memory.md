@@ -22,7 +22,7 @@ updated: 2026-05-14
 
 - Root web app is the production demo. The nested [[CueGuide/BUILD_SUMMARY|Expo app]] is a port target, not a competing UX system.
 - The MVP loop is: caregiver medication setup -> patient Focus Mode -> patient action logging -> caregiver alerts/session summary.
-- Som feedback: patient audio should feel like gentle Google Maps voice guidance: simple, soft, human, not robotic or scolding.
+- Som written feedback on 2026-05-14: patient audio should feel like Google Maps voice directions: human, soft, and gentle.
 - Som also emphasized that dementia patients should be asked, not ordered; medication voice prompts must avoid command tone.
 - Patient-facing UI must avoid failure language. Caregiver-facing UI can show skipped/help/partial status clearly.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
@@ -53,6 +53,7 @@ Recent verified checks:
 - Production page: `https://cueguide-web.vercel.app`
 - Production ElevenLabs TTS: `/api/elevenlabs/tts` returns `audio/mpeg`.
 - Production voice target is ElevenLabs Bella (`hpp4J3VqNfWAUOO0d1Us`) using `eleven_flash_v2_5`, routed only through `/api/elevenlabs/*`.
+- Patient Focus Mode should trigger ElevenLabs from explicit `Read aloud` actions rather than automatic step transitions, reducing surprise audio and provider rate-limit risk.
 - Local hardening smoke at `127.0.0.1:3004` passed the full caregiver medication loop, patient action logging, report view, and mobile overflow check. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
 - Production smoke at `https://cueguide-web.vercel.app` passed strict ElevenLabs verification with six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
 - Production voice hardening deploy `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU` passed strict smoke with Bella selected and six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].

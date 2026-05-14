@@ -63,7 +63,6 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       if (!isMounted) return;
       setCueData(data);
       setFocusState('greeting');
-      playAudio(data.greeting, profile?.preferences.voice || 'female');
     }
     loadCue();
     return () => {
@@ -127,8 +126,6 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       setStepEvents(nextEvents);
       setCurrentStepIndex(nextIndex);
       setStepStartedAt(nextStartedAt);
-      const nextCue = cueData?.steps[currentStepIndex + 1]?.audio_text;
-      if (nextCue) playAudio(nextCue, profile.preferences.voice);
     } else {
       setStepEvents(nextEvents);
       setFocusState('mood');
@@ -152,7 +149,6 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
     }));
     const text = currentCue?.help_text || currentStep.helpText || 'Take your time. Do the next small action when you are ready.';
     setHelpText(text);
-    playAudio(text, profile.preferences.voice);
   }
 
   function handleReadAloud() {
@@ -191,8 +187,6 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
             setFocusState('step');
             setStepStartedAt(startedAt);
             setStepEvents([buildStepEvent('started', routine.steps[0], startedAt)]);
-            const first = cueData?.steps[0]?.audio_text;
-            if (first) playAudio(first, profile.preferences.voice);
           }}>
             Begin
           </button>

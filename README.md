@@ -1,13 +1,13 @@
 # CueGuide
 
-CueGuide is a caregiver medication-management and patient guidance demo for dementia care. The root web app is the current production target: caregivers configure medications, launch a calm patient Focus Mode, and review completion events, help requests, skipped steps, alerts, and reports.
+CueGuide is a caregiver medication-management and patient guidance application for dementia care. The root web app is the current production target: caregivers configure medications, launch a calm patient Focus Mode, and review completion events, help requests, skipped steps, alerts, and reports.
 
 ## Current Direction
 
-- Root React/Vite web app is the production demo.
+- Root React/Vite web app is the stakeholder alpha and production source of truth.
 - Nested `CueGuide/` Expo app is a later mobile port target.
 - ElevenLabs and AI providers are called only through server-side `/api/*` routes.
-- Supabase is the production backend target; local persisted fallback keeps demos resilient.
+- Supabase is the production backend target; local persisted fallback keeps the care flow resilient while cloud data is unavailable.
 
 ## Local Setup
 
@@ -41,7 +41,7 @@ CUEGUIDE_SMOKE_URL=http://127.0.0.1:3000 CUEGUIDE_REQUIRE_ELEVENLABS=false npm r
 
 Use `CUEGUIDE_REQUIRE_ELEVENLABS=true` or omit it for production smoke when ElevenLabs must return real `audio/mpeg`.
 
-## Production Demo Flow
+## Stakeholder Alpha Flow
 
 1. Caregiver opens Today.
 2. Caregiver adds or edits a medication.

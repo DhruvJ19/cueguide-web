@@ -119,3 +119,13 @@ Decision: Treat ElevenLabs as the required production patient voice path, with b
 Reasoning: Som explicitly rejected robotic/scolding audio and described dementia medication prompts as something that must ask gently rather than order. A production caregiver product cannot make voice quality feel optional.
 
 Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-14 - Production Voice Hardening Local Gate]], [[memory#Product Memory]]
+
+## 2026-05-14 - Patient Voice Plays On Explicit Read Aloud
+
+#decision #voice #ux #resilience
+
+Decision: Patient Focus Mode should call ElevenLabs when the patient taps `Read aloud`, not automatically on greeting, Begin, Help, or every step transition.
+
+Reasoning: Som's direction is gentle navigation, not surprise audio. Explicit playback keeps the patient in control, reduces repeated provider calls during one walkthrough, and lowers ElevenLabs rate-limit risk while preserving the required production voice path.
+
+Linked: [[production-voice#Tone Rules]], [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]], [[todo#P0 - Demo-Critical]]

@@ -16,8 +16,9 @@ updated: 2026-05-14
 - [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
 - [ ] Run one manual live demo in a real browser after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
-- [ ] Verify production voice quality with human ears: calm, soft, non-commanding, and suitable for dementia care.
-- [ ] Confirm production Supabase env values are valid or intentionally disable Supabase for demo fallback.
+- [ ] Verify production voice quality with human ears against Som's Google Maps standard: human, soft, gentle, non-commanding.
+- [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
+- [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
 
 ## P1 - Production Hardening

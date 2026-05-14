@@ -552,8 +552,8 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             <ReadinessItem
               icon={<Database size={18} />}
               label="Care data"
-              value={readiness.data ? 'Supabase configured' : 'Local demo fallback'}
-              detail={readiness.data ? 'Data API remains subject to RLS policies.' : 'Demo flow stays usable if cloud config is absent.'}
+              value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
+              detail={readiness.data ? 'Data API remains subject to RLS policies.' : 'Cloud persistence is not configured in this build; browser persistence keeps the care flow usable.'}
               status={readiness.data ? 'ready' : 'fallback'}
             />
             <ReadinessItem

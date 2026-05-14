@@ -13,8 +13,8 @@ updated: 2026-05-14
 ## Plans
 
 - [[plans]] - master roadmap, architecture direction, milestones, quality gates.
-- Current stage: web-first production demo hardening.
-- Current priority: confirm live ElevenLabs audio and demo readiness. See [[todo#P0 - Demo-Critical]].
+- Current stage: web-first stakeholder alpha hardening.
+- Current priority: confirm live ElevenLabs audio, production data posture, and stakeholder readiness. See [[todo#P0 - Demo-Critical]].
 
 ## Memory
 
@@ -25,9 +25,9 @@ updated: 2026-05-14
 
 - [[todo]] - active queue and backlog.
 - Top active work:
-  - Live manual demo pass.
-  - Confirm audible ElevenLabs in real user browser.
-  - Supabase production config/RLS verification.
+  - Live browser walkthrough pass.
+  - Human-ear ElevenLabs quality check against Som's Google Maps standard.
+  - Live Supabase migration/RLS verification.
 
 ## Decisions
 
@@ -53,7 +53,7 @@ updated: 2026-05-14
 - [[qa-log]] - dated verification evidence.
 - [[source-map]] - Som and YouTube guidance mapped to product decisions.
 - [[production-voice]] - ElevenLabs production voice requirement, selected voice, and tone rules.
-- Latest local gate: [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
+- Latest local gate: [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - Latest production gate: [[qa-log#2026-05-14 - Production Deploy Smoke]].
 - Latest production voice gate: [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 
@@ -75,7 +75,7 @@ updated: 2026-05-14
 - [[decisions]]
 - [[dashboard]]
 
-### Product And Demo
+### Product And Stakeholder Walkthrough
 
 - [[YouTube_Mobile_App_Course_BMMcmmnjrM8]]
 - [[meta-optimization]]

@@ -14,6 +14,7 @@ updated: 2026-05-14
 
 | Source | Product Translation | Current App Surface |
 | --- | --- | --- |
+| Som email, 2026-05-14: "Think about Google Maps' voice directions. Sounds human, soft, and gentle." | Production voice must feel like calm navigation, not a chatbot, alarm, or instruction bark. | [[production-voice]], Bella ElevenLabs voice, gentle audio transform. |
 | [[Som_Evaluation/1st Call with Suman & Som - 6_5_26]] voice feedback: natural, pleasant, not robotic or scolding. | ElevenLabs must be real for demos; fallback voice must still be gentle. | `/api/elevenlabs/tts`, `src/utils/audio.ts`, Patient Focus Mode Read aloud. |
 | [[Som_Evaluation/1st Call with Suman & Som - 6_5_26]] medication voice feedback: patients should be asked, not ordered. | Production prompts should use question-shaped, non-commanding audio text. | Gentle audio transform, Bella ElevenLabs voice, caregiver Settings voice status. |
 | Som medication feedback: medication category is not enough without real medicines, times, and alerts. | Medication profile and schedule drive patient prompts. | Medications tab, generated medication routines, Today's Schedule. |

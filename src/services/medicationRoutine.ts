@@ -6,8 +6,8 @@ const MEDICATION_NAMESPACE = '6c8a9332-4e2d-4c87-a420-6c2f1a4ebc5f';
 const WATER_STEP: Step = {
   id: 'med-water-step',
   position: 99,
-  instruction: 'Drink a full glass of water after taking your medicine.',
-  helpText: 'The water helps the medicine go down comfortably. Take your time.',
+  instruction: 'Would you like to take a sip of water now?',
+  helpText: 'The water can help you feel comfortable. Take your time.',
   icon: 'CupSoda',
   estimatedSeconds: 60,
 };
@@ -26,10 +26,8 @@ export function getMedicationVisual(medication: Medication) {
 
 export function getMedicationPrompt(medication: Medication, patient: PatientProfile) {
   const visual = getMedicationVisual(medication);
-  const purpose = medication.purpose ? ` It ${medication.purpose}.` : '';
   const location = medication.location || 'the yellow pill box on the kitchen counter';
-  const instruction = medication.instructions ? ` ${medication.instructions}` : '';
-  return `${patient.preferredName}, next take the ${visual}. This is ${medication.name}, ${medication.dosage}. It is in ${location}.${purpose}${instruction}`;
+  return `${patient.preferredName}, would you like to take the ${visual} with a sip of water? It is in ${location}.`;
 }
 
 export function buildMedicationRoutine({
@@ -54,7 +52,7 @@ export function buildMedicationRoutine({
     medicationId: medication.id,
     position: index + 1,
     instruction: getMedicationPrompt(medication, patient),
-    helpText: `${medication.name} is the ${getMedicationVisual(medication)}. ${medication.purpose || 'It is part of your care plan.'}`,
+    helpText: `Look for the ${getMedicationVisual(medication)} in ${medication.location || 'the yellow pill box'}. Take your time.`,
     icon: 'Pill',
     estimatedSeconds: 120,
   }));

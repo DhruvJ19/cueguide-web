@@ -3,6 +3,12 @@ import { ArrowLeft, Check, HelpCircle, SkipForward, Volume2 } from 'lucide-react
 import { generateCueData } from '../services/ai';
 import { playAudio } from '../utils/audio';
 import { createCareAlertsFromStepEvents } from '../services/careAlerts';
+import {
+  advanceFocusStep,
+  buildFocusStepEvent,
+  countCompletedSteps,
+  getFocusCompletionStatus,
+} from '../services/focusSession';
 import { useAlertStore } from '../store/alertStore';
 import { usePatientStore } from '../store/patientStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -37,7 +43,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
 
   const currentStep = routine.steps[currentStepIndex];
   const currentCue = cueData?.steps[currentStepIndex];
-  const completedCount = stepEvents.filter((event) => event.status === 'completed').length;
+  const completedCount = countCompletedSteps(stepEvents);
 
   const promptContext = useMemo(() => {
     const today = new Date();
@@ -90,46 +96,40 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
 
   if (!profile) return <div className="patient-shell">Loading profile...</div>;
 
-  function buildStepEvent(
-    status: StepCompletion['status'],
-    step = currentStep,
-    startedAt = stepStartedAt,
-  ): StepCompletion {
+  function buildStepEvent(status: StepCompletion['status']): StepCompletion {
     const completedAt = new Date().toISOString();
-    return {
-      stepId: step.id,
-      routineId: routine.id,
-      patientId: profile?.id || routine.patientId,
-      medicationId: step.medicationId,
-      startedAt,
-      completedAt: status === 'started' ? undefined : completedAt,
+    return buildFocusStepEvent({
       status,
-      elapsedSeconds: status === 'started' ? 0 : Math.max(1, Math.round((Date.parse(completedAt) - Date.parse(startedAt)) / 1000)),
-      skipped: status === 'skipped',
-      helpRequested: status === 'help_requested',
-    };
+      step: currentStep,
+      routineId: routine.id,
+      patientId: profile.id || routine.patientId,
+      startedAt: stepStartedAt,
+      completedAt,
+    });
   }
 
   function moveToNextStep(newEvent?: StepCompletion) {
-    let nextEvents = newEvent ? [...stepEvents, newEvent] : stepEvents;
     if (newEvent) {
       addAlerts(createCareAlertsFromStepEvents([newEvent], {
         patientName: profile.preferredName,
         routineName: routine.name,
       }));
     }
+    const nextStartedAt = new Date().toISOString();
+    const transition = advanceFocusStep({
+      events: stepEvents,
+      currentStepIndex,
+      steps: routine.steps,
+      routineId: routine.id,
+      patientId: profile.id || routine.patientId,
+      newEvent,
+      nextStartedAt,
+    });
     setHelpText(null);
-    if (currentStepIndex < routine.steps.length - 1) {
-      const nextIndex = currentStepIndex + 1;
-      const nextStartedAt = new Date().toISOString();
-      nextEvents = [...nextEvents, buildStepEvent('started', routine.steps[nextIndex], nextStartedAt)];
-      setStepEvents(nextEvents);
-      setCurrentStepIndex(nextIndex);
-      setStepStartedAt(nextStartedAt);
-    } else {
-      setStepEvents(nextEvents);
-      setFocusState('mood');
-    }
+    setStepEvents(transition.events);
+    setCurrentStepIndex(transition.currentStepIndex);
+    setStepStartedAt(transition.stepStartedAt);
+    setFocusState(transition.focusState);
   }
 
   function handleDone() {
@@ -158,8 +158,8 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
 
   function finishWithMood(mood: string) {
     const minutes = Math.max(1, Math.round((Date.now() - startedAt) / 60000));
-    const finalCompleted = stepEvents.filter((event) => event.status === 'completed').length;
-    const status = finalCompleted === routine.steps.length ? 'completed' : finalCompleted === 0 ? 'missed' : 'partial';
+    const finalCompleted = countCompletedSteps(stepEvents);
+    const status = getFocusCompletionStatus(stepEvents, routine.steps.length);
     setFocusState('finished');
     window.setTimeout(() => onComplete(status, minutes, finalCompleted, mood, stepEvents, cueData?.steps || []), 1200);
   }
@@ -186,7 +186,14 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
             const startedAt = new Date().toISOString();
             setFocusState('step');
             setStepStartedAt(startedAt);
-            setStepEvents([buildStepEvent('started', routine.steps[0], startedAt)]);
+            setStepEvents([buildFocusStepEvent({
+              status: 'started',
+              step: routine.steps[0],
+              routineId: routine.id,
+              patientId: profile.id || routine.patientId,
+              startedAt,
+              completedAt: startedAt,
+            })]);
           }}>
             Begin
           </button>

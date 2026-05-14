@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, db } from '../services/supabase';
-import { HeartPulse, ArrowRight, Loader2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import AuthLayout from '../components/AuthLayout';
+import { db, isSupabaseConfigured, supabase } from '../services/supabase';
+import { useMedicationStore } from '../store/medicationStore';
+import { usePatientStore } from '../store/patientStore';
+import { useRoutineStore } from '../store/routineStore';
+import type { Medication, PatientProfile } from '../types';
+
+type Stage = 'early' | 'moderate' | 'late';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
+  const { setProfile } = usePatientStore();
+  const { setMedications } = useMedicationStore();
+  const { setRoutines } = useRoutineStore();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,215 +23,212 @@ export default function OnboardingPage() {
   const [caregiverName, setCaregiverName] = useState('');
   const [patientName, setPatientName] = useState('');
   const [preferredName, setPreferredName] = useState('');
-  const [stage, setStage] = useState<'early' | 'moderate' | 'late'>('early');
+  const [stage, setStage] = useState<Stage>('early');
   const [context, setContext] = useState('');
+  const [medicationName, setMedicationName] = useState('');
+  const [dosage, setDosage] = useState('');
+  const [pillColor, setPillColor] = useState('blue');
+  const [pillShape, setPillShape] = useState('small round');
+  const [medicationTime, setMedicationTime] = useState('08:00');
+  const [location, setLocation] = useState('the yellow pill box on the kitchen counter');
+
+  const canContinueCaregiver = caregiverName.trim().length > 0;
+  const canContinuePatient = patientName.trim().length > 0;
+  const canFinishMedication = medicationName.trim().length > 0 && dosage.trim().length > 0 && /^\d{2}:\d{2}$/.test(medicationTime.trim());
 
   const handleFinish = async () => {
+    if (!canFinishMedication) return;
     setLoading(true);
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
+      const now = new Date().toISOString();
       const patientId = uuidv4();
-      const routineId = uuidv4();
+      let caregiverId = 'local-caregiver';
 
-      await db.patients.save({
+      if (isSupabaseConfigured) {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) throw new Error('Please sign in before creating a cloud patient profile.');
+        const caregiver = await db.caregivers.getOrCreate(
+          user.id,
+          caregiverName.trim(),
+          user.email || '',
+        );
+        caregiverId = caregiver?.id || user.id;
+      }
+
+      const nextProfile: PatientProfile = {
         id: patientId,
-        caregiverId: user.id,
-        name: patientName,
-        preferredName: preferredName || patientName,
-        primaryCaregiverName: caregiverName,
+        caregiverId,
+        name: patientName.trim(),
+        preferredName: preferredName.trim() || patientName.trim(),
+        primaryCaregiverName: caregiverName.trim(),
         stage,
-        context,
+        context: context.trim() || 'Medication support should stay calm, simple, and one step at a time.',
         dateOfBirth: '',
         preferences: { fontSize: 28, theme: 'warm', voice: 'female' },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+        createdAt: now,
+        updatedAt: now,
+      };
 
-      await db.routines.save({
-        id: routineId,
+      const firstMedication: Medication = {
+        id: uuidv4(),
         patientId,
-        name: 'Morning Routine',
-        category: 'hygiene',
-        scheduledTime: '08:00',
-        recurrence: ['daily'],
+        name: medicationName.trim(),
+        purpose: 'supports the daily care plan',
+        dosage: dosage.trim(),
+        pillColor: pillColor.trim() || 'blue',
+        pillShape: pillShape.trim() || 'small round',
+        times: [medicationTime.trim()],
+        instructions: 'Offer with water. Ask gently and do not pressure.',
+        location: location.trim(),
         isActive: true,
-        steps: [
-          { id: uuidv4(), position: 1, instruction: 'Wash your face with warm water', icon: '🚿' },
-          { id: uuidv4(), position: 2, instruction: 'Brush your teeth for 2 minutes', icon: '🪥' },
-          { id: uuidv4(), position: 3, instruction: 'Comb your hair', icon: '💇' },
-          { id: uuidv4(), position: 4, instruction: 'Get dressed for the day', icon: '👔' }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+        createdAt: now,
+        updatedAt: now,
+      };
 
+      setProfile(nextProfile);
+      setMedications([firstMedication]);
+      setRoutines([]);
+
+      if (isSupabaseConfigured) {
+        await db.patients.save(nextProfile);
+        await db.medications.save(firstMedication);
+      }
+
+      localStorage.setItem('cueguide-active-tab', 'today');
       navigate('/dashboard', { replace: true });
-    } catch (e: any) {
-      setError(e.message || 'Something went wrong');
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : 'Onboarding could not be saved.';
+      setError(message);
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-      <div className="glass-panel p-10 max-w-lg w-full border border-indigo-500/20">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <HeartPulse size={20} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
-        </div>
+    <AuthLayout
+      eyebrow="Care setup"
+      title="Build the first medication loop"
+      subtitle="Add one patient and one scheduled medication. You can add more later."
+    >
+      <div className="auth-progress" aria-label={`Setup step ${step + 1} of 3`}>
+        {[0, 1, 2].map((index) => (
+          <span key={index} className={index <= step ? 'active' : ''} />
+        ))}
+      </div>
 
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            {[0, 1, 2].map(i => (
-              <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-indigo-500' : 'bg-line'}`} />
+      {error && <div className="auth-alert">{error}</div>}
+
+      {step === 0 && (
+        <div className="auth-form">
+          <label>
+            <span>Caregiver name</span>
+            <input
+              type="text"
+              value={caregiverName}
+              onChange={(event) => setCaregiverName(event.target.value)}
+              placeholder="Sarah Chen"
+            />
+          </label>
+          <button type="button" disabled={!canContinueCaregiver} className="cg-primary auth-submit" onClick={() => setStep(1)}>
+            Continue <ArrowRight size={18} />
+          </button>
+        </div>
+      )}
+
+      {step === 1 && (
+        <div className="auth-form">
+          <label>
+            <span>Patient full name</span>
+            <input
+              type="text"
+              value={patientName}
+              onChange={(event) => setPatientName(event.target.value)}
+              placeholder="Robert Chen"
+            />
+          </label>
+          <label>
+            <span>Patient display name</span>
+            <input
+              type="text"
+              value={preferredName}
+              onChange={(event) => setPreferredName(event.target.value)}
+              placeholder="Dad"
+            />
+          </label>
+          <div className="auth-segmented" aria-label="Dementia stage">
+            {(['early', 'moderate', 'late'] as Stage[]).map((option) => (
+              <button key={option} type="button" className={stage === option ? 'active' : ''} onClick={() => setStage(option)}>
+                {option}
+              </button>
             ))}
           </div>
-          <p className="text-content-faint text-xs font-bold uppercase tracking-widest">
-            {step === 0 ? 'About you' : step === 1 ? 'About your loved one' : 'Almost done'}
-          </p>
-        </div>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl mb-6">
-            {error}
-          </div>
-        )}
-
-        {step === 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-content mb-2">What should we call you?</h2>
-            <p className="text-content-muted text-sm mb-6">This is how your loved one will refer to you in the app.</p>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Your name</label>
-              <input
-                type="text"
-                value={caregiverName}
-                onChange={(e) => setCaregiverName(e.target.value)}
-                placeholder="Sarah"
-                className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-            <button
-              onClick={() => caregiverName.trim() && setStep(1)}
-              disabled={!caregiverName.trim()}
-              className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-500 disabled:opacity-50"
-            >
+          <label>
+            <span>Helpful context</span>
+            <textarea
+              value={context}
+              onChange={(event) => setContext(event.target.value)}
+              placeholder="Medication location, preferred cup, comfort names, useful routines..."
+              rows={4}
+            />
+          </label>
+          <div className="auth-actions">
+            <button type="button" className="cg-secondary" onClick={() => setStep(0)}>Back</button>
+            <button type="button" disabled={!canContinuePatient} className="cg-primary" onClick={() => setStep(2)}>
               Continue <ArrowRight size={18} />
             </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-content mb-2">Who are you caring for?</h2>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Full name</label>
-              <input
-                type="text"
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-                placeholder="Robert Chen"
-                className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">What do they like to be called?</label>
-              <input
-                type="text"
-                value={preferredName}
-                onChange={(e) => setPreferredName(e.target.value)}
-                placeholder="Dad"
-                className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Stage of dementia</label>
-              <div className="flex gap-2">
-                {(['early', 'moderate', 'late'] as const).map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setStage(s)}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium capitalize transition-all ${
-                      stage === s
-                        ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400'
-                        : 'bg-panel border-line text-content-muted hover:bg-panel-hover'
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Notes about their daily life</label>
-              <textarea
-                value={context}
-                onChange={(e) => setContext(e.target.value)}
-                placeholder="Lives with wife Margaret. Orange tabby cat named Ginger. Takes a blue pill in the morning..."
-                rows={4}
-                className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500 resize-none"
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setStep(0)}
-                className="px-6 py-3 bg-panel border border-line text-content-muted font-medium rounded-xl hover:bg-panel-hover transition-colors"
-              >
-                Back
-              </button>
-              <button
-                onClick={() => patientName.trim() && setStep(2)}
-                disabled={!patientName.trim()}
-                className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-500 disabled:opacity-50"
-              >
-                Continue <ArrowRight size={18} />
-              </button>
-            </div>
+      {step === 2 && (
+        <div className="auth-form">
+          <label>
+            <span>First medication</span>
+            <input
+              type="text"
+              value={medicationName}
+              onChange={(event) => setMedicationName(event.target.value)}
+              placeholder="Lisinopril"
+            />
+          </label>
+          <div className="auth-two-col">
+            <label>
+              <span>Dosage</span>
+              <input type="text" value={dosage} onChange={(event) => setDosage(event.target.value)} placeholder="10 mg" />
+            </label>
+            <label>
+              <span>Time</span>
+              <input type="time" value={medicationTime} onChange={(event) => setMedicationTime(event.target.value)} />
+            </label>
           </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-content mb-2">You're all set, {caregiverName}</h2>
-            <p className="text-content-muted text-sm">
-              We've created a sample morning routine for {preferredName || patientName}. You can customize it from your dashboard.
-            </p>
-
-            <div className="bg-panel border border-line rounded-xl p-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-content-faint mb-3">Sample routine</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center text-lg">🚿</div>
-                <div>
-                  <p className="font-semibold text-content">Morning Routine</p>
-                  <p className="text-xs text-content-muted">8:00 AM · 4 steps</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setStep(1)}
-                className="px-6 py-3 bg-panel border border-line text-content-muted font-medium rounded-xl hover:bg-panel-hover transition-colors"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleFinish}
-                disabled={loading}
-                className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-500 disabled:opacity-50"
-              >
-                {loading ? <Loader2 size={18} className="animate-spin" /> : <>Go to dashboard <ArrowRight size={18} /></>}
-              </button>
-            </div>
+          <div className="auth-two-col">
+            <label>
+              <span>Pill color</span>
+              <input type="text" value={pillColor} onChange={(event) => setPillColor(event.target.value)} placeholder="blue" />
+            </label>
+            <label>
+              <span>Pill shape</span>
+              <input type="text" value={pillShape} onChange={(event) => setPillShape(event.target.value)} placeholder="small round" />
+            </label>
           </div>
-        )}
-      </div>
-    </div>
+          <label>
+            <span>Patient location cue</span>
+            <input
+              type="text"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="the yellow pill box on the kitchen counter"
+            />
+          </label>
+          <div className="auth-actions">
+            <button type="button" className="cg-secondary" onClick={() => setStep(1)}>Back</button>
+            <button type="button" disabled={!canFinishMedication || loading} className="cg-primary" onClick={handleFinish}>
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <>Open dashboard <ArrowRight size={18} /></>}
+            </button>
+          </div>
+        </div>
+      )}
+    </AuthLayout>
   );
 }

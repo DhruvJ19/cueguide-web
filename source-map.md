@@ -2,7 +2,7 @@
 aliases: [source-map, evidence-map, product-sources]
 tags: [project, research, som, youtube, product]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Source Map
@@ -37,6 +37,23 @@ updated: 2026-05-14
 | [Alzheimer's Association agitation guidance](https://www.alz.org/Help-Support/Caregiving/Stages-Behaviors/Anxiety-Agitation) | Use calm positive language, slow down, and ask permission. | Gentle medication wording and explicit Read aloud control. |
 | [Alzheimer's Society communication guidance](https://www.alzheimers.org.uk/about-dementia/stages-and-symptoms/dementia-symptoms/how-to-communicate-dementia) | Use short sentences, calm settings, and good lighting. | Warm patient palette, reduced distractions, high-contrast patient panel. |
 | [WCAG 2.2 contrast minimum](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum) | Normal text needs strong contrast; large text also needs reliable contrast. | Light caregiver UI with dark text and restrained clinical accent colors. |
+
+## Market And Competitor Signals
+
+| Source | Product Translation | Current App Surface |
+| --- | --- | --- |
+| [Alzheimer's Association 2025 Facts and Figures](https://www.alz.org/alzheimers-dementia/facts-figures): more than 7 million Americans live with Alzheimer's, nearly 13 million unpaid caregivers provide care, and care costs are projected at $409B in 2026. | The opportunity is large, but credibility depends on caregiver utility, not generic reminders. | Today, Alerts, Reports, Settings data readiness. |
+| [AARP medication management guide](https://www.aarp.org/caregiving/health/info-2020/medication-management.html): caregivers describe medication management as time-consuming and stressful. | CueGuide should reduce caregiver coordination burden with schedules, refills, patient actions, and reviewable history. | Medication Manager, Reports, Live Session. |
+| [Medisafe Medfriend](https://app.medisafe.com/tips/med-friend-in-need-is-med-friend-indeed/): caregiver/friend notifications after missed medication alerts. | Generic med reminder apps already cover reminders plus caregiver notifications; CueGuide must differentiate with dementia-safe patient guidance and event interpretation. | Patient Focus Mode, alert timeline, Som voice standard. |
+| [Hero caregiver page](https://herohealth.com/caregivers/) and help docs: hardware dispenser plus caregiver app, missed-dose and low-supply notifications. | Hardware competitors can better prove dispensing; CueGuide must stay honest that `Done` is patient confirmation, not physical administration proof. | Live Session language, Reports interpretation, Settings caveat. |
+| [Amazon Alexa Together update](https://www.aboutamazon.com/news/devices/alexa-together-launches-to-help-customers-remotely-care-for-loved-ones): service is no longer available as of May 21, 2025. | Voice-enabled remote caregiving is validated but unstable as a platform dependency; CueGuide should own its caregiver workflow and voice boundary. | ElevenLabs server proxy, fallback policy, future mobile path. |
+
+## Product Implications From Research
+
+- #product CueGuide cannot win as "another medication reminder." It needs to be the calm patient guidance layer plus caregiver interpretation layer.
+- #risk Physical medication administration cannot be claimed without hardware, camera, caregiver confirmation, or pharmacy/dispenser integration.
+- #ux Dementia-safe language remains a product differentiator: ask, do not command; one step at a time; caregiver sees clinical detail, patient sees calm guidance.
+- #gtm Public GTM should wait for live data proof, onboarding/auth lifecycle, monitoring, compliance review, and real caregiver beta evidence.
 
 ## Current Decisions Backed By Sources
 

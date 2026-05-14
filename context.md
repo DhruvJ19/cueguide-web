@@ -2,7 +2,7 @@
 aliases: [context, project-context, live-snapshot]
 tags: [project, context, architecture, stack]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Context
@@ -19,6 +19,7 @@ updated: 2026-05-14
 - Known unrelated local dirty file: `cueguide-test.png`, intentionally not staged.
 - Current production-revamp working set also includes Obsidian notes, readiness UI, smoke QA, and Supabase RLS migration work.
 - Current UI direction: [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] with light caregiver operations screens and a separate warm patient Focus Mode.
+- Current Product Trust pass separates ElevenLabs API readiness from human voice acceptance and keeps medication prompts question-shaped.
 
 ## Technical Stack
 
@@ -38,6 +39,9 @@ updated: 2026-05-14
 | --- | --- |
 | `src/views/CaregiverDashboard.tsx` | Main caregiver shell: Today, Medications, Routines, Live Session, Reports, Settings. |
 | `src/views/PatientFocusMode.tsx` | Patient one-step-at-a-time experience. |
+| `src/components/caregiver/CaregiverPrimitives.tsx` | Shared caregiver UI primitives for sections, stats, empty states, and readiness rows. |
+| `src/components/AuthLayout.tsx` | Shared light clinical auth/setup shell for login, signup, and onboarding. |
+| `src/services/focusSession.ts` | Pure Focus Mode step-event and completion-status logic. |
 | `src/services/medicationRoutine.ts` | Medication-to-routine generation. |
 | `src/services/careAlerts.ts` | Alert creation and medication validation. |
 | `src/services/elevenlabs.ts` | Browser-side wrapper that calls server voice APIs. |
@@ -60,6 +64,8 @@ updated: 2026-05-14
 | `npm run security:all` | Lockfile, secret exposure, audit, signature checks. |
 | `npm ci --ignore-scripts --dry-run` | Supply-chain dry run. |
 | `npm run smoke:careflow` | Production/local browser smoke test for the medication demo loop. |
+
+Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3004` have served unrelated local apps during QA.
 
 ## Environment Notes
 

@@ -2,7 +2,7 @@
 aliases: [decisions, decision-log]
 tags: [project, decisions, architecture, log]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Decisions
@@ -149,3 +149,53 @@ Decision: Move the caregiver UI beyond visual cleanup into operational surfaces:
 Reasoning: The first Hybrid Care OS pass improved contrast and navigation but still felt around 5/10. A credible stakeholder alpha needs workflow clarity, not just better colors.
 
 Linked: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]], [[todo#P2 - Product Polish]], [[plans#2. Final Production Hardening]]
+
+## 2026-05-15 - Human Voice Acceptance Is Separate From API Readiness
+
+#decision #voice #qa #product
+
+Decision: Settings must show `Human voice review pending` until a person explicitly marks the ElevenLabs voice accepted for the stakeholder walkthrough.
+
+Reasoning: `/api/elevenlabs/tts` returning `audio/mpeg` proves delivery, not subjective quality. Som's standard is human, soft, gentle, and non-commanding, so the app should not imply voice acceptance from a config flag or machine check alone.
+
+Linked: [[qa-log#2026-05-15 - Product Trust Local Gate]], [[production-voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Patient Medication Prompts Exclude Caregiver Notes
+
+#decision #ux #safety #product
+
+Decision: Patient Focus Mode medication prompts use only patient-safe pill appearance and location cues. Caregiver instructions stay in caregiver surfaces and never flow into patient prompt text.
+
+Reasoning: Browser QA showed caregiver notes could leak into patient text and create command-like phrasing. Dementia-safe guidance must stay short, question-shaped, and free of operational notes meant for caregivers.
+
+Linked: [[qa-log#2026-05-15 - Product Trust Local Gate]], [[source-map#Som Feedback]], [[memory#Product Memory]]
+
+## 2026-05-15 - Auth And Setup Must Be Honest About Data Mode
+
+#decision #auth #ux #supabase
+
+Decision: Login, signup, onboarding, and `/settings` now use the same light clinical product system and explicitly distinguish cloud auth from local data fallback.
+
+Reasoning: A stakeholder or caregiver should not see a dark starter-style account flow, and the app must not imply cloud production readiness when Supabase authenticated save/load has not been verified. Local mode remains useful, but it is labeled as local data.
+
+Linked: [[qa-log#2026-05-15 - Auth And Setup Trust Pass]], [[todo#P0 - Demo-Critical]], [[context#Commands]]
+
+## 2026-05-15 - Local QA Uses An Isolated CueGuide Port
+
+#decision #qa #developer-experience
+
+Decision: `npm run dev` now serves CueGuide on `127.0.0.1:3006` with strict port behavior.
+
+Reasoning: Browser QA on `3000` and `3004` returned unrelated local apps, creating false test evidence. CueGuide needs a stable local target so screenshots, smoke tests, and manual QA actually inspect this product.
+
+Linked: [[runbook#Local Verification]], [[qa-log#2026-05-15 - Auth And Setup Trust Pass]], [[memory#Verification Memory]]
+
+## 2026-05-15 - UI Trust Pass Prioritizes Clarity Over Explanation
+
+#decision #ux #product #qa
+
+Decision: Caregiver screens should open with the next clinical action, not a product explanation. Today now prioritizes the next medication, session start, attention state, and schedule; Reports prioritizes caregiver interpretation instead of system readiness.
+
+Reasoning: The app still felt crowded and AI-generated because too many surfaces explained CueGuide instead of letting caregivers act. For dementia-care credibility, the UI must feel calm, direct, and operational.
+
+Linked: [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]], [[todo#P2 - Product Polish]], [[source-map#Dementia And Accessibility Research]]

@@ -5,6 +5,7 @@ const MAX_STEP_CHARS = 160;
 const MAX_HELP_CHARS = 180;
 const MAX_CONTEXT_CHARS = 480;
 const DISALLOWED_PATIENT_TERMS = /\b(dementia|memory loss|forgot|failure|failed|must|hurry|urgent|immediately|noncompliant)\b/i;
+const COMMANDING_PREFIX = /^(take|swallow|drink|pick up|open)\b/i;
 
 function compactWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
@@ -16,7 +17,8 @@ function truncate(value: string, maxLength: number): string {
 }
 
 function isPatientSafe(value: string): boolean {
-  return Boolean(value.trim()) && !DISALLOWED_PATIENT_TERMS.test(value);
+  const cleaned = compactWhitespace(value);
+  return Boolean(cleaned) && !DISALLOWED_PATIENT_TERMS.test(cleaned) && !COMMANDING_PREFIX.test(cleaned);
 }
 
 export function minimizeCareContext(notes: string, names: string[]): string {

@@ -2,7 +2,7 @@
 aliases: [qa-log, verification-log, test-log]
 tags: [project, qa, verification, release]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide QA Log
@@ -44,6 +44,192 @@ Known caveats:
 - Tablet-sized Patient Focus Mode QA note.
 
 Linked: [[runbook]], [[todo#P0 - Demo-Critical]], [[meta-optimization]]
+
+## 2026-05-15 - Product Trust Local Gate
+
+Status: passed locally.
+
+Verified changes:
+
+- Patient medication prompts now ask instead of command: `Dad, would you like to take the small round blue pill with a sip of water? It is in the yellow pill box on the kitchen counter.`
+- Caregiver-only medication instructions no longer leak into Patient Focus Mode.
+- Settings now separates technical voice delivery from human voice acceptance: `Human voice review pending` until a caregiver/operator marks the voice accepted.
+- Focus Mode step events now use a pure session module for started, help, skipped, stuck, done, mood, and completion status logic.
+- Build output is chunked; the previous large-bundle warning is gone.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3005 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Browser QA:
+
+- Browser plugin connection timed out twice, so direct Playwright was used for local rendered QA.
+- Desktop caregiver Today, Settings, Medications, Live Session, and Reports rendered without console errors, page errors, framework overlays, or horizontal overflow.
+- Mobile Settings and tablet Patient Focus Mode rendered without horizontal overflow.
+- Patient prompt QA explicitly rejected `next take`, `Ask, do not command`, and caregiver instructions.
+
+Voice sample evidence:
+
+- Production `/api/elevenlabs/tts` returned `200 audio/mpeg` for all three Som-standard sample prompts.
+- Samples saved outside the repo:
+  - `/tmp/cueguide-elevenlabs-product-trust-sample-1.mp3`
+  - `/tmp/cueguide-elevenlabs-product-trust-sample-2.mp3`
+  - `/tmp/cueguide-elevenlabs-product-trust-sample-3.mp3`
+
+Screenshots captured outside the repo:
+
+- `/tmp/cueguide-product-trust-desktop-today-fixed.png`
+- `/tmp/cueguide-product-trust-desktop-settings-fixed.png`
+- `/tmp/cueguide-product-trust-desktop-medications-fixed.png`
+- `/tmp/cueguide-product-trust-tablet-patient-fixed.png`
+- `/tmp/cueguide-product-trust-desktop-live-session-fixed.png`
+- `/tmp/cueguide-product-trust-desktop-reports-fixed.png`
+- `/tmp/cueguide-product-trust-mobile-settings-fixed.png`
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending; API delivery is verified, but voice quality must be accepted by a person against Som's Google Maps standard.
+- Supabase CLI is not authenticated on this machine, so live Supabase migrations/RLS/authenticated save-load proof remains blocked.
+- `cueguide-test.png` is unrelated local work and remains unstaged.
+
+## 2026-05-15 - Product Trust Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-ak0wpvkak-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_483NEJGpLeJ9fqHoyipJpY6TCeMo`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778777270596`
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Caregiver Live Session and Reports updated.
+- Settings accepted `Human voice review pending` as the honest voice state while ElevenLabs returned `200 audio/mpeg`.
+- Mobile-width caregiver view had no horizontal overflow.
+- Production tablet Patient Focus Mode rendered the question-shaped prompt: `Dad, would you like to take the small round blue pill with a sip of water? It is in the yellow pill box on the kitchen counter.`
+- Production tablet Patient Focus Mode screenshot: `/tmp/cueguide-product-trust-production-tablet-patient.png`
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending.
+- Live Supabase migrations/RLS still need authenticated verification.
+
+## 2026-05-15 - Auth And Setup Trust Pass
+
+Status: passed locally with cloud-data caveat.
+
+Why this pass happened:
+
+- Multi-project local ports were returning unrelated apps: `3000` served Robossist and `3004` served Cortex.
+- CueGuide local dev is now isolated at `http://127.0.0.1:3006`.
+- `/login`, `/signup`, `/onboarding`, and `/settings` still had legacy dark/starter surfaces that did not match [[decisions#2026-05-14 - Hybrid Care OS Visual Direction]].
+
+Code changes verified:
+
+- `package.json` and `package-lock.json` now identify the app as `cueguide-web`.
+- `npm run dev` uses `127.0.0.1:3006 --strictPort`.
+- New shared `src/components/AuthLayout.tsx` gives auth/setup screens a light clinical CueGuide shell.
+- `/login` and `/signup` show Supabase magic-link flows when configured and a clearly labeled local-data path when Supabase is absent.
+- `/onboarding` now creates the first medication loop instead of a generic hygiene routine.
+- `/settings` now opens the production readiness console inside the real caregiver dashboard, not the legacy standalone settings page.
+- `AuthCallbackPage` now creates/loads the caregiver row and supports both current `caregivers.id` and legacy direct `auth.uid()` patient ownership.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Rendered QA:
+
+- Browser plugin connection timed out twice; direct Playwright was used.
+- Desktop and mobile `/login`, `/signup`, `/onboarding`, `/dashboard`, and `/settings` rendered without app console errors or horizontal overflow.
+- Local setup flow verified: signup -> local setup -> caregiver name -> patient name -> first medication -> dashboard.
+- Verified created patient `Anika Patel`, preferred name `Mom`, and medication `Amlodipine` appeared in the caregiver dashboard.
+- Mobile login screenshot after refinement: `/tmp/cueguide-qa-20260515-after-auth/mobile-login-final.png`.
+- Desktop settings route screenshot: `/tmp/cueguide-qa-20260515-after-auth/desktop-settings-route.png`.
+
+Known caveats:
+
+- Supabase CLI is still unauthenticated: `Access token not provided`.
+- Cloud signup, migration state, RLS behavior, and authenticated save/load still need proof before public production claims.
+- Human-ear ElevenLabs voice acceptance is still pending.
+
+## 2026-05-15 - UI Trust Pass Production Deploy
+
+Status: passed.
+
+Why this pass happened:
+
+- The caregiver UI was still too wordy, crowded, and card-heavy after the previous pass.
+- Mobile Today spent too much height explaining the app before showing the schedule.
+- Reports showed system readiness where caregivers expect care interpretation.
+
+Design changes verified:
+
+- Today now opens with a compact operations board: next medication, time, step count, active med count, one primary patient-session action, medication list, and attention row.
+- Mobile Today hides noncritical header actions and reaches `Today’s Schedule` in the first viewport.
+- Medications keeps the table-like row layout but uses shorter actions: `On` and `Edit`.
+- Reports replaces the system-readiness side panel with caregiver review actions.
+- Settings copy is shorter and keeps voice/data/AI/alert/privacy state visible without a large explanatory console.
+- Auth/setup copy now uses shorter medication-care language.
+- Smoke selectors were updated for the new labels: `Care overview`, `Start patient session`, `Patient Session`, and `Edit`.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `npm run smoke:careflow`
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-jt36n59md-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_BgUFtUjB5KxEVManqvgPL2GHRcrL`
+
+Smoke evidence:
+
+- Local smoke medication: `Smoke Omega 1778780148141`
+- Production smoke medication: `Smoke Omega 1778780223376`
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+
+Rendered QA:
+
+- Browser plugin connection timed out, so direct Playwright was used.
+- Production desktop Today, Medications, Reports, Settings, and mobile Login rendered without framework overlays or horizontal overflow.
+- Production mobile Today rendered without horizontal overflow and showed `Today’s Schedule` in the first viewport.
+- Only expected warning observed: Sentry DSN not configured.
+- Screenshots captured outside the repo:
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/desktop-today.png`
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/mobile-today.png`
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/desktop-meds.png`
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/desktop-reports.png`
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/desktop-settings.png`
+  - `/tmp/cueguide-qa-20260515-production-ui-trust-pass/mobile-login.png`
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending and should be done by the user in the live browser.
+- Supabase cloud signup, migration state, RLS behavior, and authenticated save/load still need proof before public production claims.
+- Vercel still warns that `name` in `vercel.json` is deprecated.
 
 ## 2026-05-14 - Production Deploy Smoke
 

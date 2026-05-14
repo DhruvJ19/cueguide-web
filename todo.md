@@ -2,7 +2,7 @@
 aliases: [todo, tasks, backlog]
 tags: [project, todo, priorities, backlog]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Todo
@@ -17,25 +17,29 @@ updated: 2026-05-14
 - [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
 - [ ] Run one human-operated live walkthrough after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
+- [x] Verify the three Som-standard production TTS sample prompts return `audio/mpeg` through `/api/elevenlabs/tts`. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
 - [ ] Verify production voice quality with human ears against Som's Google Maps standard: human, soft, gentle, non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
+- [x] Fix local QA false-positive risk by moving CueGuide dev to isolated strict port `3006`.
+- [x] Replace legacy dark `/login`, `/signup`, `/onboarding`, and `/settings` surfaces with production-aligned care setup/readiness flows.
 
 ## P1 - Production Hardening
 
 - [x] Refactor `src/services/supabase.ts` and store save paths into a typed data gateway with explicit success/failure status.
-- [ ] Extract patient Focus Mode event handling into a pure session state module and cover Help/Skip/Done/timer behavior in tests.
+- [x] Extract patient Focus Mode event handling into a pure session state module and cover Help/Skip/Done/timer behavior in tests.
 - [x] Add structured AI cue validation at the server/client boundary with PHI-minimized context.
 - [x] Remove public-provider-secret patterns from the nested [[CueGuide/BUILD_SUMMARY|Expo app]] before mobile porting.
 - [x] Verify Supabase RLS policies and table coverage against [[context#Project Structure]].
 - [x] Audit generated bundle for provider secrets after every env/deploy change.
-- [ ] Reduce large bundle warning through route/component chunking if time allows.
+- [x] Reduce large bundle warning through route/component chunking if time allows.
 
 ## P2 - Product Polish
 
 - [x] Replace the dark card-heavy caregiver shell with the [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] light clinical UI direction.
 - [x] Upgrade the caregiver shell from visual cleanup into operational surfaces: attention queue, next-dose/refill medication rows, Live Session timeline, narrative Reports, and grouped readiness Settings.
+- [x] Run the UI Trust Pass: reduce crowded copy, compact Today, simplify mobile header, make Reports caregiver-focused, and redeploy with strict production smoke.
 - [x] Tighten README so it describes CueGuide, not the original AI Studio starter.
 - [x] Add [[runbook]] for demo/test/deploy steps after browser QA passes.
 - [x] Add [[qa-log]] for dated verification evidence.
@@ -46,6 +50,8 @@ updated: 2026-05-14
 - [x] Add clearer voice fallback language in caregiver-only surfaces.
 - [x] Make ElevenLabs readiness depend on a live server check instead of only the public feature flag.
 - [ ] Simplify the permanent Codex operating prompt into a short contract plus links to [[memory]], [[context]], and [[meta-optimization]].
+- [ ] Add a true authenticated production signup/save/load test account once Supabase CLI or MCP auth is available.
+- [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
 
 ## P3 - Mobile Path
 
@@ -70,3 +76,6 @@ updated: 2026-05-14
 - [x] Verified the Hybrid Care OS UI turnaround locally with screenshots, local care-flow smoke, security checks, and production ElevenLabs endpoint evidence. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - [x] Verified the Hybrid Care OS second-pass UI locally with full gates, screenshot QA, and care-flow smoke. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
 - [x] Deployed Hybrid Care OS second-pass UI and verified strict production smoke with ElevenLabs `audio/mpeg`. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].
+- [x] Completed Product Trust local gate: question-shaped medication prompts, voice review state, Focus Mode state tests, browser QA, production TTS samples, and chunked build. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
+- [x] Deployed Product Trust pass and verified strict production smoke plus production tablet prompt QA. See [[qa-log#2026-05-15 - Product Trust Production Deploy]].
+- [x] Deployed UI Trust Pass and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].

@@ -2,7 +2,7 @@
 aliases: [dashboard, home, moc]
 tags: [project, dashboard, moc, obsidian]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Dashboard
@@ -15,6 +15,8 @@ updated: 2026-05-14
 - [[plans]] - master roadmap, architecture direction, milestones, quality gates.
 - Current stage: web-first stakeholder alpha hardening.
 - Current priority: confirm live ElevenLabs audio, production data posture, and stakeholder readiness. See [[todo#P0 - Demo-Critical]].
+- Product Trust priority: keep voice acceptance honest, patient prompts question-shaped, and caregiver walkthrough evidence current. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
+- Current trust pass: auth/setup and local QA target repaired. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
 
 ## Memory
 
@@ -28,6 +30,7 @@ updated: 2026-05-14
   - Live browser walkthrough pass.
   - Human-ear ElevenLabs quality check against Som's Google Maps standard.
   - Live Supabase migration/RLS verification.
+  - Authenticated cloud signup/save/load proof.
 
 ## Decisions
 
@@ -59,6 +62,10 @@ updated: 2026-05-14
 - Latest UI gate: [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - Latest second-pass UI gate: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
 - Latest second-pass production gate: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].
+- Latest Product Trust local gate: [[qa-log#2026-05-15 - Product Trust Local Gate]].
+- Latest Product Trust production gate: [[qa-log#2026-05-15 - Product Trust Production Deploy]].
+- Latest auth/setup gate: [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
+- Latest UI trust gate: [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 
 ## Context
 

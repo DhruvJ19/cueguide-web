@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { supabase, db } from '../services/supabase';
+import { db, isSupabaseConfigured, supabase } from '../services/supabase';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
+  const { setRole } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
+      if (!isSupabaseConfigured) {
+        setRole('caregiver');
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
       const { data: { user }, error } = await supabase.auth.getUser();
 
       if (error || !user) {
@@ -16,8 +24,12 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const name = user.user_metadata?.name || user.email?.split('@')[0] || 'Sarah';
-      const existingPatients = await db.patients.get(user.id);
+      const name = typeof user.user_metadata?.name === 'string' ? user.user_metadata.name : user.email?.split('@')[0] || 'Caregiver';
+      const caregiver = await db.caregivers.getOrCreate(user.id, name, user.email || '');
+      const caregiverPatients = caregiver ? await db.patients.get(caregiver.id) : [];
+      const legacyPatients = caregiverPatients.length === 0 ? await db.patients.get(user.id) : [];
+      const existingPatients = caregiverPatients.length > 0 ? caregiverPatients : legacyPatients;
+      setRole('caregiver');
 
       if (existingPatients && existingPatients.length > 0) {
         navigate('/dashboard', { replace: true });
@@ -27,7 +39,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [navigate]);
+  }, [navigate, setRole]);
 
   if (error) {
     return (

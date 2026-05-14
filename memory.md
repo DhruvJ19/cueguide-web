@@ -2,7 +2,7 @@
 aliases: [memory, long-term-memory]
 tags: [project, memory, preferences, lessons]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Memory
@@ -27,7 +27,11 @@ updated: 2026-05-14
 - Patient-facing UI must avoid failure language. Caregiver-facing UI can show skipped/help/partial status clearly.
 - The accepted UI direction is **Hybrid Care OS**: light clinical caregiver operations UI, separate warm dementia-first patient mode, no dark card soup, no generic AI-demo styling.
 - Second-pass UI quality standard: caregiver screens must act like operations surfaces, not static cards. Use attention queues, next-dose/refill states, session timelines, narrative reports, and grouped readiness rows.
+- UI Trust standard: reduce explanation copy until the next caregiver action is obvious. Today should lead with next medication, start session, attention state, and schedule; Reports should show care interpretation, not system plumbing.
+- Product Trust standard: technical ElevenLabs delivery is not the same as human voice acceptance. Settings must show human review pending until a person marks the voice accepted for the walkthrough.
+- Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
+- Market review reinforces Som's concern: reminder apps and caregiver alerts already exist, so CueGuide must differentiate through dementia-safe patient guidance, caregiver event interpretation, and honest medication-confirmation language.
 
 ## Technical Lessons
 
@@ -56,6 +60,9 @@ Recent verified checks:
 - Production ElevenLabs TTS: `/api/elevenlabs/tts` returns `audio/mpeg`.
 - Production voice target is ElevenLabs Bella (`hpp4J3VqNfWAUOO0d1Us`) using `eleven_flash_v2_5`, routed only through `/api/elevenlabs/*`.
 - Patient Focus Mode should trigger ElevenLabs from explicit `Read aloud` actions rather than automatic step transitions, reducing surprise audio and provider rate-limit risk.
+- Patient Focus Mode event handling now has a pure session module for started, help requested, skipped, stuck, completed, and completion-status logic.
+- Medication prompts are question-shaped by default: "Would you like to..." instead of "next take" or direct command language.
+- Vite build uses manual vendor chunks for Supabase, motion, charts, PDF, AI, and general vendor code; the large-bundle warning is cleared.
 - Local hardening smoke at `127.0.0.1:3004` passed the full caregiver medication loop, patient action logging, report view, and mobile overflow check. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
 - Production smoke at `https://cueguide-web.vercel.app` passed strict ElevenLabs verification with six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
 - Production voice hardening deploy `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU` passed strict smoke with Bella selected and six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
@@ -63,6 +70,11 @@ Recent verified checks:
 - Hybrid Care OS UI turnaround passed local gates, local care-flow smoke, screenshot QA, mobile/tablet overflow checks, and production ElevenLabs endpoint verification. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - Hybrid Care OS second-pass UI passed local full gates, screenshot QA, care-flow smoke, and ElevenLabs `audio/mpeg` observation. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
 - Hybrid Care OS second-pass production deploy `dpl_GzDvHnVAT4D7FBrj1Z5nYYn3CNJv` passed strict smoke with ElevenLabs `200 audio/mpeg` and no mobile overflow. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].
+- Product Trust local gate passed on 2026-05-15 with tests, lint, build, security checks, dry-run install, local smoke, browser QA, production TTS samples, and no patient prompt leakage. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
+- Product Trust production deploy `dpl_483NEJGpLeJ9fqHoyipJpY6TCeMo` passed strict smoke and production tablet prompt QA. See [[qa-log#2026-05-15 - Product Trust Production Deploy]].
+- Local ports `3000` and `3004` served unrelated apps during QA; CueGuide local dev now uses strict `127.0.0.1:3006`. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
+- Login, signup, onboarding, and `/settings` now use the light clinical CueGuide shell and label local fallback honestly. See [[decisions#2026-05-15 - Auth And Setup Must Be Honest About Data Mode]].
+- UI Trust production deploy `dpl_BgUFtUjB5KxEVManqvgPL2GHRcrL` passed strict smoke with ElevenLabs `200 audio/mpeg`, no mobile overflow, and screenshot QA for Today, Medications, Reports, Settings, and mobile Login. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

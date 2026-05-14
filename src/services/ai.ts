@@ -47,7 +47,7 @@ export async function generateCueData(contextData: AIPromptContext, aiConfig: AI
   const fallbackSteps = contextData.steps.map((step) => ({
     stepId: step.id,
     text: step.instruction,
-    audio_text: `${contextData.preferredName}, next ${step.instruction.toLowerCase()}. Take your time.`,
+    audio_text: step.instruction,
     help_text: step.helpText || 'Take your time. Do this one small step, then press Done.',
   }));
   const fallbackCueData = buildFallbackCueData(
@@ -85,7 +85,7 @@ Care Notes, de-identified and minimum necessary: ${minimizedNotes}
 
 Rules:
 - Write like gentle navigation directions: human, soft, brief, and steady.
-- Use one action per step. Prefer "Next..." or "When you're ready..." over assistant-like chatter.
+- Use one action per step. Prefer "Would you like to..." or "When you're ready..." over commands.
 - Simple, calm, non-clinical language.
 - Never mention dementia, memory loss, forgetting, failure, urgency, or blame.
 - Do not say you are AI. Do not over-explain.

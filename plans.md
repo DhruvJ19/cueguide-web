@@ -2,7 +2,7 @@
 aliases: [plans, roadmap, master-plan]
 tags: [project, plan, roadmap, architecture]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Plans
@@ -65,12 +65,15 @@ Status: active.
 
 - Use the [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] direction for all web UI work: light clinical caregiver operations, warm patient Focus Mode, and no generic dark AI-demo styling.
 - Keep improving the caregiver UI as an operational care surface, following [[decisions#2026-05-14 - Second-Pass UI Must Behave Like Operations]].
+- Keep UI Trust as the current visual standard: fewer explanations, clear next action, compact mobile Today, caregiver-focused Reports, and short row-based Settings. See [[decisions#2026-05-15 - UI Trust Pass Prioritizes Clarity Over Explanation]].
+- Keep Product Trust explicit: server voice readiness, human voice acceptance, patient-safe prompt wording, and real walkthrough evidence are separate gates.
 - Confirm Supabase schema, RLS, and realtime readiness.
 - Remove remaining placeholder/demo friction.
 - Add browser-level regression coverage for the medication loop.
 - Add caregiver-visible production readiness status for voice, AI, data, alerts, and local fallback.
 - Keep security checks green after every dependency or API change.
 - Replace starter-app residue in docs and env examples with CueGuide-specific production guidance.
+- Keep auth/setup surfaces aligned with [[decisions#2026-05-15 - Auth And Setup Must Be Honest About Data Mode]]: real cloud auth when configured, explicit local fallback when not, and no legacy starter-style dark screens.
 
 ### 3. Som Demo Readiness
 

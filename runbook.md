@@ -2,7 +2,7 @@
 aliases: [runbook, release-runbook, demo-runbook]
 tags: [project, operations, qa, demo]
 created: 2026-05-14
-updated: 2026-05-14
+updated: 2026-05-15
 ---
 
 # CueGuide Runbook
@@ -21,13 +21,25 @@ npm run build
 npm run security:all
 ```
 
+Start CueGuide on its isolated local port:
+
+```bash
+npm run dev
+```
+
+Local URL:
+
+```text
+http://127.0.0.1:3006
+```
+
 For local browser smoke:
 
 ```bash
-CUEGUIDE_SMOKE_URL=http://127.0.0.1:3000 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow
+CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow
 ```
 
-Use the actual local port if Vite starts somewhere else.
+Do not reuse `3000` for CueGuide QA on this machine unless you first verify the page is actually CueGuide; other local projects have occupied that port.
 
 ## Production Smoke
 
@@ -43,7 +55,9 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 
 - Production voice must be ElevenLabs through `/api/elevenlabs/tts`.
 - Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
-- Settings must show `ElevenLabs active` from a live server check before stakeholder use.
+- Settings must show `ElevenLabs active` from a live server check, then `Human voice review pending` until a person marks the voice accepted.
+- Test the three Som-standard samples in Settings: small blue pill with water, yellow box location, and "Take your time. I can wait with you."
+- Only mark `Voice accepted` after a human hears the output as Google Maps-like: soft, gentle, and non-commanding.
 - Patient voice should play from explicit `Read aloud` actions, not automatic step transitions.
 - Browser TTS is only an emergency fallback; it is not production-ready voice quality.
 
@@ -57,10 +71,19 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 6. Open Reports and show adherence, help, skip, and mood metrics.
 7. Open Settings and show ElevenLabs, AI, Supabase/local fallback, alerts, and event readiness.
 
+## UI Review Standard
+
+- Today must show the next medication and `Start patient session` before explanatory content.
+- Mobile Today should reach `Today’s Schedule` in the first viewport.
+- Reports should explain caregiver review signals, not internal system readiness.
+- Settings can expose readiness, but copy should stay short and row-based.
+- If a surface needs more than one sentence to explain itself, simplify the surface before adding copy.
+
 ## Stop Conditions
 
 - ElevenLabs production smoke does not return `audio/mpeg`.
-- Settings does not show `ElevenLabs active`.
+- Settings does not show `ElevenLabs active`, `Human voice review pending`, or `Voice accepted` accurately.
+- Patient medication prompt includes caregiver-only instructions or command language such as `next take`.
 - Browser console shows unhandled app errors.
 - Mobile-width smoke reports horizontal overflow.
 - Provider secrets appear in tracked files or `dist`.

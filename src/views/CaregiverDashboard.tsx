@@ -42,22 +42,31 @@ import { getElevenLabsStatus, type VoiceStatus } from '../services/elevenlabs';
 import { playAudio } from '../utils/audio';
 import { config } from '../config/env';
 import { isSupabaseConfigured } from '../services/supabase';
+import {
+  EmptyState,
+  ReadinessItem,
+  Section,
+  StatCard,
+  type CaregiverTone,
+} from '../components/caregiver/CaregiverPrimitives';
 import type { Medication, Routine, RoutineStatus, StepCompletion } from '../types';
 
 type Tab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
+type VoiceReviewState = 'pending' | 'accepted';
 
 interface Props {
   onStartSimulation: (routine: Routine) => void;
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
   setIsCommandOpen: (open: boolean) => void;
+  initialTab?: Tab;
 }
 
 const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode }> = [
   { id: 'today', label: 'Today', icon: <LayoutDashboard size={18} /> },
   { id: 'medications', label: 'Medications', icon: <Pill size={18} /> },
   { id: 'routines', label: 'Routines', icon: <ClipboardList size={18} /> },
-  { id: 'session', label: 'Live Session', icon: <Radio size={18} /> },
+  { id: 'session', label: 'Session', icon: <Radio size={18} /> },
   { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
   { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ];
@@ -76,32 +85,12 @@ const emptyMedication: Omit<Medication, 'id' | 'createdAt' | 'updatedAt'> = {
   isActive: true,
 };
 
-type Tone = 'ready' | 'attention' | 'urgent' | 'muted';
-
-function Section({ title, children, action, eyebrow }: { title: string; children: React.ReactNode; action?: React.ReactNode; eyebrow?: string }) {
-  return (
-    <section className="cg-section">
-      <div className="cg-section-header">
-        <div>
-          {eyebrow && <p>{eyebrow}</p>}
-          <h2>{title}</h2>
-        </div>
-        {action}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function StatCard({ label, value, note, tone }: { label: string; value: string; note: string; tone?: Tone }) {
-  return (
-    <div className={`cg-stat ${tone ? `cg-stat-${tone}` : ''}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{note}</small>
-    </div>
-  );
-}
+const VOICE_REVIEW_STORAGE_KEY = 'cueguide-voice-review-state';
+const VOICE_REVIEW_PROMPTS = [
+  'Would you like to take the small blue pill with a sip of water?',
+  'The pill is in the yellow box on the counter.',
+  'Take your time. I can wait with you.',
+];
 
 function formatStatus(status: RoutineStatus | string): string {
   const labels: Record<string, string> = {
@@ -133,7 +122,7 @@ function getNextDoseLabel(medication: Medication, currentTime: string): string {
   return sortedTimes[0] ? `Tomorrow ${sortedTimes[0]}` : 'No time set';
 }
 
-function getRefillInfo(medication: Medication): { label: string; tone: Tone } {
+function getRefillInfo(medication: Medication): { label: string; tone: CaregiverTone } {
   if (!medication.refillDate) return { label: 'No refill date', tone: 'muted' };
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -153,40 +142,7 @@ function getSessionMessage(completionStatus: RoutineStatus | undefined): string 
   return 'Start a medication session to see patient actions and caregiver alerts here.';
 }
 
-function EmptyState({ title, body, action }: { title: string; body: string; action?: React.ReactNode }) {
-  return (
-    <div className="cg-empty">
-      <strong>{title}</strong>
-      <p>{body}</p>
-      {action}
-    </div>
-  );
-}
-
-function ReadinessItem({
-  icon,
-  label,
-  value,
-  detail,
-  status,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  detail: string;
-  status: 'ready' | 'fallback' | 'review' | 'blocked';
-}) {
-  return (
-    <div className={`cg-readiness-item ${status}`}>
-      <div className="cg-readiness-icon">{icon}</div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{detail}</small>
-    </div>
-  );
-}
-
-export default function CaregiverDashboard({ onStartSimulation, theme, setTheme, setIsCommandOpen }: Props) {
+export default function CaregiverDashboard({ onStartSimulation, theme, setTheme, setIsCommandOpen, initialTab }: Props) {
   const { profile } = usePatientStore();
   const { routines } = useRoutineStore();
   const { completions } = useCompletionStore();
@@ -195,6 +151,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const { alerts, acknowledgeAlert } = useAlertStore();
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (initialTab) return initialTab;
     const stored = localStorage.getItem('cueguide-active-tab') as Tab | null;
     return stored && tabs.some((item) => item.id === stored) ? stored : 'today';
   });
@@ -202,6 +159,9 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const [editingMedicationId, setEditingMedicationId] = useState<string | null>(null);
   const [draftMedication, setDraftMedication] = useState(emptyMedication);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [voiceReviewState, setVoiceReviewState] = useState<VoiceReviewState>(() => {
+    return localStorage.getItem(VOICE_REVIEW_STORAGE_KEY) === 'accepted' ? 'accepted' : 'pending';
+  });
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>({
     ok: false,
     selectedVoiceId: '',
@@ -221,6 +181,14 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   React.useEffect(() => {
     localStorage.setItem('cueguide-active-tab', activeTab);
   }, [activeTab]);
+
+  React.useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
+
+  React.useEffect(() => {
+    localStorage.setItem(VOICE_REVIEW_STORAGE_KEY, voiceReviewState);
+  }, [voiceReviewState]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -267,6 +235,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   );
   const sortedRoutines = [...allRoutines].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
   const nextRoutine = sortedRoutines.find((routine) => !todaysCompletions.some((item) => item.routineId === routine.id)) || sortedRoutines[0];
+  const nextMedicationRoutine = medicationRoutines.find((routine) => !todaysCompletions.some((item) => item.routineId === routine.id)) || medicationRoutines[0];
   const nextRoutineCompletion = nextRoutine ? todaysCompletions.find((item) => item.routineId === nextRoutine.id) : undefined;
   const nextRoutineIsPastDue = Boolean(nextRoutine && !nextRoutineCompletion && nextRoutine.scheduledTime < currentTime);
   const overdueRoutines = sortedRoutines.filter((routine) => {
@@ -295,24 +264,39 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
     return refill.tone === 'attention' || refill.tone === 'urgent';
   }).length;
   const sessionStatusNote = getSessionMessage(latestCompletion?.status);
-  const voiceReadinessStatus: 'ready' | 'blocked' = readiness.voice ? 'ready' : 'blocked';
-  const voiceReadinessValue = readiness.voice
-    ? 'ElevenLabs active'
-    : config.elevenlabs.enabled
-      ? 'ElevenLabs blocked'
-      : 'ElevenLabs required';
-  const voiceReadinessDetail = readiness.voice
-    ? `${voiceStatus.selectedVoiceName || 'Production voice'} is verified through the server proxy.`
-    : voiceStatus.message;
-  const pageTitle = tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
+  const voiceReviewReady = readiness.voice && voiceReviewState === 'accepted';
+  const voiceReviewStatus: 'ready' | 'review' | 'blocked' = voiceReviewReady ? 'ready' : readiness.voice ? 'review' : 'blocked';
+  const voiceReadinessValue = voiceReviewReady
+    ? 'Voice accepted'
+    : readiness.voice
+      ? 'Human voice review pending'
+      : config.elevenlabs.enabled
+        ? 'ElevenLabs blocked'
+        : 'ElevenLabs required';
+  const voiceReadinessDetail = voiceReviewReady
+    ? `${voiceStatus.selectedVoiceName || 'Production voice'} is accepted for patient prompts.`
+    : readiness.voice
+      ? `Server voice works. Human tone review is still pending.`
+      : voiceStatus.message;
+  const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
+  const headerContext = profile?.name ? `${profile.name} care plan` : 'Patient care plan';
   const headerStatus = unreadAlerts.length > 0
     ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? '' : 's'} need review`
     : nextRoutine
-      ? `Next: ${nextRoutine.name} at ${nextRoutine.scheduledTime}`
+      ? `${nextRoutine.name} at ${nextRoutine.scheduledTime}`
       : 'Care plan ready';
   const adherenceLabel = medicationCompletions.length < 2 ? 'Pending' : `${adherenceRate}%`;
   const latestSessionEvents = latestCompletion?.stepEvents || [];
   const latestVisibleAlerts = [...alerts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
+
+  const markVoiceAccepted = () => {
+    if (!readiness.voice) return;
+    setVoiceReviewState('accepted');
+  };
+
+  const resetVoiceReview = () => {
+    setVoiceReviewState('pending');
+  };
 
   const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
     setDraftMedication((current) => ({ ...current, [field]: value }));
@@ -370,46 +354,51 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
     <div className="cg-content-grid">
       <div className="cg-main-stack">
         <section className="cg-command-panel" aria-label="Medication guidance overview">
-          <div className="cg-command-copy">
-            <p className="cg-eyebrow">Care operations for {profile?.preferredName || 'patient'}</p>
-            <h2>Medication guidance for {profile?.preferredName || 'today'}</h2>
-            <p>
-              Start the next dose, watch for help or skipped steps, and keep the caregiver record clear without exposing failure language to the patient.
-            </p>
-            <div className="cg-hero-status">
-              <span><Volume2 size={15} /> {readiness.voice ? 'ElevenLabs voice verified' : 'Voice needs setup'}</span>
-              <span><Database size={15} /> {readiness.data ? 'Cloud data configured' : 'Local fallback active'}</span>
-              <span><Bell size={15} /> {unreadAlerts.length} alert{unreadAlerts.length === 1 ? '' : 's'} open</span>
+          <div className="cg-next-primary">
+            <p className="cg-eyebrow">{nextRoutineIsPastDue ? 'Past due' : 'Next medication'}</p>
+            <h2>{nextRoutine?.name || 'No medication scheduled'}</h2>
+            <div className="cg-meta-grid">
+              <span><strong>{nextRoutine?.scheduledTime || '--:--'}</strong> Time</span>
+              <span><strong>{nextRoutine?.steps.length || 0}</strong> Steps</span>
+              <span><strong>{activeMedications.length}</strong> Active meds</span>
             </div>
+            <button className="cg-primary cg-start-button" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>
+              <Pill size={18} /> Start patient session
+            </button>
           </div>
-          <div className="cg-next-session">
-            <span>{nextRoutineIsPastDue ? 'Past due session' : 'Next session'}</span>
-            <strong>{nextRoutine?.name || 'No medication scheduled'}</strong>
-            <small>{nextRoutine ? `${nextRoutine.scheduledTime} · ${nextRoutine.steps.length} guided steps` : 'Add medication times to build the schedule.'}</small>
-            <div className="cg-next-actions">
-              <button className="cg-primary" disabled={!medicationRoutines[0]} onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>
-                <Pill size={18} /> Start medication session
-              </button>
-              <button className="cg-secondary" onClick={() => setActiveTab('medications')}>
-                Review medications <ChevronRight size={16} />
-              </button>
-            </div>
+          <div className="cg-summary-list" aria-label="Care status summary">
+            <button type="button" className="cg-brief-row" onClick={() => setActiveTab('medications')}>
+              <Pill size={18} />
+              <span>
+                <strong>Medication list</strong>
+                <small>{activeDoseCount} scheduled dose{activeDoseCount === 1 ? '' : 's'} today</small>
+              </span>
+              <ChevronRight size={16} />
+            </button>
+            <button type="button" className="cg-brief-row" onClick={() => setActiveTab('session')}>
+              <Bell size={18} />
+              <span>
+                <strong>{unreadAlerts.length > 0 ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? '' : 's'}` : 'No open alerts'}</strong>
+                <small>{needsReviewToday.length > 0 ? `${needsReviewToday.length} session${needsReviewToday.length === 1 ? '' : 's'} need review` : 'Patient events are quiet'}</small>
+              </span>
+              <ChevronRight size={16} />
+            </button>
           </div>
         </section>
 
         <div className="cg-status-strip">
-          <StatCard label="Doses today" value={`${activeDoseCount}`} note={`${activeMedications.length} active medication${activeMedications.length === 1 ? '' : 's'}`} tone="ready" />
-          <StatCard label="Completed" value={`${completedToday.length}`} note="confirmed care sessions" tone="ready" />
-          <StatCard label="Needs review" value={`${unreadAlerts.length + needsReviewToday.length}`} note="alerts or partial sessions" tone={unreadAlerts.length + needsReviewToday.length > 0 ? 'attention' : 'ready'} />
-          <StatCard label="Refills" value={`${refillAttentionCount}`} note="due soon or overdue" tone={refillAttentionCount > 0 ? 'attention' : 'muted'} />
+          <StatCard label="Doses" value={`${activeDoseCount}`} note="today" tone="ready" />
+          <StatCard label="Done" value={`${completedToday.length}`} note="sessions" tone="ready" />
+          <StatCard label="Review" value={`${unreadAlerts.length + needsReviewToday.length}`} note="alerts" tone={unreadAlerts.length + needsReviewToday.length > 0 ? 'attention' : 'ready'} />
+          <StatCard label="Refills" value={`${refillAttentionCount}`} note="soon" tone={refillAttentionCount > 0 ? 'attention' : 'muted'} />
         </div>
 
-        <Section title="Today's Medication And Care Schedule" eyebrow="Operational timeline">
+        <Section title="Today’s Schedule">
           <div className="cg-schedule">
             {allRoutines.length === 0 && (
               <EmptyState
                 title="No care sessions scheduled yet"
-                body="Add a medication time to create the first patient-ready session automatically."
+                body="Add a medication time to create the first patient-ready session."
                 action={<button className="cg-secondary" onClick={() => setActiveTab('medications')}>Add medication</button>}
               />
             )}
@@ -421,7 +410,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                   <div className="cg-time">{routine.scheduledTime}</div>
                   <div className="cg-schedule-body">
                     <strong>{routine.name}</strong>
-                    <span>{routine.category === 'medication' ? 'Medication session' : 'Care routine'} · {routine.steps.length} guided steps</span>
+                    <span>{routine.category === 'medication' ? 'Medication' : 'Routine'} · {routine.steps.length} steps</span>
                   </div>
                   <span className={`cg-status ${routineStatus}`}>
                     {formatStatus(routineStatus)}
@@ -437,10 +426,10 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       </div>
 
       <aside className="cg-side-stack">
-        <Section title="Attention Queue" eyebrow="Caregiver-only">
+        <Section title="Attention">
           <div className="cg-alert-list">
             {alerts.length === 0 && (
-              <EmptyState title="No alerts yet" body="Help requests, skipped steps, longer-than-usual steps, and completion summaries will appear here." />
+              <EmptyState title="No alerts" body="Help, skipped steps, and long pauses will appear here." />
             )}
             {overdueRoutines.length > 0 && (
               <div className="cg-system-alert">
@@ -463,7 +452,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             ))}
           </div>
         </Section>
-        <Section title="Patient Context" eyebrow="For tone and cueing">
+        <Section title="Patient">
           <div className="cg-profile">
             <div className="cg-avatar"><UserRound size={30} /></div>
             <strong>{profile?.name}</strong>
@@ -478,8 +467,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const renderMedications = () => (
     <div className="cg-main-stack">
       <Section
-        title="Medication Manager"
-        eyebrow="Dose, pill, schedule, refill"
+        title="Medications"
         action={
           <button className="cg-primary" onClick={startAddMedication}>
             <Plus size={16} /> Add medication
@@ -499,7 +487,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
           {medications.length === 0 && (
             <EmptyState
               title="No medications entered"
-              body="Add the first medication with pill appearance, schedule, purpose, and instructions."
+              body="Add a medication with pill appearance, schedule, and instructions."
               action={<button className="cg-secondary" onClick={startAddMedication}>Add medication</button>}
             />
           )}
@@ -512,11 +500,10 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                   <div>
                     <h3>{medication.name}</h3>
                     <p>{medication.dosage} · {medication.pillShape} {medication.pillColor}</p>
-                    {medication.location && <small>Location cue: {medication.location}</small>}
+                    {medication.location && <small>{medication.location}</small>}
                   </div>
                 </div>
                 <div className="cg-med-purpose">
-                  <span>Purpose</span>
                   <strong>{medication.purpose}</strong>
                   {medication.instructions && <small>{medication.instructions}</small>}
                 </div>
@@ -531,10 +518,10 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                 </div>
                 <div className="cg-row-actions">
                   <button className="cg-toggle" onClick={() => toggleMedication(medication.id)}>
-                    {medication.isActive ? 'Active' : 'Inactive'}
+                    {medication.isActive ? 'On' : 'Off'}
                   </button>
                   <button className="cg-secondary" onClick={() => startEditMedication(medication)}>
-                    <Edit3 size={15} /> Edit medication
+                    <Edit3 size={15} /> Edit
                   </button>
                 </div>
               </article>
@@ -626,22 +613,22 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   );
 
   const renderSession = () => (
-    <Section title="Live Patient Session" eyebrow="Event timeline">
+    <Section title="Patient Session">
       {latestCompletion ? (
         <div className="cg-session-layout">
           <div className="cg-session-summary">
             <div>
-              <p className="cg-eyebrow">Most recent patient session</p>
+              <p className="cg-eyebrow">Latest session</p>
               <h2>{latestRoutine?.name || 'Medication session'}</h2>
               <p>{sessionStatusNote}</p>
             </div>
             <div className="cg-session-metrics">
-              <StatCard label="Session status" value={formatStatus(latestCompletion.status)} note="caregiver language only" tone={latestCompletion.status === 'completed' ? 'ready' : 'attention'} />
-              <StatCard label="Step progress" value={`${latestCompletion.stepsCompleted}/${latestCompletion.stepsTotal}`} note={`${latestCompletion.minutes} minute${latestCompletion.minutes === 1 ? '' : 's'} elapsed`} tone="muted" />
+              <StatCard label="Status" value={formatStatus(latestCompletion.status)} note="caregiver only" tone={latestCompletion.status === 'completed' ? 'ready' : 'attention'} />
+              <StatCard label="Steps" value={`${latestCompletion.stepsCompleted}/${latestCompletion.stepsTotal}`} note={`${latestCompletion.minutes} min`} tone="muted" />
               <StatCard label="Help" value={`${latestSessionEvents.filter((event) => event.status === 'help_requested').length}`} note="patient-tapped help events" tone={latestSessionEvents.some((event) => event.status === 'help_requested') ? 'attention' : 'ready'} />
               <StatCard label="Skipped" value={`${latestSessionEvents.filter((event) => event.status === 'skipped').length}`} note="steps for caregiver review" tone={latestSessionEvents.some((event) => event.status === 'skipped') ? 'attention' : 'ready'} />
             </div>
-            <button className="cg-primary" onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>Start next medication session</button>
+            <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
           </div>
           <div className="cg-timeline" aria-label="Latest patient action timeline">
             {latestSessionEvents.length === 0 && <p>No detailed step events were logged for this session.</p>}
@@ -658,8 +645,8 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         <div className="cg-live-panel">
           <Activity size={28} />
           <h2>No session logged today</h2>
-          <p>Start a scheduled routine to see completion, help requests, skipped steps, and timing details here.</p>
-          <button className="cg-primary" disabled={!medicationRoutines[0]} onClick={() => medicationRoutines[0] && onStartSimulation(medicationRoutines[0])}>Start next medication session</button>
+          <p>Start a scheduled routine to see help, skip, done, and timing events.</p>
+          <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
         </div>
       )}
     </Section>
@@ -668,14 +655,14 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const renderReports = () => (
     <div className="cg-content-grid">
       <div className="cg-main-stack">
-        <Section title="Care Review" eyebrow="Medication adherence and behavior signals">
+        <Section title="Care Review">
           <div className="cg-report-lead">
             <div>
-              <p className="cg-eyebrow">Current interpretation</p>
+              <p className="cg-eyebrow">Current signal</p>
               <h3>{medicationCompletions.length < 2 ? 'Trend evidence is still building' : `${adherenceRate}% medication-session adherence`}</h3>
               <p>
                 {medicationCompletions.length < 2
-                  ? 'Run more medication sessions before treating adherence as a reliable trend.'
+                  ? 'Run more medication sessions before treating this as a trend.'
                   : `${medicationCompletions.filter((completion) => completion.status === 'completed').length} of ${medicationCompletions.length} recent medication sessions were completed.`}
               </p>
             </div>
@@ -688,25 +675,25 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
               <CheckCircle2 size={22} />
               <span>Medication adherence</span>
               <strong>{adherenceLabel}</strong>
-              <small>{medicationCompletions.length < 2 ? 'Needs more medication sessions before using this trend.' : 'completed medication sessions in recent history'}</small>
+              <small>{medicationCompletions.length < 2 ? 'Needs more sessions' : 'recent sessions'}</small>
             </div>
             <div className="cg-report-card">
               <Bell size={22} />
               <span>Help requests</span>
               <strong>{helpEvents.length}</strong>
-              <small>patient-tapped help events</small>
+              <small>patient tapped Help</small>
             </div>
             <div className="cg-report-card">
               <ClipboardList size={22} />
               <span>Skipped steps</span>
               <strong>{skippedEvents.length}</strong>
-              <small>logged for caregiver review</small>
+              <small>caregiver review</small>
             </div>
             <div className="cg-report-card">
               <HeartPulse size={22} />
               <span>Common mood</span>
               <strong>{topMood}</strong>
-              <small>from completed sessions</small>
+              <small>session mood</small>
             </div>
           </div>
           <div className="cg-insight-list">
@@ -743,12 +730,12 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         </Section>
       </div>
       <aside className="cg-side-stack">
-        <Section title="Production Readiness">
+        <Section title="Review Next">
           <div className="cg-checklist">
-            <span><ShieldCheck size={16} /> Supabase RLS target</span>
-            <span><Bell size={16} /> Realtime alert model</span>
-            <span><CalendarClock size={16} /> Adaptive scheduling ready</span>
-            <span><Volume2 size={16} /> ElevenLabs server proxy</span>
+            <span><Pill size={16} /> Confirm the next scheduled dose</span>
+            <span><Bell size={16} /> Review any Help or Skip events</span>
+            <span><HeartPulse size={16} /> Watch mood after medication prompts</span>
+            <span><Volume2 size={16} /> Accept voice tone after hearing test</span>
           </div>
         </Section>
       </aside>
@@ -756,94 +743,97 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   );
 
   const renderSettings = () => (
-    <div className="cg-content-grid">
-      <div className="cg-main-stack">
-        <Section title="Production Readiness Console" eyebrow="Caregiver and operator settings">
-          <div className="cg-settings-group">
-            <h3>Voice and cue quality</h3>
-            <div className="cg-settings-list">
-              <ReadinessItem icon={<Volume2 size={18} />} label="Patient voice" value={voiceReadinessValue} detail={voiceReadinessDetail} status={voiceReadinessStatus} />
-              <ReadinessItem
-                icon={<BrainCircuit size={18} />}
-                label="AI cue generation"
-                value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
-                detail="Patient prompts stay simple, warm, and non-scolding."
-                status={readiness.ai ? 'review' : 'fallback'}
-              />
-            </div>
+    <div className="cg-main-stack">
+      <Section title="Settings" eyebrow="Voice, data, alerts, privacy">
+        <div className="cg-settings-summary">
+          <div>
+            <p className="cg-eyebrow">Care loop</p>
+            <h3>{voiceReviewReady && readiness.events ? 'Ready for review' : 'Needs final checks'}</h3>
+            <p>
+              Voice, data, AI, alerts, and privacy are tracked here.
+            </p>
           </div>
-          <div className="cg-settings-group">
-            <h3>Data and monitoring</h3>
-            <div className="cg-settings-list">
-              <ReadinessItem
-                icon={<Database size={18} />}
-                label="Care data"
-                value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
-                detail={readiness.data ? 'Data API remains subject to RLS policies.' : 'Cloud persistence is not configured in this build; browser persistence keeps the care flow usable.'}
-                status={readiness.data ? 'ready' : 'fallback'}
-              />
-              <ReadinessItem
-                icon={<Bell size={18} />}
-                label="Care monitoring"
-                value={alerts.length > 0 ? `${alerts.length} alerts available` : 'Alert model ready'}
-                detail="Help, skip, stuck, medication, and completion summaries feed caregiver review."
-                status={alerts.length > 0 ? 'ready' : 'review'}
-              />
-              <ReadinessItem
-                icon={<HardDrive size={18} />}
-                label="Session events"
-                value={readiness.events ? 'Patient actions logged' : 'Run session to verify'}
-                detail="Step start, help, skip, done, timing, mood, and summaries are captured."
-                status={readiness.events ? 'ready' : 'review'}
-              />
-            </div>
-          </div>
-          <div className="cg-settings-group">
-            <h3>Privacy and account posture</h3>
-            <div className="cg-settings-list">
-              <ReadinessItem
-                icon={<ShieldCheck size={18} />}
-                label="Provider secrets"
-                value="Server-only boundary"
-                detail="ElevenLabs and AI provider keys are called through /api routes, not browser variables."
-                status="ready"
-              />
-              <ReadinessItem
-                icon={<CalendarClock size={18} />}
-                label="Notification posture"
-                value="In-app alerts first"
-                detail="Push/SMS should wait for caregiver preferences, quiet hours, and compliance review."
-                status="review"
-              />
-            </div>
-          </div>
-        </Section>
-      </div>
-      <aside className="cg-side-stack">
-        <Section title="Voice Check">
-          <div className="cg-settings">
-            <div className={`cg-voice-status ${voiceReadinessStatus}`}>
+          <button className="cg-primary" disabled={!readiness.voice} onClick={() => playAudio(VOICE_REVIEW_PROMPTS[0], 'female', true)}>
+            <Volume2 size={17} /> Play primary voice
+          </button>
+        </div>
+
+        <div className="cg-settings-group">
+          <h3>Voice</h3>
+          <div className="cg-settings-list">
+            <ReadinessItem icon={<Volume2 size={18} />} label="Patient voice" value={voiceReadinessValue} detail={voiceReadinessDetail} status={voiceReviewStatus} />
+            <div className={`cg-voice-status ${voiceReviewStatus}`}>
               <Volume2 size={18} />
               <div>
-                <strong>{voiceReadinessValue}</strong>
-                <p>{voiceReadinessDetail}</p>
+                <strong>Som voice standard</strong>
+                <p>Play samples, then mark accepted only after human review.</p>
               </div>
-              <button
-                type="button"
-                disabled={!readiness.voice}
-                onClick={() => playAudio('When you are ready, would you like to take your medicine with a sip of water?', 'female', true)}
-              >
-                Test voice
-              </button>
+              <div className="cg-voice-prompts">
+                {VOICE_REVIEW_PROMPTS.map((prompt, index) => (
+                  <button key={prompt} type="button" disabled={!readiness.voice} onClick={() => playAudio(prompt, 'female', true)}>
+                    Sample {index + 1}
+                  </button>
+                ))}
+              </div>
+              <div className="cg-voice-review-actions">
+                <button type="button" disabled={!readiness.voice} onClick={markVoiceAccepted}>Mark voice accepted</button>
+                <button type="button" onClick={resetVoiceReview}>Reset review</button>
+              </div>
             </div>
-            <label>
-              <span>Live AI cue generation</span>
-              <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />
-            </label>
-            <p>AI uses the server-side OpenRouter key only. When AI is disabled or unavailable, CueGuide uses reviewed fallback prompts so patient workflows keep working.</p>
           </div>
-        </Section>
-      </aside>
+        </div>
+
+        <div className="cg-settings-group">
+          <h3>Data</h3>
+          <div className="cg-settings-list">
+            <ReadinessItem
+              icon={<Database size={18} />}
+              label="Care data"
+              value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
+              detail={readiness.data ? 'Cloud env is present. Live save/load proof still needs evidence.' : 'Browser persistence is active. Cloud proof is still pending.'}
+              status={readiness.data ? 'review' : 'fallback'}
+            />
+            <ReadinessItem
+              icon={<HardDrive size={18} />}
+              label="Session events"
+              value={readiness.events ? 'Patient actions logged' : 'Run session to verify'}
+              detail="Begin, help, skip, done, timing, and mood events."
+              status={readiness.events ? 'ready' : 'review'}
+            />
+          </div>
+        </div>
+
+        <div className="cg-settings-group">
+          <h3>AI, alerts, and privacy</h3>
+          <div className="cg-settings-list">
+            <ReadinessItem
+              icon={<BrainCircuit size={18} />}
+              label="AI cue generation"
+              value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
+              detail="Prompts stay short, warm, and non-scolding."
+              status={readiness.ai ? 'review' : 'fallback'}
+            />
+            <ReadinessItem
+              icon={<Bell size={18} />}
+              label="Care monitoring"
+              value={alerts.length > 0 ? `${alerts.length} alerts available` : 'Alert model ready'}
+              detail="Help, skip, stuck, and completion summaries."
+              status={alerts.length > 0 ? 'ready' : 'review'}
+            />
+            <ReadinessItem
+              icon={<ShieldCheck size={18} />}
+              label="Provider secrets"
+              value="Server-only boundary"
+              detail="ElevenLabs and AI keys stay behind /api routes."
+              status="ready"
+            />
+          </div>
+          <label className="cg-ai-toggle">
+            <span>Live AI cue generation</span>
+            <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />
+          </label>
+        </div>
+      </Section>
     </div>
   );
 
@@ -880,7 +870,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       <main className="cg-main">
         <header className="cg-topbar">
           <div>
-            <p>{profile?.name || 'Patient'} · {format(new Date(), 'MMM d')}</p>
+            <p>{headerContext}</p>
             <h1>{pageTitle}</h1>
             <span>{headerStatus}</span>
           </div>

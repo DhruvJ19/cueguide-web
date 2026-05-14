@@ -14,7 +14,6 @@ const LoginPage = lazy(() => import('./pages/Login'));
 const SignupPage = lazy(() => import('./pages/Signup'));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallback'));
 const OnboardingPage = lazy(() => import('./pages/Onboarding'));
-const SettingsPage = lazy(() => import('./pages/Settings'));
 const PrivacyPage = lazy(() => import('./pages/Privacy'));
 const TermsPage = lazy(() => import('./pages/Terms'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -39,6 +38,7 @@ import CommandPalette from './components/CommandPalette';
 import { supabase, db, isSupabaseConfigured } from './services/supabase';
 
 const THEME_SCHEMA_VERSION = 'hybrid-care-os-v1';
+type CaregiverInitialTab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
 
 function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
@@ -57,7 +57,7 @@ function ErrorFallback({ error, resetErrorBoundary }: any) {
   );
 }
 
-function AppShell() {
+function AppShell({ initialTab }: { initialTab?: CaregiverInitialTab }) {
   const { role, setRole, isAuthenticated } = useAuthStore();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const storedVersion = localStorage.getItem('cueguide-theme-version');
@@ -200,6 +200,7 @@ function AppShell() {
                    theme={theme}
                    setTheme={setTheme}
                    setIsCommandOpen={setIsCommandOpen}
+                   initialTab={initialTab}
                 />
               </motion.div>
             ) : (
@@ -264,7 +265,7 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<AppShell initialTab="settings" />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/dashboard" element={<AppShell />} />

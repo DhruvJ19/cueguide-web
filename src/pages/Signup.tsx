@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { supabase, db } from '../services/supabase';
-import { HeartPulse, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../components/AuthLayout';
+import { isSupabaseConfigured, supabase } from '../services/supabase';
+import { useAuthStore } from '../store/authStore';
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const { setRole } = useAuthStore();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -12,133 +15,120 @@ export default function SignupPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim()) return;
+  const startLocalSetup = () => {
+    setRole('caregiver');
+    localStorage.setItem('cueguide-active-tab', 'today');
+    navigate('/onboarding');
+  };
+
+  const handleSignup = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim();
+    const normalizedPhone = phone.trim();
+    if (!normalizedName || !normalizedEmail) return;
+
+    if (!isSupabaseConfigured) {
+      setError('Cloud account creation is not configured in this environment. Continue with local setup or add Supabase credentials.');
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
+    const { error: signUpError } = await supabase.auth.signInWithOtp({
+      email: normalizedEmail,
       options: {
         data: {
-          name: name.trim(),
-          phone: phone.trim() || null
+          name: normalizedName,
+          phone: normalizedPhone || null,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`
-      }
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signUpError) {
+      setError(signUpError.message);
       setLoading(false);
-    } else {
-      setSent(true);
-      setLoading(false);
+      return;
     }
+
+    setSent(true);
+    setLoading(false);
   };
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-        <div className="glass-panel p-10 max-w-md w-full border border-indigo-500/20 text-center">
-          <div className="w-16 h-16 bg-indigo-500/20 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <HeartPulse size={32} />
-          </div>
-          <h1 className="text-2xl font-semibold text-content mb-3">Almost there, {name}</h1>
-          <p className="text-content-muted mb-2">
-            We sent a confirmation link to <span className="text-content font-medium">{email}</span>
-          </p>
-          <p className="text-content-faint text-sm mb-8">
-            Click the link in the email to activate your account.
-          </p>
-          <button
-            onClick={() => { setSent(false); setEmail(''); }}
-            className="text-indigo-500 text-sm font-medium hover:underline"
-          >
+      <AuthLayout
+        eyebrow="Caregiver account"
+        title={`Almost there, ${name}`}
+        subtitle={`We sent a private setup link to ${email}.`}
+      >
+        <div className="auth-success">
+          <p>Open the email to finish sign-in, then CueGuide will guide you through patient and medication setup.</p>
+          <button type="button" className="cg-secondary" onClick={() => { setSent(false); setEmail(''); }}>
             Use a different email
           </button>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-      <div className="glass-panel p-10 max-w-md w-full border border-indigo-500/20">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <HeartPulse size={20} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
-        </div>
+    <AuthLayout
+      eyebrow="Caregiver account"
+      title="Create your account"
+      subtitle="Start with the caregiver, patient, and first medication schedule."
+    >
+      {error && <div className="auth-alert">{error}</div>}
 
-        <h2 className="text-xl font-semibold text-content mb-2">Create your account</h2>
-        <p className="text-content-muted mb-8 text-sm">Start caring for your loved one</p>
+      <form onSubmit={handleSignup} className="auth-form">
+        <label>
+          <span>Your name</span>
+          <input
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Sarah Chen"
+            required
+          />
+        </label>
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl mb-6">
-            {error}
-          </div>
-        )}
+        <label>
+          <span>Email address</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="caregiver@example.com"
+            required
+          />
+        </label>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Your name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Sarah"
-              required
-              className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-          </div>
+        <label>
+          <span>Phone number <em>optional for SMS alerts</em></span>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            placeholder="+1 555 000 1234"
+          />
+        </label>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="sarah@example.com"
-              required
-              className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-          </div>
+        <button type="submit" disabled={loading} className="cg-primary auth-submit">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <>Send setup link <ArrowRight size={18} /></>}
+        </button>
+      </form>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Phone number <span className="text-content-faint normal-case">(optional — for SMS alerts)</span></label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+1 555 000 1234"
-              className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-          </div>
+      {!isSupabaseConfigured && (
+        <button type="button" className="cg-secondary auth-local" onClick={startLocalSetup}>
+          Continue local setup
+        </button>
+      )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-500 transition-colors disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>Create account <ArrowRight size={18} /></>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-content-muted text-sm">
-            Already have an account?{' '}
-            <Link to="/login" className="text-indigo-500 font-medium hover:underline">Sign in</Link>
-          </p>
-        </div>
-      </div>
-    </div>
+      <p className="auth-switch">
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
+    </AuthLayout>
   );
 }

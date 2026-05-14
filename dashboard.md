@@ -56,6 +56,8 @@ updated: 2026-05-14
 - Latest local gate: [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - Latest production gate: [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
 - Latest production voice gate: [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
+- Latest UI gate: [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
+- Latest second-pass UI gate: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
 
 ## Context
 

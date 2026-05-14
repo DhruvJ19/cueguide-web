@@ -65,7 +65,7 @@ async function runSmoke(): Promise<void> {
     });
     await page.reload({ waitUntil: 'networkidle', timeout: 30_000 });
 
-    await page.getByRole('heading', { name: /Medication guidance and routine monitoring/i }).waitFor({ state: 'visible' });
+    await page.getByRole('heading', { name: /Medication guidance for/i }).waitFor({ state: 'visible' });
     assert.equal(await page.locator('text=/Failed to compile|Unhandled Runtime Error|Vite Error/i').count(), 0);
 
     await clickNav(page, 'Medications');
@@ -86,7 +86,7 @@ async function runSmoke(): Promise<void> {
     await page.getByPlaceholder('Caregiver notes or instructions').fill('Take with water.');
     await page.getByRole('button', { name: /Save medication/i }).click();
     await page.getByText(medicationName).waitFor({ state: 'visible' });
-    await page.locator('.cg-med-card').filter({ hasText: medicationName }).getByRole('button', { name: /Edit medication/i }).click();
+    await page.locator('.cg-med-row').filter({ hasText: medicationName }).getByRole('button', { name: /Edit medication/i }).click();
     await page.getByPlaceholder('Plain-language purpose').fill('Supports the updated morning care plan');
     await page.getByRole('button', { name: /Update medication/i }).click();
     await page.getByText('Supports the updated morning care plan').waitFor({ state: 'visible' });
@@ -116,7 +116,7 @@ async function runSmoke(): Promise<void> {
     await page.getByRole('heading', { name: /Live Patient Session/i }).waitFor({ state: 'visible', timeout: 15_000 });
     const summary = await page.locator('.cg-session-summary, .cg-live-panel').first().textContent();
     assert.match(summary || '', /Medication/);
-    assert.match(summary || '', /patient actions logged/);
+    assert.match(summary || '', /Step progress|patient actions logged/);
 
     await clickNav(page, 'Settings');
     await page.getByText(/Patient voice/i).waitFor({ state: 'visible' });
@@ -127,7 +127,7 @@ async function runSmoke(): Promise<void> {
     }
 
     await clickNav(page, 'Reports');
-    await page.getByText(/Medication adherence/i).waitFor({ state: 'visible' });
+    await page.getByText('Medication adherence', { exact: true }).waitFor({ state: 'visible' });
     await page.getByText(/Help requests/i).waitFor({ state: 'visible' });
 
     await page.setViewportSize({ width: 390, height: 844 });

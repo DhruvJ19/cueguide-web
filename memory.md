@@ -25,6 +25,8 @@ updated: 2026-05-14
 - Som written feedback on 2026-05-14: patient audio should feel like Google Maps voice directions: human, soft, and gentle.
 - Som also emphasized that dementia patients should be asked, not ordered; medication voice prompts must avoid command tone.
 - Patient-facing UI must avoid failure language. Caregiver-facing UI can show skipped/help/partial status clearly.
+- The accepted UI direction is **Hybrid Care OS**: light clinical caregiver operations UI, separate warm dementia-first patient mode, no dark card soup, no generic AI-demo styling.
+- Second-pass UI quality standard: caregiver screens must act like operations surfaces, not static cards. Use attention queues, next-dose/refill states, session timelines, narrative reports, and grouped readiness rows.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
 
 ## Technical Lessons
@@ -58,6 +60,8 @@ Recent verified checks:
 - Production smoke at `https://cueguide-web.vercel.app` passed strict ElevenLabs verification with six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
 - Production voice hardening deploy `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU` passed strict smoke with Bella selected and six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 - Stakeholder alpha deploy `dpl_C1ScBDEzNWq57dXvrVe5NSWqe5nm` passed strict production smoke with explicit-Read-aloud ElevenLabs audio and no mobile overflow. See [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
+- Hybrid Care OS UI turnaround passed local gates, local care-flow smoke, screenshot QA, mobile/tablet overflow checks, and production ElevenLabs endpoint verification. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
+- Hybrid Care OS second-pass UI passed local full gates, screenshot QA, care-flow smoke, and ElevenLabs `audio/mpeg` observation. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
 
 ## Obsidian Maintenance Rules
 

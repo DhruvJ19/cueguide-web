@@ -200,3 +200,95 @@ Known caveats:
 - Human-ear review against Som's Google Maps standard is still required before calling voice quality accepted.
 - Live Supabase migrations/RLS still need authenticated verification before claiming cloud-data production readiness.
 - Build still reports a large bundle warning.
+
+## 2026-05-14 - Hybrid Care OS UI Turnaround Local Gate
+
+Status: passed locally; not deployed yet.
+
+Design change verified:
+
+- Default caregiver UI is now light clinical instead of dark card-heavy.
+- Desktop navigation has a collapsible sidebar with stable icon/label tabs.
+- Mobile caregiver navigation uses a bottom tab bar without the desktop collapse control.
+- Today now prioritizes next medication, schedule, patient context, and alerts.
+- Medications now uses a structured full-width row/table layout with edit actions.
+- Reports now uses caregiver-useful adherence/help/skip/mood/session sections and avoids dominant `0%` empty-state language.
+- Settings now uses operational rows for Voice, AI, Data, Monitoring, and Session Events.
+- Patient Focus Mode remains visually separate, warm, high-contrast, and one action per screen.
+- One-time theme migration resets stale stored dark-mode users into the new light clinical caregiver UI.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3004 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Browser QA evidence:
+
+- Desktop screenshots captured for Today, Medications, Reports, and Settings.
+- Mobile screenshots captured for Today and Settings.
+- Tablet Patient Focus Mode screenshot captured after starting a medication session.
+- No horizontal overflow at 1440 desktop, 390 mobile, or 834 tablet patient viewport.
+- No framework error overlay detected.
+- Only console warning observed: Sentry DSN not configured, which is expected for local development.
+- Stale `cueguide-theme=dark` storage migrated to `cueguide-theme=light` with `cueguide-theme-version=hybrid-care-os-v1`.
+
+Voice evidence:
+
+- Local smoke observed ElevenLabs `200 audio/mpeg`.
+- Production `/api/elevenlabs/tts` returned `200 audio/mpeg` with a 40,169 byte MP3 sample.
+
+Known caveats:
+
+- This UI pass is local only until committed, pushed, deployed, and strict production smoke is rerun.
+- Human-ear voice review against Som's Google Maps standard remains required.
+- Live Supabase migrations/RLS still need authenticated verification before cloud-data production readiness.
+- Build still reports a large bundle warning.
+
+## 2026-05-14 - Hybrid Care OS Second-Pass Local Gate
+
+Status: passed locally; not deployed yet.
+
+Second-pass changes verified:
+
+- Today now behaves more like an operations console: voice/data/alert readiness chips, four-part status strip, attention queue, and caregiver-only past-due language.
+- Medication Manager now uses table-like rows with next dose, schedule chips, refill status, location cue, instructions, active toggle, and edit action.
+- Live Session now shows a caregiver event timeline, step progress, help count, skipped count, and patient-safe session interpretation.
+- Reports now include narrative adherence interpretation, a meter, medication review, caregiver attention, comfort signals, and recent session log.
+- Settings now groups readiness into Voice/Cue Quality, Data/Monitoring, and Privacy/Account posture.
+- Smoke selectors were updated for the new Live Session and Reports wording.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3005 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Browser QA evidence:
+
+- Desktop screenshots captured for Today, Medications, Live Session, Reports, and Settings.
+- Mobile screenshots captured for Today, Medications, and Settings.
+- Tablet Patient Focus Mode screenshot captured after starting medication session.
+- No horizontal overflow at 1440 desktop, 390 mobile, or 834 tablet patient viewport.
+- No framework error overlay detected.
+- Only expected local warning observed: Sentry DSN not configured.
+
+Smoke evidence:
+
+- Medication created and edited: `Smoke Omega 1778772385090`.
+- Patient flow reached Read aloud, Help, Skip, Done, and caregiver summary.
+- ElevenLabs proxy observed `200 audio/mpeg`.
+- Mobile-width caregiver view had no horizontal overflow.
+
+Known caveats:
+
+- This second-pass UI is local until committed, pushed, deployed, and strict production smoke is rerun.
+- Human-ear voice review remains required.
+- Live Supabase migrations/RLS still need authenticated verification before cloud-data production readiness.
+- Build still reports a large bundle warning.

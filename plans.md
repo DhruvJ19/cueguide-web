@@ -63,6 +63,8 @@ Status: built, deployed, and being hardened.
 
 Status: active.
 
+- Use the [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] direction for all web UI work: light clinical caregiver operations, warm patient Focus Mode, and no generic dark AI-demo styling.
+- Keep improving the caregiver UI as an operational care surface, following [[decisions#2026-05-14 - Second-Pass UI Must Behave Like Operations]].
 - Confirm Supabase schema, RLS, and realtime readiness.
 - Remove remaining placeholder/demo friction.
 - Add browser-level regression coverage for the medication loop.

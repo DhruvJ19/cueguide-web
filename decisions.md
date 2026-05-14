@@ -129,3 +129,23 @@ Decision: Patient Focus Mode should call ElevenLabs when the patient taps `Read 
 Reasoning: Som's direction is gentle navigation, not surprise audio. Explicit playback keeps the patient in control, reduces repeated provider calls during one walkthrough, and lowers ElevenLabs rate-limit risk while preserving the required production voice path.
 
 Linked: [[production-voice#Tone Rules]], [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-14 - Hybrid Care OS Visual Direction
+
+#decision #ux #accessibility #product
+
+Decision: Redesign CueGuide as a **Hybrid Care OS**: a restrained light clinical operations workspace for caregivers, paired with a separate warm, high-contrast, one-action-at-a-time patient mode.
+
+Reasoning: The dark card-heavy dashboard made the product feel cheap, repetitive, and hard to navigate. Som's guidance and dementia communication research point toward calm language, clear hierarchy, minimal distractions, and patient prompts that ask rather than command.
+
+Linked: [[source-map#Dementia And Accessibility Research]], [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]], [[todo#P2 - Product Polish]]
+
+## 2026-05-14 - Second-Pass UI Must Behave Like Operations
+
+#decision #ux #product #qa
+
+Decision: Move the caregiver UI beyond visual cleanup into operational surfaces: attention queue, past-due language, medication rows with next-dose/refill status, Live Session timeline, narrative Reports, and grouped readiness Settings.
+
+Reasoning: The first Hybrid Care OS pass improved contrast and navigation but still felt around 5/10. A credible stakeholder alpha needs workflow clarity, not just better colors.
+
+Linked: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]], [[todo#P2 - Product Polish]], [[plans#2. Final Production Hardening]]

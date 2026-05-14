@@ -38,6 +38,8 @@ import { v4 as uuidv4 } from 'uuid';
 import CommandPalette from './components/CommandPalette';
 import { supabase, db, isSupabaseConfigured } from './services/supabase';
 
+const THEME_SCHEMA_VERSION = 'hybrid-care-os-v1';
+
 function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg p-8 text-content">
@@ -58,8 +60,14 @@ function ErrorFallback({ error, resetErrorBoundary }: any) {
 function AppShell() {
   const { role, setRole, isAuthenticated } = useAuthStore();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const storedVersion = localStorage.getItem('cueguide-theme-version');
+    if (storedVersion !== THEME_SCHEMA_VERSION) {
+      localStorage.setItem('cueguide-theme-version', THEME_SCHEMA_VERSION);
+      localStorage.setItem('cueguide-theme', 'light');
+      return 'light';
+    }
     const stored = localStorage.getItem('cueguide-theme');
-    return (stored === 'light' || stored === 'dark') ? stored : 'dark';
+    return (stored === 'light' || stored === 'dark') ? stored : 'light';
   });
   const [isCommandOpen, setIsCommandOpen] = useState(false);
 

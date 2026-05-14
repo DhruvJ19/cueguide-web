@@ -1,4 +1,10 @@
 import type { AICueData, AICueStep } from '../types';
+import {
+  buildFallbackCueData,
+  minimizeCareContext,
+  parseCueJson,
+  validateCueData,
+} from './cueValidation';
 
 const DEFAULT_MODEL = 'openai/gpt-4o';
 
@@ -6,7 +12,7 @@ interface AIPromptContext {
   patientName: string;
   preferredName: string;
   routineName: string;
-  steps: { instruction: string; icon?: string }[];
+  steps: { id?: string; instruction: string; icon?: string; helpText?: string }[];
   context: {
     day: string;
     date: string;
@@ -37,65 +43,57 @@ async function callOpenRouter(prompt: string, model = DEFAULT_MODEL) {
   return data.text || '';
 }
 
-function safeParseCueData(text: string, fallbackSteps: AICueStep[]): AICueData | null {
-  try {
-    const parsed = JSON.parse(text.replace(/^```json\s*/i, '').replace(/```$/i, '').trim());
-    if (!parsed || typeof parsed.greeting !== 'string' || !Array.isArray(parsed.steps)) return null;
-    const steps = parsed.steps
-      .map((step: any) => ({
-        stepId: typeof step.stepId === 'string' ? step.stepId : undefined,
-        text: typeof step.text === 'string' ? step.text : '',
-        audio_text: typeof step.audio_text === 'string' ? step.audio_text : '',
-        help_text: typeof step.help_text === 'string' ? step.help_text : undefined,
-      }))
-      .filter((step: AICueStep) => step.text && step.audio_text);
-    if (steps.length === 0) return null;
-    return {
-      greeting: parsed.greeting.slice(0, 220),
-      steps,
-      encouragement: typeof parsed.encouragement === 'string' ? parsed.encouragement.slice(0, 220) : 'All set.',
-      reviewed: false,
-      source: 'ai',
-    };
-  } catch {
-    return null;
-  }
-}
-
 export async function generateCueData(contextData: AIPromptContext, aiConfig: AIGenerationStatus): Promise<AICueData> {
-  const fallbackSteps = contextData.steps.map((step: any) => ({
+  const fallbackSteps = contextData.steps.map((step) => ({
     stepId: step.id,
     text: step.instruction,
     audio_text: `${contextData.preferredName}, next ${step.instruction.toLowerCase()}. Take your time.`,
     help_text: step.helpText || 'Take your time. Do this one small step, then press Done.',
   }));
+  const fallbackCueData = buildFallbackCueData(
+    contextData.preferredName,
+    contextData.context.day,
+    contextData.context.date,
+    fallbackSteps,
+  );
   
   if (aiConfig.isEnabled) {
     try {
+      const minimizedNotes = minimizeCareContext(contextData.context.notes, [
+        contextData.patientName,
+        contextData.preferredName,
+      ]);
+      const promptSteps = contextData.steps.map((step, index) => ({
+        stepId: step.id || `step-${index + 1}`,
+        instruction: step.instruction,
+        icon: step.icon,
+        helpText: step.helpText,
+      }));
       const prompt = `You are CueGuide, a calm patient guidance voice for people who need simple daily support.
 Generate step-by-step prompts from de-identified care context.
 
-Preferred Name: ${contextData.preferredName}
+Preferred address: use the exact placeholder "{{preferredName}}" when addressing the patient. The app will safely personalize it later.
 Routine: ${contextData.routineName}
-Steps: ${JSON.stringify(contextData.steps)}
+Steps: ${JSON.stringify(promptSteps)}
 
 Context:
 Day: ${contextData.context.day}
 Date: ${contextData.context.date}
 Weather: ${contextData.context.weather}
 Upcoming: ${contextData.context.upcoming}
-Care Notes, de-identified and minimum necessary: ${contextData.context.notes}
+Care Notes, de-identified and minimum necessary: ${minimizedNotes}
 
 Rules:
 - Write like gentle navigation directions: human, soft, brief, and steady.
 - Use one action per step. Prefer "Next..." or "When you're ready..." over assistant-like chatter.
 - Simple, calm, non-clinical language.
-- Never mention dementia, memory loss, failure, or blame.
+- Never mention dementia, memory loss, forgetting, failure, urgency, or blame.
 - Do not say you are AI. Do not over-explain.
 - Keep each step one short instruction, 8-18 words when possible.
 - For medications, describe the pill visually and purpose simply.
 - Patient-facing text must never sound urgent or scolding.
 - Help text should calmly repeat the next physical action, not apologize or lecture.
+- Return exactly ${fallbackSteps.length} steps in the same order as the input.
 
 Output format ONLY JSON, no markdown formatting blocks, no extra text:
 {
@@ -113,21 +111,27 @@ Output format ONLY JSON, no markdown formatting blocks, no extra text:
 
       const text = await callOpenRouter(prompt);
       if (text) {
-        const parsed = safeParseCueData(text, fallbackSteps);
-        if (parsed) return parsed;
+        const validated = validateCueData(parseCueJson(text), fallbackCueData);
+        if (validated.source === 'ai') {
+          return {
+            ...validated,
+            greeting: validated.greeting.replaceAll('{{preferredName}}', contextData.preferredName),
+            steps: validated.steps.map((step) => ({
+              ...step,
+              text: step.text.replaceAll('{{preferredName}}', contextData.preferredName),
+              audio_text: step.audio_text.replaceAll('{{preferredName}}', contextData.preferredName),
+              help_text: step.help_text?.replaceAll('{{preferredName}}', contextData.preferredName),
+            })),
+            encouragement: validated.encouragement.replaceAll('{{preferredName}}', contextData.preferredName),
+          };
+        }
       }
     } catch (e) {
       console.error("AI Generation failed", e);
     }
   }
 
-  return {
-    "greeting": `Good morning, ${contextData.preferredName}. It is ${contextData.context.day}, ${contextData.context.date}. We will go one step at a time.`,
-    "steps": fallbackSteps,
-    "encouragement": `All set, ${contextData.preferredName}. Thank you for taking care of yourself.`,
-    "reviewed": true,
-    "source": "fallback"
-  };
+  return fallbackCueData;
 }
 
 export async function generateRoutineSteps(routineName: string, category: string, stepCount: string | number, aiConfig: AIGenerationStatus) {
@@ -173,8 +177,9 @@ Only reply with the category name, nothing else.`;
 export async function suggestRoutineName(contextNotes: string, aiConfig: AIGenerationStatus) {
   if (aiConfig.isEnabled) {
     try {
+      const minimizedNotes = minimizeCareContext(contextNotes || 'General daily support.', []);
       const prompt = `Based on this patient context, suggest a comforting short routine name (max 3-4 words).
-Context: ${contextNotes || 'General early stage dementia.'}
+Context: ${minimizedNotes}
 Only return the routine name, nothing else.`;
       const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
       return text?.trim().replace(/"/g, '');

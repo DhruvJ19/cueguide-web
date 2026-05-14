@@ -6,6 +6,7 @@ import {
   validateMedicationDraft,
 } from '../services/careAlerts';
 import { isUsableSupabaseKey, isUsableSupabaseUrl } from '../services/supabase';
+import { buildFallbackCueData, minimizeCareContext, validateCueData } from '../services/cueValidation';
 import type { Medication, PatientProfile, StepCompletion } from '../types';
 
 const patient: PatientProfile = {
@@ -149,5 +150,33 @@ assert.equal(isUsableSupabaseKey('your_supabase_anon_key_here'), false);
 assert.equal(isUsableSupabaseKey('mock-anon-key'), false);
 assert.equal(isUsableSupabaseKey('placeholder'), false);
 assert.equal(isUsableSupabaseKey('header.payload.signature'), true);
+
+const minimizedContext = minimizeCareContext('Robert Chen keeps medicine near Sarah. Phone +1 555 123 4567.', ['Robert Chen', 'Sarah']);
+assert.doesNotMatch(minimizedContext, /Robert Chen|Sarah|\+1 555/i);
+assert.match(minimizedContext, /caregiver/i);
+
+const fallbackCue = buildFallbackCueData('Dad', 'Thursday', 'May 14', [
+  {
+    stepId: 'step-1',
+    text: 'Pick up the blue pill.',
+    audio_text: 'Dad, pick up the blue pill.',
+    help_text: 'The blue pill is in the yellow box.',
+  },
+]);
+
+const unsafeCue = validateCueData({
+  greeting: 'Dad, you forgot your medicine.',
+  steps: [{ text: 'Hurry and take it now.', audio_text: 'Hurry and take it now.' }],
+  encouragement: 'Done.',
+}, fallbackCue);
+assert.equal(unsafeCue.source, 'fallback');
+
+const safeCue = validateCueData({
+  greeting: 'Good morning, {{preferredName}}.',
+  steps: [{ stepId: 'step-1', text: 'Pick up the blue pill.', audio_text: 'Pick up the blue pill.', help_text: 'It is in the yellow box.' }],
+  encouragement: 'All set.',
+}, fallbackCue);
+assert.equal(safeCue.source, 'ai');
+assert.equal(safeCue.steps.length, 1);
 
 console.log('careflows tests passed');

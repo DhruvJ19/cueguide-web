@@ -111,7 +111,6 @@ export interface SensorReading {
 
 export interface AIConfig {
   isEnabled: boolean;
-  apiKey: string;
   provider: 'gemini' | 'claude';
 }
 

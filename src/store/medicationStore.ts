@@ -7,6 +7,7 @@ import { db } from '../services/supabase';
 
 interface MedicationState {
   medications: Medication[];
+  lastSaveError: string | null;
   setMedications: (medications: Medication[]) => void;
   addMedication: (medication: Omit<Medication, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateMedication: (id: string, updates: Partial<Medication>) => void;
@@ -17,16 +18,14 @@ export const useMedicationStore = create<MedicationState>()(
   persist(
     (set, get) => ({
       medications: INITIAL_MEDICATIONS,
+      lastSaveError: null,
       setMedications: (medications) => set({ medications }),
       addMedication: async (medication) => {
         const now = new Date().toISOString();
         const next: Medication = { ...medication, id: uuidv4(), createdAt: now, updatedAt: now };
-        set((state) => ({ medications: [...state.medications, next] }));
-        try {
-          await db.medications.save(next);
-        } catch (error) {
-          console.error('Failed to save medication', error);
-        }
+        set((state) => ({ medications: [...state.medications, next], lastSaveError: null }));
+        const result = await db.medications.saveWithResult(next);
+        if (result.ok === false) set({ lastSaveError: result.error });
       },
       updateMedication: async (id, updates) => {
         const previous = get().medications;
@@ -34,15 +33,12 @@ export const useMedicationStore = create<MedicationState>()(
           medications: state.medications.map((medication) =>
             medication.id === id ? { ...medication, ...updates, updatedAt: new Date().toISOString() } : medication
           ),
+          lastSaveError: null,
         }));
         const updated = get().medications.find((medication) => medication.id === id);
         if (updated) {
-          try {
-            await db.medications.save(updated);
-          } catch (error) {
-            console.error('Failed to update medication', error);
-            set({ medications: previous });
-          }
+          const result = await db.medications.saveWithResult(updated);
+          if (result.ok === false) set({ medications: previous, lastSaveError: result.error });
         }
       },
       toggleMedication: (id) => {

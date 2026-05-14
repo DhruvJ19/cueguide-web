@@ -9,6 +9,7 @@ const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const MAX_TTS_CHARS = 700;
 const MAX_AI_PROMPT_CHARS = 8_000;
+const ALLOWED_AI_MODELS = new Set(['openai/gpt-4o', 'openai/gpt-4o-mini']);
 
 function readRequestBody(req: IncomingMessage): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
@@ -157,12 +158,14 @@ export default defineConfig(({mode}) => {
 
           server.middlewares.use('/api/ai/cue', async (req, res) => {
             if (req.method !== 'POST') return sendJson(res, 405, { error: 'Method not allowed' });
-            if (!env.OPENROUTER_API_KEY) return sendJson(res, 503, { error: 'AI generation is not configured' });
+            const apiKey = readEnvValue(env.OPENROUTER_API_KEY);
+            if (!apiKey) return sendJson(res, 503, { error: 'AI generation is not configured' });
 
             try {
               const body = await readRequestBody(req);
               const prompt = typeof body.prompt === 'string' ? body.prompt : '';
-              const model = typeof body.model === 'string' ? body.model : 'openai/gpt-4o';
+              const requestedModel = typeof body.model === 'string' ? body.model : 'openai/gpt-4o';
+              const model = ALLOWED_AI_MODELS.has(requestedModel) ? requestedModel : 'openai/gpt-4o';
               if (!prompt.trim() || prompt.length > MAX_AI_PROMPT_CHARS) {
                 return sendJson(res, 400, { error: 'Invalid prompt' });
               }
@@ -170,7 +173,7 @@ export default defineConfig(({mode}) => {
               const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
                 method: 'POST',
                 headers: {
-                  Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+                  Authorization: `Bearer ${apiKey}`,
                   'Content-Type': 'application/json',
                   'HTTP-Referer': 'https://cueguide.app',
                   'X-Title': 'CueGuide',

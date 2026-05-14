@@ -14,6 +14,5 @@ export const config = {
   },
   vapid: {
     publicKey: readEnvValue(viteEnv.VITE_VAPID_PUBLIC_KEY),
-    privateKey: readEnvValue(viteEnv.VITE_VAPID_PRIVATE_KEY),
   }
 };

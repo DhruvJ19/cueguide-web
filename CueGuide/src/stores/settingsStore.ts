@@ -25,7 +25,6 @@ export const useSettingsStore = create<SettingsState>()(
       notificationsEnabled: true,
       aiConfig: {
         isEnabled: false,
-        apiKey: '',
         provider: 'gemini',
       },
       setTheme: (theme) => set({ theme }),

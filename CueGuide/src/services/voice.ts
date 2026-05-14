@@ -1,8 +1,7 @@
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
-import { Platform } from 'react-native';
 
-const ELEVENLABS_API_KEY = process.env.EXPO_PUBLIC_ELEVENLABS_API_KEY ?? '';
+const CUEGUIDE_API_BASE_URL = process.env.EXPO_PUBLIC_CUEGUIDE_API_BASE_URL?.trim() ?? '';
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
 const GENTLE_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
 
@@ -27,31 +26,33 @@ function transformToGentle(text: string): string {
     .trim();
 }
 
+function getApiUrl(path: string): string {
+  if (!CUEGUIDE_API_BASE_URL) return '';
+  return `${CUEGUIDE_API_BASE_URL.replace(/\/$/, '')}${path}`;
+}
+
 export async function speakWithElevenLabs(text: string, gentle: boolean = true): Promise<void> {
-  if (!ELEVENLABS_API_KEY) {
+  const apiUrl = getApiUrl('/api/elevenlabs/tts');
+  if (!apiUrl) {
     return speakWithNativeTTS(text, gentle);
   }
 
   try {
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${gentle ? GENTLE_VOICE_ID : VOICE_ID}/stream`,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': ELEVENLABS_API_KEY,
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'audio/mpeg',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: gentle ? transformToGentle(text) : text,
+        voiceId: gentle ? GENTLE_VOICE_ID : VOICE_ID,
+        voice_settings: gentle ? GENTLE_SETTINGS : {
+          stability: 0.4,
+          similarity_boost: 0.8,
         },
-        body: JSON.stringify({
-          text: gentle ? transformToGentle(text) : text,
-          model_id: 'eleven_monolingual_v1',
-          voice_settings: gentle ? GENTLE_SETTINGS : {
-            stability: 0.4,
-            similarity_boost: 0.8,
-          },
-        }),
-      }
-    );
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`ElevenLabs API error: ${response.status}`);
@@ -96,18 +97,17 @@ export function stopSpeaking() {
 }
 
 export async function speakGentle(text: string): Promise<void> {
-  if (ELEVENLABS_API_KEY) {
+  if (CUEGUIDE_API_BASE_URL) {
     return speakWithElevenLabs(text, true);
   }
   return speakWithNativeTTS(text, true);
 }
 
 export async function testVoice(): Promise<boolean> {
-  if (!ELEVENLABS_API_KEY) return false;
+  const apiUrl = getApiUrl('/api/elevenlabs/voices');
+  if (!apiUrl) return false;
   try {
-    const response = await fetch('https://api.elevenlabs.io/v1/voices', {
-      headers: { 'xi-api-key': ELEVENLABS_API_KEY },
-    });
+    const response = await fetch(apiUrl);
     return response.ok;
   } catch {
     return false;
@@ -115,5 +115,5 @@ export async function testVoice(): Promise<boolean> {
 }
 
 export function isVoiceEnabled(): boolean {
-  return true;
+  return Boolean(CUEGUIDE_API_BASE_URL);
 }

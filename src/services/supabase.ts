@@ -11,6 +11,11 @@ import {
   Medication,
   CareAlert
 } from '../types';
+import {
+  createPersistenceFailure,
+  createPersistenceSuccess,
+  type PersistenceResult,
+} from './persistence';
 
 export function isUsableSupabaseUrl(url: string): boolean {
   return Boolean(url) && !url.includes('mock-supabase-url') && url.startsWith('https://');
@@ -272,7 +277,29 @@ export const db = {
       const { data, error } = await supabase.from('medications').upsert(payload).select().single();
       if (error) console.error(error);
       return data;
-    }
+    },
+    saveWithResult: async (medication: Medication): Promise<PersistenceResult<Medication>> => {
+      if (!isSupabaseConfigured) return createPersistenceSuccess('local', medication);
+      const payload = {
+        id: medication.id,
+        patient_id: medication.patientId,
+        name: medication.name,
+        purpose: medication.purpose,
+        dosage: medication.dosage,
+        pill_color: medication.pillColor,
+        pill_shape: medication.pillShape,
+        times: medication.times,
+        instructions: medication.instructions || null,
+        location: medication.location || null,
+        refill_date: medication.refillDate || null,
+        is_active: medication.isActive,
+        created_at: medication.createdAt,
+        updated_at: medication.updatedAt
+      };
+      const { data, error } = await supabase.from('medications').upsert(payload).select().single();
+      if (error) return createPersistenceFailure('supabase', `Failed to save medication ${medication.id}`, error);
+      return createPersistenceSuccess('supabase', data as Medication);
+    },
   },
   alerts: {
     getForPatient: async (patientId: string): Promise<CareAlert[]> => {

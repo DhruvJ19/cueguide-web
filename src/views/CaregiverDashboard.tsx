@@ -2,21 +2,27 @@ import React, { useMemo, useState } from 'react';
 import {
   Activity,
   Bell,
+  BrainCircuit,
   CalendarClock,
   CheckCircle2,
   ClipboardList,
+  Database,
+  Edit3,
   FileText,
   HeartPulse,
+  HardDrive,
   LayoutDashboard,
   Moon,
   Pill,
   Plus,
   Radio,
+  Save,
   Search,
   Settings,
   ShieldCheck,
   Sun,
   UserRound,
+  Volume2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePatientStore } from '../store/patientStore';
@@ -27,6 +33,8 @@ import { useMedicationStore } from '../store/medicationStore';
 import { useAlertStore } from '../store/alertStore';
 import { validateMedicationDraft } from '../services/careAlerts';
 import { buildMedicationRoutine, getMedicationScheduleTimes } from '../services/medicationRoutine';
+import { config } from '../config/env';
+import { isSupabaseConfigured } from '../services/supabase';
 import type { Medication, Routine } from '../types';
 
 type Tab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
@@ -93,18 +101,42 @@ function EmptyState({ title, body, action }: { title: string; body: string; acti
   );
 }
 
+function ReadinessItem({
+  icon,
+  label,
+  value,
+  detail,
+  status,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  detail: string;
+  status: 'ready' | 'fallback' | 'review';
+}) {
+  return (
+    <div className={`cg-readiness-item ${status}`}>
+      <div className="cg-readiness-icon">{icon}</div>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
 export default function CaregiverDashboard({ onStartSimulation, theme, setTheme, setIsCommandOpen }: Props) {
   const { profile } = usePatientStore();
   const { routines } = useRoutineStore();
   const { completions } = useCompletionStore();
   const { aiConfig, setAiConfig } = useSettingsStore();
-  const { medications, addMedication, toggleMedication } = useMedicationStore();
+  const { medications, addMedication, updateMedication, toggleMedication, lastSaveError } = useMedicationStore();
   const { alerts, acknowledgeAlert } = useAlertStore();
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     const stored = localStorage.getItem('cueguide-active-tab') as Tab | null;
     return stored && tabs.some((item) => item.id === stored) ? stored : 'today';
   });
   const [isAddingMedication, setIsAddingMedication] = useState(false);
+  const [editingMedicationId, setEditingMedicationId] = useState<string | null>(null);
   const [draftMedication, setDraftMedication] = useState(emptyMedication);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -136,17 +168,59 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const unreadAlerts = alerts.filter((alert) => alert.status === 'unread');
   const latestCompletion = [...todaysCompletions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
   const latestRoutine = latestCompletion ? allRoutines.find((routine) => routine.id === latestCompletion.routineId) : undefined;
+  const recentCompletions = completions.slice(0, 30);
+  const medicationCompletions = recentCompletions.filter((completion) =>
+    allRoutines.find((routine) => routine.id === completion.routineId)?.category === 'medication'
+  );
+  const helpEvents = recentCompletions.flatMap((completion) => completion.stepEvents || []).filter((event) => event.status === 'help_requested');
+  const skippedEvents = recentCompletions.flatMap((completion) => completion.stepEvents || []).filter((event) => event.status === 'skipped');
+  const adherenceRate = medicationCompletions.length === 0
+    ? 0
+    : Math.round((medicationCompletions.filter((completion) => completion.status === 'completed').length / medicationCompletions.length) * 100);
+  const moodCounts = recentCompletions.reduce<Record<string, number>>((counts, completion) => {
+    if (!completion.mood) return counts;
+    return { ...counts, [completion.mood]: (counts[completion.mood] || 0) + 1 };
+  }, {});
+  const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'No mood data';
+  const readiness = {
+    voice: config.elevenlabs.enabled,
+    ai: aiConfig.isEnabled,
+    data: isSupabaseConfigured,
+    events: todaysCompletions.some((completion) => (completion.stepEvents?.length || 0) > 0),
+  };
 
   const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
     setDraftMedication((current) => ({ ...current, [field]: value }));
     setFormErrors((current) => ({ ...current, [field]: '' }));
   };
 
-  const handleAddMedication = () => {
+  const resetMedicationForm = () => {
+    setDraftMedication(emptyMedication);
+    setFormErrors({});
+    setEditingMedicationId(null);
+    setIsAddingMedication(false);
+  };
+
+  const startAddMedication = () => {
+    setDraftMedication(emptyMedication);
+    setFormErrors({});
+    setEditingMedicationId(null);
+    setIsAddingMedication(true);
+  };
+
+  const startEditMedication = (medication: Medication) => {
+    const { id, createdAt, updatedAt, ...draft } = medication;
+    setDraftMedication(draft);
+    setFormErrors({});
+    setEditingMedicationId(id);
+    setIsAddingMedication(true);
+  };
+
+  const handleSaveMedication = () => {
     const now = new Date().toISOString();
     const validation = validateMedicationDraft({
       ...draftMedication,
-      id: 'draft-medication',
+      id: editingMedicationId || 'draft-medication',
       patientId: profile?.id || 'patient-1',
       createdAt: now,
       updatedAt: now,
@@ -156,10 +230,15 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       return;
     }
     const { id, createdAt, updatedAt, ...medication } = validation.normalized;
-    addMedication({ ...medication, patientId: profile?.id || 'patient-1' });
-    setDraftMedication(emptyMedication);
-    setFormErrors({});
-    setIsAddingMedication(false);
+    if (editingMedicationId) {
+      updateMedication(editingMedicationId, {
+        ...medication,
+        patientId: profile?.id || 'patient-1',
+      });
+    } else {
+      addMedication({ ...medication, patientId: profile?.id || 'patient-1' });
+    }
+    resetMedicationForm();
   };
 
   const renderToday = () => (
@@ -248,7 +327,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       <Section
         title="Medication List"
         action={
-          <button className="cg-primary" onClick={() => setIsAddingMedication(true)}>
+          <button className="cg-primary" onClick={startAddMedication}>
             <Plus size={16} /> Add medication
           </button>
         }
@@ -258,7 +337,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             <EmptyState
               title="No medications entered"
               body="Add the first medication with pill appearance, schedule, purpose, and instructions."
-              action={<button className="cg-secondary" onClick={() => setIsAddingMedication(true)}>Add medication</button>}
+              action={<button className="cg-secondary" onClick={startAddMedication}>Add medication</button>}
             />
           )}
           {medications.map((medication) => (
@@ -276,13 +355,17 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                 {medication.times.map((time) => <span key={time}>{time}</span>)}
               </div>
               {medication.refillDate && <small>Refill by {medication.refillDate}</small>}
+              <button className="cg-secondary cg-card-action" onClick={() => startEditMedication(medication)}>
+                <Edit3 size={15} /> Edit medication
+              </button>
             </article>
           ))}
         </div>
+        {lastSaveError && <p className="cg-warning-note">{lastSaveError}</p>}
       </Section>
 
       {isAddingMedication && (
-        <Section title="Add Medication">
+        <Section title={editingMedicationId ? 'Edit Medication' : 'Add Medication'}>
           <div className="cg-form">
             <input value={draftMedication.name} onChange={(event) => handleMedicationChange('name', event.target.value)} placeholder="Medication name" />
             {formErrors.name && <small className="cg-field-error">{formErrors.name}</small>}
@@ -299,8 +382,10 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             <input value={draftMedication.location} onChange={(event) => handleMedicationChange('location', event.target.value)} placeholder="Where the patient finds it" />
             <textarea value={draftMedication.instructions} onChange={(event) => handleMedicationChange('instructions', event.target.value)} placeholder="Caregiver notes or instructions" />
             <div className="cg-form-actions">
-              <button className="cg-secondary" onClick={() => setIsAddingMedication(false)}>Cancel</button>
-              <button className="cg-primary" onClick={handleAddMedication}>Save medication</button>
+              <button className="cg-secondary" onClick={resetMedicationForm}>Cancel</button>
+              <button className="cg-primary" onClick={handleSaveMedication}>
+                <Save size={16} /> {editingMedicationId ? 'Update medication' : 'Save medication'}
+              </button>
             </div>
           </div>
         </Section>
@@ -359,11 +444,40 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const renderReports = () => (
     <div className="cg-content-grid">
       <Section title="Weekly Care Summary">
-        <div className="cg-report">
-          <CheckCircle2 size={22} />
+        <div className="cg-report-grid">
+          <div className="cg-report-card">
+            <CheckCircle2 size={22} />
+            <span>Medication adherence</span>
+            <strong>{adherenceRate}%</strong>
+            <small>completed medication sessions in recent history</small>
+          </div>
+          <div className="cg-report-card">
+            <Bell size={22} />
+            <span>Help requests</span>
+            <strong>{helpEvents.length}</strong>
+            <small>patient-tapped help events</small>
+          </div>
+          <div className="cg-report-card">
+            <ClipboardList size={22} />
+            <span>Skipped steps</span>
+            <strong>{skippedEvents.length}</strong>
+            <small>logged for caregiver review</small>
+          </div>
+          <div className="cg-report-card">
+            <HeartPulse size={22} />
+            <span>Common mood</span>
+            <strong>{topMood}</strong>
+            <small>from completed sessions</small>
+          </div>
+        </div>
+        <div className="cg-insight-list">
           <div>
-            <strong>{todaysCompletions.length} routines logged today</strong>
-            <p>Reports combine completion, skipped-step, help-request, medication, and mood data for caregiver and clinician review.</p>
+            <strong>Medication review</strong>
+            <p>{activeMedications.length} active medications across {medTimes.length} scheduled time{medTimes.length === 1 ? '' : 's'}.</p>
+          </div>
+          <div>
+            <strong>Caregiver attention</strong>
+            <p>{unreadAlerts.length} unread alert{unreadAlerts.length === 1 ? '' : 's'} and {alerts.length} total alert{alerts.length === 1 ? '' : 's'} available for review.</p>
           </div>
         </div>
       </Section>
@@ -372,21 +486,67 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
           <span><ShieldCheck size={16} /> Supabase RLS target</span>
           <span><Bell size={16} /> Realtime alert model</span>
           <span><CalendarClock size={16} /> Adaptive scheduling ready</span>
+          <span><Volume2 size={16} /> ElevenLabs server proxy</span>
         </div>
       </Section>
     </div>
   );
 
   const renderSettings = () => (
-    <Section title="Settings">
-      <div className="cg-settings">
-        <label>
-          <span>Live AI cue generation</span>
-          <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />
-        </label>
-        <p>AI uses the server-side OpenRouter key only. When AI is disabled or unavailable, CueGuide uses reviewed fallback prompts so patient workflows keep working.</p>
+    <div className="cg-content-grid">
+      <div className="cg-main-stack">
+        <Section title="Production Readiness">
+          <div className="cg-readiness-grid">
+            <ReadinessItem
+              icon={<Volume2 size={18} />}
+              label="Patient voice"
+              value={readiness.voice ? 'ElevenLabs enabled' : 'Browser fallback'}
+              detail={readiness.voice ? 'Read aloud uses the server-side TTS proxy.' : 'Patient audio still works without provider secrets.'}
+              status={readiness.voice ? 'ready' : 'fallback'}
+            />
+            <ReadinessItem
+              icon={<BrainCircuit size={18} />}
+              label="AI cue generation"
+              value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
+              detail="Patient prompts stay simple, warm, and non-scolding."
+              status={readiness.ai ? 'review' : 'fallback'}
+            />
+            <ReadinessItem
+              icon={<Database size={18} />}
+              label="Care data"
+              value={readiness.data ? 'Supabase configured' : 'Local demo fallback'}
+              detail={readiness.data ? 'Data API remains subject to RLS policies.' : 'Demo flow stays usable if cloud config is absent.'}
+              status={readiness.data ? 'ready' : 'fallback'}
+            />
+            <ReadinessItem
+              icon={<Bell size={18} />}
+              label="Care monitoring"
+              value={alerts.length > 0 ? `${alerts.length} alerts available` : 'Alert model ready'}
+              detail="Help, skip, stuck, medication, and completion summaries feed caregiver review."
+              status={alerts.length > 0 ? 'ready' : 'review'}
+            />
+            <ReadinessItem
+              icon={<HardDrive size={18} />}
+              label="Session events"
+              value={readiness.events ? 'Patient actions logged' : 'Run session to verify'}
+              detail="Step start, help, skip, done, timing, mood, and summaries are captured."
+              status={readiness.events ? 'ready' : 'review'}
+            />
+          </div>
+        </Section>
       </div>
-    </Section>
+      <aside className="cg-side-stack">
+        <Section title="Settings">
+          <div className="cg-settings">
+            <label>
+              <span>Live AI cue generation</span>
+              <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />
+            </label>
+            <p>AI uses the server-side OpenRouter key only. When AI is disabled or unavailable, CueGuide uses reviewed fallback prompts so patient workflows keep working.</p>
+          </div>
+        </Section>
+      </aside>
+    </div>
   );
 
   const renderActiveTab = () => {

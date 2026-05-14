@@ -1,0 +1,85 @@
+---
+aliases: [context, project-context, live-snapshot]
+tags: [project, context, architecture, stack]
+created: 2026-05-14
+updated: 2026-05-14
+---
+
+# CueGuide Context
+
+> [!note]
+> Current live snapshot for future Codex sessions. Read this with [[plans]], [[memory]], [[todo]], [[decisions]], and [[dashboard]].
+
+## Snapshot
+
+- Workspace: `/Users/dj/Downloads/Official-CueGuide`
+- Branch: `codex/production-revamp`
+- Production URL: `https://cueguide-web.vercel.app`
+- Draft PR: `https://github.com/DhruvJ19/cueguide-web/pull/1`
+- Known unrelated local dirty file: `cueguide-test.png`, intentionally not staged.
+- Current production-revamp working set also includes Obsidian notes, readiness UI, smoke QA, and Supabase RLS migration work.
+
+## Technical Stack
+
+| Area | Stack |
+| --- | --- |
+| Web | React 19, Vite 6, TypeScript, Tailwind CSS 4, Zustand, React Router |
+| Icons/UI | lucide-react, motion, sonner, recharts |
+| Backend target | Supabase client, migrations under `supabase/migrations` |
+| Server APIs | Vercel-style API routes in `api/` plus Vite local API middleware |
+| Voice | ElevenLabs via `/api/elevenlabs/tts` and `/api/elevenlabs/voices` |
+| AI | OpenRouter-compatible server route `/api/ai/cue` with fallback cue generation |
+| Security | `.npmrc`, lockfile scanner, secret scanner, `npm audit signatures`, GitHub security workflow |
+
+## Project Structure
+
+| Path | Purpose |
+| --- | --- |
+| `src/views/CaregiverDashboard.tsx` | Main caregiver shell: Today, Medications, Routines, Live Session, Reports, Settings. |
+| `src/views/PatientFocusMode.tsx` | Patient one-step-at-a-time experience. |
+| `src/services/medicationRoutine.ts` | Medication-to-routine generation. |
+| `src/services/careAlerts.ts` | Alert creation and medication validation. |
+| `src/services/elevenlabs.ts` | Browser-side wrapper that calls server voice APIs. |
+| `src/utils/audio.ts` | Audio orchestration and patient tone transformation. |
+| `api/elevenlabs/tts.ts` | Production server TTS proxy. |
+| `api/elevenlabs/voices.ts` | Production server voice list proxy. |
+| `supabase/migrations/20260513093902_medication_alert_production_schema.sql` | Medication, alerts, and production data shape. |
+| `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` | Pending RLS/realtime hardening migration created for production policy coverage. |
+| `scripts/smoke-careflow.ts` | Browser smoke flow for medication setup, Focus Mode, alerts/session summary, voice, and mobile overflow. |
+| `Som_Evaluation/` | Som/Suman transcripts, specs, architecture, demo prep. |
+| `CueGuide/` | Nested Expo app, later mobile port target. |
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm test` | Careflow logic tests. |
+| `npm run lint` | TypeScript type check. |
+| `npm run build` | Production build. |
+| `npm run security:all` | Lockfile, secret exposure, audit, signature checks. |
+| `npm ci --ignore-scripts --dry-run` | Supply-chain dry run. |
+| `npm run smoke:careflow` | Production/local browser smoke test for the medication demo loop. |
+
+## Environment Notes
+
+- `.env` and `.env.local` are ignored. Do not print secrets.
+- `VITE_USE_ELEVENLABS` is public feature-gate config and must be trimmed before comparison.
+- `ELEVENLABS_API_KEY` is server-only.
+- Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
+- Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.
+
+## Nested Expo App
+
+The nested [[CueGuide/BUILD_SUMMARY|Expo app]] has useful medication/health ideas but is not the current production demo. See [[plans#4. Mobile Port]].
+
+Before any mobile port, keep the nested app on `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` and route voice/AI through the root web app server APIs. Do not reintroduce public provider secrets. See [[meta-optimization#Codebase And Architecture]].
+
+## Important Source Docs
+
+- [[SOM_DEMO_BRIEF_May6]]
+- [[EmailThread_Ongoing]]
+- [[Som_Evaluation/DELIVERABLE_1_Agile_Feature_Spec]]
+- [[Som_Evaluation/DELIVERABLE_2_Technical_Architecture]]
+- [[Som_Evaluation/CUEGUIDE_BUILD_SPEC]]
+- [[SECURITY]]
+- [[meta-optimization]]

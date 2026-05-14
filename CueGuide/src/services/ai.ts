@@ -1,6 +1,4 @@
-import { Platform } from 'react-native';
-
-const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const CUEGUIDE_API_BASE_URL = process.env.EXPO_PUBLIC_CUEGUIDE_API_BASE_URL?.trim() ?? '';
 const DEFAULT_MODEL = 'openai/gpt-4o';
 
 interface AIPromptContext {
@@ -19,36 +17,23 @@ interface AIPromptContext {
 
 export interface AIGenerationStatus {
   isEnabled: boolean;
-  apiKey: string;
 }
 
-function getApiKey(): string {
-  try {
-    return process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || '';
-  } catch {
-    return '';
-  }
+function getApiUrl(path: string): string {
+  if (!CUEGUIDE_API_BASE_URL) return '';
+  return `${CUEGUIDE_API_BASE_URL.replace(/\/$/, '')}${path}`;
 }
 
 async function callOpenRouter(prompt: string, model = DEFAULT_MODEL): Promise<string> {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error('OpenRouter API key not configured');
-  }
+  const apiUrl = getApiUrl('/api/ai/cue');
+  if (!apiUrl) throw new Error('CueGuide AI proxy is not configured');
 
-  const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+  const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://cueguide.app',
-      'X-Title': 'CueGuide',
     },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-    }),
+    body: JSON.stringify({ prompt, model }),
   });
 
   if (!response.ok) {
@@ -64,9 +49,7 @@ export async function generateCueData(contextData: AIPromptContext, aiConfig: AI
   steps: { text: string; audio_text: string }[];
   encouragement: string;
 }> {
-  const apiKey = aiConfig.apiKey || getApiKey();
-  
-  if (aiConfig.isEnabled && apiKey) {
+  if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
       const prompt = `You are CueGuide, a compassionate AI assistant helping people with early-stage
 dementia complete daily routines. You generate step-by-step prompts.
@@ -120,9 +103,7 @@ export async function generateRoutineSteps(
   stepCount: string | number, 
   aiConfig: AIGenerationStatus
 ): Promise<{ instruction: string; icon: string }[] | null> {
-  const apiKey = aiConfig.apiKey || getApiKey();
-  
-  if (aiConfig.isEnabled && apiKey) {
+  if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
       const prompt = `Generate exactly ${stepCount} simple, clear steps for a routine for someone with early dementia.
 Routine Name: ${routineName}
@@ -145,9 +126,7 @@ export async function suggestRoutineCategory(
   routineName: string, 
   aiConfig: AIGenerationStatus
 ): Promise<string | null> {
-  const apiKey = aiConfig.apiKey || getApiKey();
-  
-  if (aiConfig.isEnabled && apiKey && routineName.trim()) {
+  if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL && routineName.trim()) {
     try {
       const prompt = `Categorize this routine name: "${routineName}"
 Choose the single most appropriate category from this list: hygiene, medication, exercise, social, meals, other.
@@ -168,9 +147,7 @@ export async function suggestRoutineName(
   contextNotes: string, 
   aiConfig: AIGenerationStatus
 ): Promise<string> {
-  const apiKey = aiConfig.apiKey || getApiKey();
-  
-  if (aiConfig.isEnabled && apiKey) {
+  if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
       const prompt = `Based on this patient context, suggest a comforting short routine name (max 3-4 words).
 Context: ${contextNotes || 'General early stage dementia.'}
@@ -188,9 +165,7 @@ export async function generateHelpExplanation(
   stepInstruction: string, 
   aiConfig: AIGenerationStatus
 ): Promise<string> {
-  const apiKey = aiConfig.apiKey || getApiKey();
-  
-  if (aiConfig.isEnabled && apiKey) {
+  if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
       const prompt = `Please provide a calm, simple 1-2 sentence expanded explanation for this step for someone with early dementia: "${stepInstruction}"`;
       const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');

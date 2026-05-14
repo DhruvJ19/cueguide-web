@@ -107,8 +107,8 @@ Status: passed.
 Production deployment:
 
 - Alias: `https://cueguide-web.vercel.app`
-- Deployment: `https://cueguide-a9ncb1rmh-dhruvjainhk-4433s-projects.vercel.app`
-- Vercel deployment id: `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU`
+- Deployment: `https://cueguide-f9v0vicdn-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_7oiAW2vDgjPinVX21gDjdvVc8F28`
 
 Selected production voice:
 
@@ -121,7 +121,7 @@ Verified:
 - Production `/api/elevenlabs/voices` returned selected voice metadata.
 - `npm run smoke:careflow`
 - Target URL: `https://cueguide-web.vercel.app`
-- Medication created and edited: `Smoke Omega 1778751634810`
+- Medication created and edited: `Smoke Omega 1778751739965`
 - Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
 - Caregiver Settings required `ElevenLabs active`.
 - ElevenLabs production proxy returned six `200 audio/mpeg` TTS responses.

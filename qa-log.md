@@ -52,14 +52,14 @@ Status: passed.
 Production deployment:
 
 - Alias: `https://cueguide-web.vercel.app`
-- Deployment: `https://cueguide-k1ajd0kow-dhruvjainhk-4433s-projects.vercel.app`
-- Vercel deployment id: `dpl_6pJUsEwH6y1LTn5nYYZAkGEziNLY`
+- Deployment: `https://cueguide-lece5xlxo-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_B82EJ3MhyBYuLUmGzrYaY8BxAyLe`
 
 Verified:
 
 - `npm run smoke:careflow`
 - Target URL: `https://cueguide-web.vercel.app`
-- Medication created and edited: `Smoke Omega 1778750185222`
+- Medication created and edited: `Smoke Omega 1778750280302`
 - Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
 - Caregiver Live Session and Reports updated.
 - ElevenLabs production proxy returned six `200 audio/mpeg` TTS responses.

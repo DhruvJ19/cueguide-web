@@ -24,6 +24,7 @@ updated: 2026-05-15
 - The MVP loop is: caregiver medication setup -> patient Focus Mode -> patient action logging -> caregiver alerts/session summary.
 - Som written feedback on 2026-05-14: patient audio should feel like Google Maps voice directions: human, soft, and gentle.
 - Som also emphasized that dementia patients should be asked, not ordered; medication voice prompts must avoid command tone.
+- Som's exact email standard is now the acceptance gate: do not mark voice accepted from API success alone; it must sound like calm Google Maps-style navigation in the live app.
 - Patient-facing UI must avoid failure language. Caregiver-facing UI can show skipped/help/partial status clearly.
 - The accepted UI direction is **Hybrid Care OS**: light clinical caregiver operations UI, separate warm dementia-first patient mode, no dark card soup, no generic AI-demo styling.
 - Second-pass UI quality standard: caregiver screens must act like operations surfaces, not static cards. Use attention queues, next-dose/refill states, session timelines, narrative reports, and grouped readiness rows.

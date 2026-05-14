@@ -199,3 +199,13 @@ Decision: Caregiver screens should open with the next clinical action, not a pro
 Reasoning: The app still felt crowded and AI-generated because too many surfaces explained CueGuide instead of letting caregivers act. For dementia-care credibility, the UI must feel calm, direct, and operational.
 
 Linked: [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]], [[todo#P2 - Product Polish]], [[source-map#Dementia And Accessibility Research]]
+
+## 2026-05-15 - Google Maps Voice Standard Is The Acceptance Gate
+
+#decision #voice #som #product
+
+Decision: Som's exact written standard — Google Maps voice directions that sound human, soft, and gentle — is the patient voice acceptance gate. ElevenLabs `audio/mpeg` delivery is necessary but not sufficient.
+
+Reasoning: Som did not ask for generic TTS. He gave a specific interaction model: navigation-like guidance that feels calm, human, and gentle. CueGuide should not mark voice accepted until a human confirms that standard in the live product.
+
+Linked: [[production-voice#Requirement]], [[source-map#Som Feedback]], [[todo#P0 - Demo-Critical]]

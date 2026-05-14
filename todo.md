@@ -18,7 +18,7 @@ updated: 2026-05-15
 - [ ] Run one human-operated live walkthrough after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
 - [x] Verify the three Som-standard production TTS sample prompts return `audio/mpeg` through `/api/elevenlabs/tts`. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
-- [ ] Verify production voice quality with human ears against Som's Google Maps standard: human, soft, gentle, non-commanding.
+- [ ] Verify production voice quality with human ears against Som's exact email standard: Google Maps-like, human, soft, gentle, and non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.

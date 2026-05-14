@@ -231,6 +231,33 @@ Known caveats:
 - Supabase cloud signup, migration state, RLS behavior, and authenticated save/load still need proof before public production claims.
 - Vercel still warns that `name` in `vercel.json` is deprecated.
 
+## 2026-05-15 - Som Exact Voice Standard Alignment
+
+Status: passed and deployed.
+
+Why this pass happened:
+
+- Som's exact email says: "Think about Google Maps' voice directions. Sounds human, soft, and gentle."
+- The app already verified ElevenLabs `audio/mpeg`, but Settings needed to state the acceptance target more explicitly.
+
+Verified change:
+
+- Settings now says `Google Maps voice standard`.
+- Settings voice detail now says to accept only if the voice sounds like calm Google Maps directions.
+- [[production-voice]], [[todo]], [[decisions]], [[memory]], and [[runbook]] now separate API delivery from Som-standard voice acceptance.
+- Production deploy: `https://cueguide-azu5gyz0q-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_BL2tqkZd8GErtE7TXpKXef8PJQGR`
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm run smoke:careflow` passed after updating the smoke selector from `Som voice standard` to `Google Maps voice standard`.
+- Production smoke medication: `Smoke Omega 1778780754483`
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+
+Known caveat:
+
+- Human-ear review is still pending and must happen in the live product before voice quality is marked accepted.
+
 ## 2026-05-14 - Production Deploy Smoke
 
 Status: passed.

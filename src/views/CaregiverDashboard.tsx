@@ -274,9 +274,9 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         ? 'ElevenLabs blocked'
         : 'ElevenLabs required';
   const voiceReadinessDetail = voiceReviewReady
-    ? `${voiceStatus.selectedVoiceName || 'Production voice'} is accepted for patient prompts.`
+    ? `${voiceStatus.selectedVoiceName || 'Production voice'} passed the Google Maps standard: human, soft, gentle.`
     : readiness.voice
-      ? `Server voice works. Human tone review is still pending.`
+      ? `Server voice works. Accept only if it sounds like calm Google Maps directions.`
       : voiceStatus.message;
   const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
   const headerContext = profile?.name ? `${profile.name} care plan` : 'Patient care plan';
@@ -765,8 +765,8 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             <div className={`cg-voice-status ${voiceReviewStatus}`}>
               <Volume2 size={18} />
               <div>
-                <strong>Som voice standard</strong>
-                <p>Play samples, then mark accepted only after human review.</p>
+                <strong>Google Maps voice standard</strong>
+                <p>Som's target: human, soft, gentle, and non-commanding. Play samples before accepting.</p>
               </div>
               <div className="cg-voice-prompts">
                 {VOICE_REVIEW_PROMPTS.map((prompt, index) => (

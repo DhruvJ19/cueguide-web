@@ -54,10 +54,11 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 ## Production Voice
 
 - Production voice must be ElevenLabs through `/api/elevenlabs/tts`.
+- Acceptance target is Som's exact email standard: Google Maps voice directions that sound human, soft, and gentle.
 - Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
 - Settings must show `ElevenLabs active` from a live server check, then `Human voice review pending` until a person marks the voice accepted.
 - Test the three Som-standard samples in Settings: small blue pill with water, yellow box location, and "Take your time. I can wait with you."
-- Only mark `Voice accepted` after a human hears the output as Google Maps-like: soft, gentle, and non-commanding.
+- Only mark `Voice accepted` after a human hears the output as Google Maps-like: human, soft, gentle, and non-commanding.
 - Patient voice should play from explicit `Read aloud` actions, not automatic step transitions.
 - Browser TTS is only an emergency fallback; it is not production-ready voice quality.
 

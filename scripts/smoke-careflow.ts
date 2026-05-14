@@ -125,7 +125,7 @@ async function runSmoke(): Promise<void> {
     } else {
       await page.getByText(/Human voice review pending|Voice accepted|ElevenLabs active|ElevenLabs required|ElevenLabs blocked/i).first().waitFor({ state: 'visible', timeout: 15_000 });
     }
-    await page.getByText(/Som voice standard/i).waitFor({ state: 'visible' });
+    await page.getByText(/Google Maps voice standard/i).waitFor({ state: 'visible' });
 
     await clickNav(page, 'Reports');
     await page.getByText('Medication adherence', { exact: true }).waitFor({ state: 'visible' });

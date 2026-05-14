@@ -14,6 +14,8 @@ updated: 2026-05-15
 
 ElevenLabs is the production patient voice path. Browser speech is only an emergency fallback so the patient is never blocked.
 
+Acceptance is not just technical playback. The voice must pass Som's written standard: it should feel like Google Maps voice directions: human, soft, and gentle.
+
 ## Current Voice
 
 | Setting | Value |
@@ -31,6 +33,7 @@ ElevenLabs is the production patient voice path. Browser speech is only an emerg
 - Ask instead of command.
 - Use short, warm, physical directions.
 - Avoid robotic phrasing, urgency, blame, and celebration effects.
+- Do not mark Settings as accepted if the voice sounds like a chatbot, alarm, nurse command, or scolding assistant.
 - Medication prompts should sound like gentle navigation: calm, specific, and non-scolding.
 - Trigger audio from explicit `Read aloud` actions so the patient controls when voice plays and one walkthrough does not overload the voice provider.
 - Treat `audio/mpeg` API success as delivery proof only. Human acceptance must be recorded separately before calling voice quality accepted.

@@ -21,6 +21,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 import { HeartPulse, AlertTriangle } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
+import { format } from 'date-fns';
 
 import { usePatientStore } from './store/patientStore';
 import { useRoutineStore } from './store/routineStore';
@@ -130,7 +131,7 @@ function AppShell() {
       id: uuidv4(),
       patientId: profile?.id || '',
       routineId: routine.id,
-      date: new Date().toISOString().split('T')[0],
+      date: format(new Date(), 'yyyy-MM-dd'),
       status,
       minutes,
       stepsCompleted,

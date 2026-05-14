@@ -12,10 +12,21 @@ import {
   CareAlert
 } from '../types';
 
+export function isUsableSupabaseUrl(url: string): boolean {
+  return Boolean(url) && !url.includes('mock-supabase-url') && url.startsWith('https://');
+}
+
+export function isUsableSupabaseKey(key: string): boolean {
+  const normalizedKey = key.trim().toLowerCase();
+  if (!normalizedKey) return false;
+  if (normalizedKey === 'mock-anon-key') return false;
+  if (normalizedKey.includes('your_supabase_anon_key')) return false;
+  if (normalizedKey.includes('placeholder')) return false;
+  return normalizedKey.split('.').length === 3;
+}
+
 export const isSupabaseConfigured =
-  Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY) &&
-  !config.supabase.url.includes('mock-supabase-url') &&
-  config.supabase.anonKey !== 'mock-anon-key';
+  isUsableSupabaseUrl(config.supabase.url) && isUsableSupabaseKey(config.supabase.anonKey);
 export const supabase = createClient(config.supabase.url, config.supabase.anonKey, {
   auth: {
     persistSession: isSupabaseConfigured,

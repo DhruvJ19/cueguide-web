@@ -5,6 +5,7 @@ import {
   createRoutineCompletionAlert,
   validateMedicationDraft,
 } from '../services/careAlerts';
+import { isUsableSupabaseKey, isUsableSupabaseUrl } from '../services/supabase';
 import type { Medication, PatientProfile, StepCompletion } from '../types';
 
 const patient: PatientProfile = {
@@ -141,5 +142,12 @@ const validDraft = validateMedicationDraft({
 
 assert.equal(validDraft.isValid, true);
 assert.deepEqual(validDraft.normalized.times, ['08:00', '21:30']);
+
+assert.equal(isUsableSupabaseUrl('https://kueqtpekkqapclczvahc.supabase.co'), true);
+assert.equal(isUsableSupabaseUrl('https://mock-supabase-url.supabase.co'), false);
+assert.equal(isUsableSupabaseKey('your_supabase_anon_key_here'), false);
+assert.equal(isUsableSupabaseKey('mock-anon-key'), false);
+assert.equal(isUsableSupabaseKey('placeholder'), false);
+assert.equal(isUsableSupabaseKey('header.payload.signature'), true);
 
 console.log('careflows tests passed');

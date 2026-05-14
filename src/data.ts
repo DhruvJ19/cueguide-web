@@ -164,7 +164,7 @@ export const INITIAL_COMPLETIONS: Completion[] = (() => {
   
   for (let i = 0; i < 30; i++) {
     const d = format(subDays(new Date(), i), 'yyyy-MM-dd');
-    routines.forEach(rId => {
+    routines.forEach((rId, routineIndex) => {
        // Randomize completion chance
        const rand = Math.random();
        let status: 'completed' | 'partial' | 'missed' = 'completed';
@@ -191,7 +191,7 @@ completions.push({
           stepsCompleted,
           stepsTotal: 5,
           mood: status === 'completed' ? moods[Math.floor(Math.random() * 3)] : moods[2 + Math.floor(Math.random() * 3)],
-          createdAt: new Date().toISOString()
+          createdAt: new Date(Date.now() - (i * 24 + routines.length - routineIndex + 1) * 60 * 60 * 1000).toISOString()
         });
     });
   }

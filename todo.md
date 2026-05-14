@@ -12,7 +12,7 @@ updated: 2026-05-14
 
 ## P0 - Demo-Critical
 
-- [ ] Commit, push, deploy, and rerun strict production smoke for the Hybrid Care OS second-pass UI.
+- [x] Commit, push, deploy, and rerun strict production smoke for the Hybrid Care OS second-pass UI.
 - [x] Complete `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` so medication, completion, and alert data have explicit production RLS/realtime coverage.
 - [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
 - [ ] Run one human-operated live walkthrough after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
@@ -69,3 +69,4 @@ updated: 2026-05-14
 - [x] Deployed production voice hardening and verified strict production ElevenLabs smoke. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 - [x] Verified the Hybrid Care OS UI turnaround locally with screenshots, local care-flow smoke, security checks, and production ElevenLabs endpoint evidence. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - [x] Verified the Hybrid Care OS second-pass UI locally with full gates, screenshot QA, and care-flow smoke. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
+- [x] Deployed Hybrid Care OS second-pass UI and verified strict production smoke with ElevenLabs `audio/mpeg`. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].

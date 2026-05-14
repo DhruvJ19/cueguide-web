@@ -292,3 +292,29 @@ Known caveats:
 - Human-ear voice review remains required.
 - Live Supabase migrations/RLS still need authenticated verification before cloud-data production readiness.
 - Build still reports a large bundle warning.
+
+## 2026-05-14 - Hybrid Care OS Second-Pass Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-337yqe296-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_GzDvHnVAT4D7FBrj1Z5nYYn3CNJv`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778772713850`
+- Patient flow reached Read aloud, Help, Skip, Done, and caregiver summary.
+- Caregiver Live Session and Reports reflected the upgraded wording.
+- ElevenLabs production proxy returned one `200 audio/mpeg` TTS response.
+- Mobile-width caregiver view had no horizontal overflow.
+
+Known caveats:
+
+- Human-ear voice review against Som's Google Maps standard remains required.
+- Live Supabase migrations/RLS still need authenticated verification before cloud-data production readiness.
+- Build still reports a large bundle warning.

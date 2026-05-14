@@ -62,6 +62,7 @@ Recent verified checks:
 - Stakeholder alpha deploy `dpl_C1ScBDEzNWq57dXvrVe5NSWqe5nm` passed strict production smoke with explicit-Read-aloud ElevenLabs audio and no mobile overflow. See [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
 - Hybrid Care OS UI turnaround passed local gates, local care-flow smoke, screenshot QA, mobile/tablet overflow checks, and production ElevenLabs endpoint verification. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - Hybrid Care OS second-pass UI passed local full gates, screenshot QA, care-flow smoke, and ElevenLabs `audio/mpeg` observation. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
+- Hybrid Care OS second-pass production deploy `dpl_GzDvHnVAT4D7FBrj1Z5nYYn3CNJv` passed strict smoke with ElevenLabs `200 audio/mpeg` and no mobile overflow. See [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

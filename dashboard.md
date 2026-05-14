@@ -58,6 +58,7 @@ updated: 2026-05-14
 - Latest production voice gate: [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 - Latest UI gate: [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
 - Latest second-pass UI gate: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Local Gate]].
+- Latest second-pass production gate: [[qa-log#2026-05-14 - Hybrid Care OS Second-Pass Production Deploy]].
 
 ## Context
 

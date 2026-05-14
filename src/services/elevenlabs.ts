@@ -13,11 +13,18 @@ export interface Voice {
   labels?: Record<string, string>;
 }
 
+export interface VoiceStatus {
+  ok: boolean;
+  selectedVoiceId: string;
+  selectedVoiceName: string;
+  message: string;
+}
+
 const GENTLE_SETTINGS: VoiceSettings = {
-  stability: 0.55,
-  similarity_boost: 0.85,
-  style: 0.3,
-  use_speaker_boost: true,
+  stability: 0.68,
+  similarity_boost: 0.78,
+  style: 0.18,
+  use_speaker_boost: false,
 };
 
 const DEFAULT_SETTINGS: VoiceSettings = {
@@ -26,26 +33,59 @@ const DEFAULT_SETTINGS: VoiceSettings = {
 };
 
 let cachedVoices: Voice[] | null = null;
+let cachedVoiceStatus: VoiceStatus | null = null;
+
+async function fetchVoicePayload(): Promise<{ voices: Voice[]; selectedVoiceId: string; selectedVoice: Voice | null }> {
+  const res = await fetch('/api/elevenlabs/voices');
+  if (!res.ok) throw new Error(`ElevenLabs voices unavailable: ${res.status}`);
+  const data = await res.json();
+  return {
+    voices: data.voices || [],
+    selectedVoiceId: data.selectedVoiceId || '',
+    selectedVoice: data.selectedVoice || null,
+  };
+}
 
 export async function fetchVoices(): Promise<Voice[]> {
   if (cachedVoices) return cachedVoices;
-
   try {
-    const res = await fetch('/api/elevenlabs/voices');
-    if (!res.ok) return [];
-    const data = await res.json();
-    cachedVoices = data.voices || [];
+    const data = await fetchVoicePayload();
+    cachedVoices = data.voices;
     return cachedVoices;
   } catch {
     return [];
   }
 }
 
+export async function getElevenLabsStatus(): Promise<VoiceStatus> {
+  if (cachedVoiceStatus) return cachedVoiceStatus;
+  try {
+    const data = await fetchVoicePayload();
+    cachedVoices = data.voices;
+    const selectedVoiceName = data.selectedVoice?.name || 'production voice';
+    cachedVoiceStatus = {
+      ok: Boolean(data.selectedVoiceId),
+      selectedVoiceId: data.selectedVoiceId,
+      selectedVoiceName,
+      message: `Server voice ready: ${selectedVoiceName}`,
+    };
+    return cachedVoiceStatus;
+  } catch (error) {
+    cachedVoiceStatus = {
+      ok: false,
+      selectedVoiceId: '',
+      selectedVoiceName: '',
+      message: error instanceof Error ? error.message : 'ElevenLabs status check failed',
+    };
+    return cachedVoiceStatus;
+  }
+}
+
 export async function speakWithElevenLabs(
   text: string,
-  voiceId: string,
   gentle: boolean = false,
   onEnd?: () => void,
+  voiceId?: string,
 ): Promise<void> {
   try {
     const response = await fetch('/api/elevenlabs/tts', {

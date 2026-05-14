@@ -120,7 +120,11 @@ async function runSmoke(): Promise<void> {
 
     await clickNav(page, 'Settings');
     await page.getByText(/Patient voice/i).waitFor({ state: 'visible' });
-    await page.getByText(/ElevenLabs enabled|Browser fallback/i).waitFor({ state: 'visible' });
+    if (requireElevenLabs) {
+      await page.getByText(/ElevenLabs active/i).first().waitFor({ state: 'visible', timeout: 15_000 });
+    } else {
+      await page.getByText(/ElevenLabs active|ElevenLabs required|ElevenLabs blocked/i).first().waitFor({ state: 'visible', timeout: 15_000 });
+    }
 
     await clickNav(page, 'Reports');
     await page.getByText(/Medication adherence/i).waitFor({ state: 'visible' });

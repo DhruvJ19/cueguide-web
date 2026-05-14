@@ -31,7 +31,7 @@ This checks:
 - Do not paste API keys into chat, tickets, commits, screenshots, or docs.
 - Treat any pasted key as compromised and rotate it immediately.
 - `.env`, `.env.local`, and production env files are ignored by git.
-- ElevenLabs is opt-in with `VITE_USE_ELEVENLABS=true`; browser TTS is the safe fallback.
+- ElevenLabs is required for production voice with `VITE_USE_ELEVENLABS=true`; browser TTS is only an emergency patient-safety fallback.
 - Keep the ElevenLabs secret in `ELEVENLABS_API_KEY` only. Never use a `VITE_` prefix for provider secrets because Vite exposes those values to browser code.
 - Keep AI provider secrets in server-only variables such as `OPENROUTER_API_KEY`; CueGuide calls `/api/ai/*` from the browser.
 - Use a freshly rotated ElevenLabs key before enabling live voice.
@@ -43,6 +43,8 @@ After rotating the exposed key, set these values only in an ignored local env fi
 ```env
 VITE_USE_ELEVENLABS=true
 ELEVENLABS_API_KEY=your_new_rotated_key
+ELEVENLABS_VOICE_ID=hpp4J3VqNfWAUOO0d1Us
+ELEVENLABS_MODEL_ID=eleven_flash_v2_5
 ```
 
 Then run:

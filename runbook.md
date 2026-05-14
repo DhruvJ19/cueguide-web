@@ -39,6 +39,13 @@ npm run smoke:careflow
 
 This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `audio/mpeg`.
 
+## Production Voice
+
+- Production voice must be ElevenLabs through `/api/elevenlabs/tts`.
+- Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
+- Settings must show `ElevenLabs active` from a live server check before stakeholder use.
+- Browser TTS is only an emergency fallback; it is not production-ready voice quality.
+
 ## Demo Walkthrough
 
 1. Open Today and show active medication schedule.
@@ -52,6 +59,7 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 ## Stop Conditions
 
 - ElevenLabs production smoke does not return `audio/mpeg`.
+- Settings does not show `ElevenLabs active`.
 - Browser console shows unhandled app errors.
 - Mobile-width smoke reports horizontal overflow.
 - Provider secrets appear in tracked files or `dist`.

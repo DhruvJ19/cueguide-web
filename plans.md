@@ -12,7 +12,7 @@ updated: 2026-05-14
 
 ## Plans Stage
 
-CueGuide is in the **web-first production demo hardening** stage: the root Vite/React web app is the source of truth, while the nested [[context#Nested Expo App|Expo app]] remains a later port target.
+CueGuide is in the **web-first production hardening** stage: the root Vite/React web app is the source of truth, while the nested [[context#Nested Expo App|Expo app]] remains a later port target.
 
 The current operating model is reinforced by [[YouTube_Mobile_App_Course_BMMcmmnjrM8]]: finish the real web product loop, verify it in browser/mobile-width views, then port the proven experience to a real phone.
 
@@ -51,9 +51,9 @@ Use [[meta-optimization]] as the quality leverage map for the production pass. T
 - Turn the care-flow smoke test into a release gate.
 - Refactor persistence/session logic only where it improves demo reliability.
 
-### 1. Web Demo Core Loop
+### 1. Web Production Core Loop
 
-Status: mostly built and deployed.
+Status: built, deployed, and being hardened.
 
 - [[todo#P0 - Demo-Critical|P0]] caregiver dashboard, medication workflows, Focus Mode, alerts, reports.
 - Production deploy: `https://cueguide-web.vercel.app`.

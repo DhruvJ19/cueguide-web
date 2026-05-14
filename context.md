@@ -27,7 +27,7 @@ updated: 2026-05-14
 | Icons/UI | lucide-react, motion, sonner, recharts |
 | Backend target | Supabase client, migrations under `supabase/migrations` |
 | Server APIs | Vercel-style API routes in `api/` plus Vite local API middleware |
-| Voice | ElevenLabs via `/api/elevenlabs/tts` and `/api/elevenlabs/voices` |
+| Voice | ElevenLabs via `/api/elevenlabs/tts` and `/api/elevenlabs/voices`; production voice `Bella - Professional, Bright, Warm` |
 | AI | OpenRouter-compatible server route `/api/ai/cue` with fallback cue generation |
 | Security | `.npmrc`, lockfile scanner, secret scanner, `npm audit signatures`, GitHub security workflow |
 
@@ -65,6 +65,7 @@ updated: 2026-05-14
 - `.env` and `.env.local` are ignored. Do not print secrets.
 - `VITE_USE_ELEVENLABS` is public feature-gate config and must be trimmed before comparison.
 - `ELEVENLABS_API_KEY` is server-only.
+- `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.
 

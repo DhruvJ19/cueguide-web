@@ -1,4 +1,4 @@
-import { speakWithElevenLabs, speakWithBrowserTTS, cancelSpeech, isSpeaking, DEFAULT_VOICE_ID } from '../services/elevenlabs';
+import { speakWithElevenLabs, speakWithBrowserTTS, cancelSpeech, isSpeaking } from '../services/elevenlabs';
 import { config } from '../config/env';
 
 export interface AudioConfig {
@@ -7,21 +7,25 @@ export interface AudioConfig {
   useElevenLabs: boolean;
 }
 
-function getGentleVoiceId(): string {
-  return DEFAULT_VOICE_ID;
-}
-
-function transformToGentle(text: string): string {
-  return text
-    .replace(/\bTake\b/gi, 'Would you like to')
-    .replace(/\bRemember\b/gi, 'If you feel ready, you might')
-    .replace(/\bDon't forget\b/gi, 'Whenever you\'re ready')
-    .replace(/\bYou need to\b/gi, 'You can')
-    .replace(/\bYou should\b/gi, 'You\'re welcome to')
-    .replace(/\bWake up\b/gi, 'Good morning')
-    .replace(/\bbrush your teeth\b/gi, 'brush your teeth, when you\'re ready')
-    .replace(/\bTake your medicine\b/gi, 'Your medicine is here, whenever you\'re comfortable')
+export function transformToGentle(text: string): string {
+  const cleaned = text
     .replace(/!/g, '.')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned
+    .replace(/\bYou need to\b/gi, 'You can')
+    .replace(/\bYou should\b/gi, 'You are welcome to')
+    .replace(/\bRemember to\b/gi, 'When you feel ready, you can')
+    .replace(/\bDon't forget to\b/gi, 'When you feel ready, you can')
+    .replace(/\bTake your medicine\b/gi, 'Would you like to take your medicine')
+    .replace(/\bTake the\b/gi, 'Would you like to take the')
+    .replace(/\bTake this\b/gi, 'Would you like to take this')
+    .replace(/^Take\b/i, 'Would you like to take')
+    .replace(/\bPick up\b/gi, 'When you are ready, please pick up')
+    .replace(/\bSwallow\b/gi, 'When you are comfortable, please swallow')
+    .replace(/\bwith water\b/gi, 'with a sip of water')
+    .replace(/\bThere is no rush\b/gi, 'There is no rush')
     .trim();
 }
 
@@ -34,10 +38,9 @@ export async function playAudio(
   cancelSpeech();
 
   const transformed = gentle ? transformToGentle(text) : text;
-  const voiceId = getGentleVoiceId();
 
   if (config.elevenlabs.enabled) {
-    await speakWithElevenLabs(transformed, voiceId, gentle);
+    await speakWithElevenLabs(transformed, gentle);
   } else {
     speakWithBrowserTTS(transformed, gentle);
   }

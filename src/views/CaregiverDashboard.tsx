@@ -33,6 +33,8 @@ import { useMedicationStore } from '../store/medicationStore';
 import { useAlertStore } from '../store/alertStore';
 import { validateMedicationDraft } from '../services/careAlerts';
 import { buildMedicationRoutine, getMedicationScheduleTimes } from '../services/medicationRoutine';
+import { getElevenLabsStatus, type VoiceStatus } from '../services/elevenlabs';
+import { playAudio } from '../utils/audio';
 import { config } from '../config/env';
 import { isSupabaseConfigured } from '../services/supabase';
 import type { Medication, Routine } from '../types';
@@ -112,7 +114,7 @@ function ReadinessItem({
   label: string;
   value: string;
   detail: string;
-  status: 'ready' | 'fallback' | 'review';
+  status: 'ready' | 'fallback' | 'review' | 'blocked';
 }) {
   return (
     <div className={`cg-readiness-item ${status}`}>
@@ -139,6 +141,12 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const [editingMedicationId, setEditingMedicationId] = useState<string | null>(null);
   const [draftMedication, setDraftMedication] = useState(emptyMedication);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>({
+    ok: false,
+    selectedVoiceId: '',
+    selectedVoiceName: '',
+    message: config.elevenlabs.enabled ? 'Checking ElevenLabs voice service.' : 'ElevenLabs is required for production voice.',
+  });
 
   React.useEffect(() => {
     const handleNav = (event: Event) => {
@@ -152,6 +160,27 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   React.useEffect(() => {
     localStorage.setItem('cueguide-active-tab', activeTab);
   }, [activeTab]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    if (!config.elevenlabs.enabled) {
+      setVoiceStatus({
+        ok: false,
+        selectedVoiceId: '',
+        selectedVoiceName: '',
+        message: 'Enable VITE_USE_ELEVENLABS=true for production voice.',
+      });
+      return;
+    }
+
+    getElevenLabsStatus().then((status) => {
+      if (!cancelled) setVoiceStatus(status);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const todaysCompletions = completions.filter((completion) => completion.date === today);
@@ -183,11 +212,20 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   }, {});
   const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'No mood data';
   const readiness = {
-    voice: config.elevenlabs.enabled,
+    voice: config.elevenlabs.enabled && voiceStatus.ok,
     ai: aiConfig.isEnabled,
     data: isSupabaseConfigured,
     events: todaysCompletions.some((completion) => (completion.stepEvents?.length || 0) > 0),
   };
+  const voiceReadinessStatus: 'ready' | 'blocked' = readiness.voice ? 'ready' : 'blocked';
+  const voiceReadinessValue = readiness.voice
+    ? 'ElevenLabs active'
+    : config.elevenlabs.enabled
+      ? 'ElevenLabs blocked'
+      : 'ElevenLabs required';
+  const voiceReadinessDetail = readiness.voice
+    ? `${voiceStatus.selectedVoiceName || 'Production voice'} is verified through the server proxy.`
+    : voiceStatus.message;
 
   const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
     setDraftMedication((current) => ({ ...current, [field]: value }));
@@ -500,9 +538,9 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
             <ReadinessItem
               icon={<Volume2 size={18} />}
               label="Patient voice"
-              value={readiness.voice ? 'ElevenLabs enabled' : 'Browser fallback'}
-              detail={readiness.voice ? 'Read aloud uses the server-side TTS proxy.' : 'Patient audio still works without provider secrets.'}
-              status={readiness.voice ? 'ready' : 'fallback'}
+              value={voiceReadinessValue}
+              detail={voiceReadinessDetail}
+              status={voiceReadinessStatus}
             />
             <ReadinessItem
               icon={<BrainCircuit size={18} />}
@@ -538,6 +576,20 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       <aside className="cg-side-stack">
         <Section title="Settings">
           <div className="cg-settings">
+            <div className={`cg-voice-status ${voiceReadinessStatus}`}>
+              <Volume2 size={18} />
+              <div>
+                <strong>{voiceReadinessValue}</strong>
+                <p>{voiceReadinessDetail}</p>
+              </div>
+              <button
+                type="button"
+                disabled={!readiness.voice}
+                onClick={() => playAudio('When you are ready, would you like to take your medicine with a sip of water?', 'female', true)}
+              >
+                Test voice
+              </button>
+            </div>
             <label>
               <span>Live AI cue generation</span>
               <input type="checkbox" checked={aiConfig.isEnabled} onChange={(event) => setAiConfig({ isEnabled: event.target.checked })} />

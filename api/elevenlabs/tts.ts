@@ -1,6 +1,7 @@
 import https from 'node:https';
 
 const DEFAULT_MODEL = process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_flash_v2_5';
+const DEFAULT_VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us';
 const MAX_TTS_CHARS = 700;
 
 function getApiKey(): string {
@@ -11,12 +12,25 @@ function getLocalAddress(): string {
   return process.env.ELEVENLABS_LOCAL_ADDRESS?.trim() || '';
 }
 
+function getDefaultVoiceId(): string {
+  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
+}
+
 function isValidVoiceId(voiceId: unknown): voiceId is string {
   return typeof voiceId === 'string' && /^[A-Za-z0-9_-]{10,80}$/.test(voiceId);
 }
 
 function isValidText(text: unknown): text is string {
   return typeof text === 'string' && text.trim().length > 0 && text.length <= MAX_TTS_CHARS;
+}
+
+function readBody(body: unknown): Record<string, unknown> {
+  if (typeof body !== 'string') return body && typeof body === 'object' ? body as Record<string, unknown> : {};
+  try {
+    return JSON.parse(body || '{}');
+  } catch {
+    return {};
+  }
 }
 
 function postElevenLabsTts({
@@ -75,12 +89,13 @@ export default async function handler(req: any, res: any) {
     return res.status(503).json({ error: 'ElevenLabs is not configured' });
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
+  const body = readBody(req.body);
   const { text, voiceId, voice_settings } = body;
 
-  if (!isValidText(text) || !isValidVoiceId(voiceId)) {
+  if (!isValidText(text) || (voiceId !== undefined && !isValidVoiceId(voiceId))) {
     return res.status(400).json({ error: 'Invalid text or voice' });
   }
+  const selectedVoiceId = isValidVoiceId(voiceId) ? voiceId : getDefaultVoiceId();
 
   const payload = JSON.stringify({
     text: text.trim(),
@@ -89,7 +104,7 @@ export default async function handler(req: any, res: any) {
   });
   const response = await postElevenLabsTts({
     apiKey,
-    voiceId,
+    voiceId: selectedVoiceId,
     localAddress: getLocalAddress(),
     payload,
   });

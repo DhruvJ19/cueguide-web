@@ -69,3 +69,34 @@ Known caveats:
 
 - Build still reports a large bundle warning; this is a P2 performance optimization, not a launch blocker.
 - `cueguide-test.png` is unrelated local work and remains unstaged.
+
+## 2026-05-14 - Production Voice Hardening Local Gate
+
+Status: passed locally with provider rate-limit caveat.
+
+Selected production voice:
+
+- Voice: `Bella - Professional, Bright, Warm`
+- Voice id: `hpp4J3VqNfWAUOO0d1Us`
+- Model: `eleven_flash_v2_5`
+
+Verified:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- Local `/api/elevenlabs/voices` returned selected voice metadata.
+- Local tiny TTS sample returned `200 audio/mpeg` and was saved to `/tmp/cueguide-elevenlabs-voice-sample.mp3`.
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3004 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Evidence:
+
+- Settings now checks the live ElevenLabs server route before showing `ElevenLabs active`.
+- Patient voice text is softened before TTS so medication prompts ask instead of command.
+- Full local smoke observed five `200 audio/mpeg` TTS responses and one local `429`; the fallback path worked as an emergency resilience path.
+
+Next production requirement:
+
+- Redeploy with `ELEVENLABS_VOICE_ID=hpp4J3VqNfWAUOO0d1Us`.
+- Run strict production `npm run smoke:careflow` and record all TTS responses.

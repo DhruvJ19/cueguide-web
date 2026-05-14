@@ -7,6 +7,7 @@ import https from 'node:https';
 
 const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const DEFAULT_ELEVENLABS_VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us';
 const MAX_TTS_CHARS = 700;
 const MAX_AI_PROMPT_CHARS = 8_000;
 const ALLOWED_AI_MODELS = new Set(['openai/gpt-4o', 'openai/gpt-4o-mini']);
@@ -48,6 +49,10 @@ function isValidText(text: unknown): text is string {
 
 function readEnvValue(value: string | undefined): string {
   return value?.trim() || '';
+}
+
+function getElevenLabsVoiceId(env: Record<string, string>): string {
+  return readEnvValue(env.ELEVENLABS_VOICE_ID) || DEFAULT_ELEVENLABS_VOICE_ID;
 }
 
 function postElevenLabsTts({
@@ -114,9 +119,16 @@ export default defineConfig(({mode}) => {
               const response = await fetch(`${ELEVENLABS_BASE}/voices`, {
                 headers: { 'xi-api-key': apiKey },
               });
+              const data = response.ok ? await response.json() : null;
+              const selectedVoiceId = getElevenLabsVoiceId(env);
+              const voices = Array.isArray(data?.voices) ? data.voices : [];
               res.statusCode = response.status;
               res.setHeader('Content-Type', response.headers.get('Content-Type') || 'application/json');
-              res.end(response.ok ? JSON.stringify(await response.json()) : JSON.stringify({ error: 'ElevenLabs request failed' }));
+              res.end(response.ok ? JSON.stringify({
+                ...data,
+                selectedVoiceId,
+                selectedVoice: voices.find((voice: { voice_id?: string }) => voice.voice_id === selectedVoiceId) || null,
+              }) : JSON.stringify({ error: 'ElevenLabs request failed' }));
             } catch {
               sendJson(res, 502, { error: 'ElevenLabs request failed' });
             }
@@ -131,9 +143,10 @@ export default defineConfig(({mode}) => {
               const body = await readRequestBody(req);
               const text = body.text;
               const voiceId = body.voiceId;
-              if (!isValidText(text) || !isValidVoiceId(voiceId)) {
+              if (!isValidText(text) || (voiceId !== undefined && !isValidVoiceId(voiceId))) {
                 return sendJson(res, 400, { error: 'Invalid text or voice' });
               }
+              const selectedVoiceId = isValidVoiceId(voiceId) ? voiceId : getElevenLabsVoiceId(env);
 
               const payload = JSON.stringify({
                 text: text.trim(),
@@ -142,7 +155,7 @@ export default defineConfig(({mode}) => {
               });
               const response = await postElevenLabsTts({
                 apiKey,
-                voiceId,
+                voiceId: selectedVoiceId,
                 localAddress: readEnvValue(env.ELEVENLABS_LOCAL_ADDRESS),
                 payload,
               });

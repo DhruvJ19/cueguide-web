@@ -16,6 +16,7 @@ updated: 2026-05-14
 - [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
 - [ ] Run one manual live demo in a real browser after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
+- [ ] Verify production voice quality with human ears: calm, soft, non-commanding, and suitable for dementia care.
 - [ ] Confirm production Supabase env values are valid or intentionally disable Supabase for demo fallback.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
 
@@ -39,6 +40,7 @@ updated: 2026-05-14
 - [x] Expand Reports from placeholder summary into useful caregiver/clinician review.
 - [x] Make medication editing first-class, not just add/toggle.
 - [x] Add clearer voice fallback language in caregiver-only surfaces.
+- [x] Make ElevenLabs readiness depend on a live server check instead of only the public feature flag.
 - [ ] Simplify the permanent Codex operating prompt into a short contract plus links to [[memory]], [[context]], and [[meta-optimization]].
 
 ## P3 - Mobile Path
@@ -59,3 +61,4 @@ updated: 2026-05-14
 - [x] Verified local care-flow smoke in fallback-tolerant mode with no mobile overflow.
 - [x] Verified the hardening pass locally with tests, lint, build, security checks, dry-run install, and care-flow smoke. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
 - [x] Deployed production and verified strict ElevenLabs `audio/mpeg` smoke. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
+- [x] Selected a production ElevenLabs stock voice and verified local TTS sample generation. See [[qa-log#2026-05-14 - Production Voice Hardening Local Gate]].

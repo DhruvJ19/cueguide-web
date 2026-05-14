@@ -1,7 +1,12 @@
 const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
+const DEFAULT_VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us';
 
 function getApiKey(): string {
   return process.env.ELEVENLABS_API_KEY?.trim() || '';
+}
+
+function getDefaultVoiceId(): string {
+  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
 }
 
 export default async function handler(req: any, res: any) {
@@ -23,6 +28,14 @@ export default async function handler(req: any, res: any) {
     return res.status(response.status).json({ error: 'ElevenLabs request failed' });
   }
 
+  const data = await response.json();
+  const selectedVoiceId = getDefaultVoiceId();
+  const voices = Array.isArray(data.voices) ? data.voices : [];
+
   res.setHeader('Cache-Control', 'private, max-age=300');
-  return res.status(200).json(await response.json());
+  return res.status(200).json({
+    ...data,
+    selectedVoiceId,
+    selectedVoice: voices.find((voice: { voice_id?: string }) => voice.voice_id === selectedVoiceId) || null,
+  });
 }

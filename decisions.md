@@ -109,3 +109,13 @@ Decision: Treat the current hardening pass as locally release-ready after tests,
 Reasoning: The branch now verifies the medication-centered loop end to end before deploy: create/edit medication, patient Begin/Read aloud/Help/Skip/Done, caregiver summary, reports, voice proxy observation, and mobile-width overflow.
 
 Linked: [[qa-log#2026-05-14 - Production-Hardening Local Gate]], [[runbook]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-14 - ElevenLabs Is A Production Voice Requirement
+
+#decision #voice #production
+
+Decision: Treat ElevenLabs as the required production patient voice path, with browser TTS only as an emergency patient-safety fallback.
+
+Reasoning: Som explicitly rejected robotic/scolding audio and described dementia medication prompts as something that must ask gently rather than order. A production caregiver product cannot make voice quality feel optional.
+
+Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-14 - Production Voice Hardening Local Gate]], [[memory#Product Memory]]

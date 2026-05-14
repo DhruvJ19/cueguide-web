@@ -7,6 +7,7 @@ import {
 } from '../services/careAlerts';
 import { isUsableSupabaseKey, isUsableSupabaseUrl } from '../services/supabase';
 import { buildFallbackCueData, minimizeCareContext, validateCueData } from '../services/cueValidation';
+import { transformToGentle } from '../utils/audio';
 import type { Medication, PatientProfile, StepCompletion } from '../types';
 
 const patient: PatientProfile = {
@@ -178,5 +179,9 @@ const safeCue = validateCueData({
 }, fallbackCue);
 assert.equal(safeCue.source, 'ai');
 assert.equal(safeCue.steps.length, 1);
+
+const gentleCue = transformToGentle('Take the blue pill with water!');
+assert.equal(gentleCue, 'Would you like to take the blue pill with a sip of water.');
+assert.doesNotMatch(gentleCue, /^Take\b|!/i);
 
 console.log('careflows tests passed');

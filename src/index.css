@@ -760,6 +760,51 @@ body {
   color: var(--warning);
 }
 
+.cg-readiness-item.blocked,
+.cg-voice-status.blocked {
+  border-color: color-mix(in srgb, var(--danger) 34%, var(--line));
+}
+
+.cg-readiness-item.blocked .cg-readiness-icon,
+.cg-voice-status.blocked svg {
+  color: var(--danger);
+}
+
+.cg-voice-status {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel-hover);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.cg-voice-status strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--content);
+}
+
+.cg-voice-status p {
+  margin: 0;
+}
+
+.cg-voice-status button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--content);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font-weight: 800;
+}
+
+.cg-voice-status button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .cg-settings label {
   display: grid;
   gap: 8px;

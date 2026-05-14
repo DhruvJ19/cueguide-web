@@ -15,6 +15,7 @@ updated: 2026-05-14
 | Source | Product Translation | Current App Surface |
 | --- | --- | --- |
 | [[Som_Evaluation/1st Call with Suman & Som - 6_5_26]] voice feedback: natural, pleasant, not robotic or scolding. | ElevenLabs must be real for demos; fallback voice must still be gentle. | `/api/elevenlabs/tts`, `src/utils/audio.ts`, Patient Focus Mode Read aloud. |
+| [[Som_Evaluation/1st Call with Suman & Som - 6_5_26]] medication voice feedback: patients should be asked, not ordered. | Production prompts should use question-shaped, non-commanding audio text. | Gentle audio transform, Bella ElevenLabs voice, caregiver Settings voice status. |
 | Som medication feedback: medication category is not enough without real medicines, times, and alerts. | Medication profile and schedule drive patient prompts. | Medications tab, generated medication routines, Today's Schedule. |
 | Som asked how caregiver knows medication was administered. | Patient action logging is explicit but honest: Done means patient confirmed, Help/Skip are logged. | Live Session, Alert Feed, Reports. |
 | Som/Suman emphasized real healthcare patients and caregiver usefulness. | Avoid gimmicks, failure language, and generic AI-demo styling. | Patient Focus Mode, caregiver dashboard language. |
@@ -32,6 +33,7 @@ updated: 2026-05-14
 - [[decisions#2026-05-14 - Root Web App Is Production Demo]]
 - [[decisions#2026-05-14 - Medication Workflow Is The MVP Spine]]
 - [[decisions#2026-05-14 - ElevenLabs Must Stay Server-Side]]
+- [[decisions#2026-05-14 - ElevenLabs Is A Production Voice Requirement]]
 - [[decisions#2026-05-14 - Use YouTube Course As Process Guide]]
 - [[decisions#2026-05-14 - Meta-Optimization Review Completed]]
 

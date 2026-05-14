@@ -52,6 +52,7 @@ Recent verified checks:
 - Production page: `https://cueguide-web.vercel.app`
 - Production ElevenLabs TTS: `/api/elevenlabs/tts` returns `audio/mpeg`.
 - Local hardening smoke at `127.0.0.1:3004` passed the full caregiver medication loop, patient action logging, report view, and mobile overflow check. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
+- Production smoke at `https://cueguide-web.vercel.app` passed strict ElevenLabs verification with six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
 
 ## Obsidian Maintenance Rules
 

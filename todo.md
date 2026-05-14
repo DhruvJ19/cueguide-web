@@ -13,9 +13,9 @@ updated: 2026-05-14
 ## P0 - Demo-Critical
 
 - [x] Complete `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` so medication, completion, and alert data have explicit production RLS/realtime coverage.
-- [ ] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
+- [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
 - [ ] Run one manual live demo in a real browser after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
-- [ ] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
+- [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
 - [ ] Confirm production Supabase env values are valid or intentionally disable Supabase for demo fallback.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
 
@@ -58,3 +58,4 @@ updated: 2026-05-14
 - [x] Added [[meta-optimization]] review note and linked it from the Obsidian operating system.
 - [x] Verified local care-flow smoke in fallback-tolerant mode with no mobile overflow.
 - [x] Verified the hardening pass locally with tests, lint, build, security checks, dry-run install, and care-flow smoke. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
+- [x] Deployed production and verified strict ElevenLabs `audio/mpeg` smoke. See [[qa-log#2026-05-14 - Production Deploy Smoke]].

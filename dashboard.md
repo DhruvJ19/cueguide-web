@@ -53,6 +53,7 @@ updated: 2026-05-14
 - [[qa-log]] - dated verification evidence.
 - [[source-map]] - Som and YouTube guidance mapped to product decisions.
 - Latest local gate: [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
+- Latest production gate: [[qa-log#2026-05-14 - Production Deploy Smoke]].
 
 ## Context
 

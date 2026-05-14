@@ -40,10 +40,32 @@ Known caveats:
 
 ## Evidence To Add After Deploy
 
-- Production smoke output with ElevenLabs `audio/mpeg`.
 - Desktop caregiver screenshot or browser QA note.
-- Mobile-width caregiver overflow result.
 - Tablet-sized Patient Focus Mode QA note.
-- Secret scan result after `dist` is rebuilt.
 
 Linked: [[runbook]], [[todo#P0 - Demo-Critical]], [[meta-optimization]]
+
+## 2026-05-14 - Production Deploy Smoke
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-k1ajd0kow-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_6pJUsEwH6y1LTn5nYYZAkGEziNLY`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778750185222`
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Caregiver Live Session and Reports updated.
+- ElevenLabs production proxy returned six `200 audio/mpeg` TTS responses.
+- Mobile-width caregiver view had no horizontal overflow.
+
+Known caveats:
+
+- Build still reports a large bundle warning; this is a P2 performance optimization, not a launch blocker.
+- `cueguide-test.png` is unrelated local work and remains unstaged.

@@ -172,3 +172,31 @@ Known caveats:
 - Full public GTM is still blocked by live Supabase migration verification, auth lifecycle QA, monitoring, legal/compliance review, and real caregiver beta evidence.
 - Subjective human-ear voice acceptance remains a real-person QA item; automated checks only prove ElevenLabs audio delivery.
 - Build still reports a large bundle warning.
+
+## 2026-05-14 - Stakeholder Alpha Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-gkmrvwx2z-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_C1ScBDEzNWq57dXvrVe5NSWqe5nm`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778753386597`
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Caregiver Live Session and Reports updated.
+- Caregiver Settings required `ElevenLabs active`.
+- ElevenLabs production proxy returned one `200 audio/mpeg` TTS response after explicit-Read-aloud voice gating.
+- Mobile-width caregiver view had no horizontal overflow.
+- Production desktop caregiver, mobile caregiver, and tablet Patient Focus Mode screenshots showed no horizontal overflow or console problems.
+
+Known caveats:
+
+- Human-ear review against Som's Google Maps standard is still required before calling voice quality accepted.
+- Live Supabase migrations/RLS still need authenticated verification before claiming cloud-data production readiness.
+- Build still reports a large bundle warning.

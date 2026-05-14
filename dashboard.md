@@ -54,7 +54,7 @@ updated: 2026-05-14
 - [[source-map]] - Som and YouTube guidance mapped to product decisions.
 - [[production-voice]] - ElevenLabs production voice requirement, selected voice, and tone rules.
 - Latest local gate: [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
-- Latest production gate: [[qa-log#2026-05-14 - Production Deploy Smoke]].
+- Latest production gate: [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
 - Latest production voice gate: [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 
 ## Context

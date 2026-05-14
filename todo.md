@@ -14,7 +14,7 @@ updated: 2026-05-14
 
 - [x] Complete `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` so medication, completion, and alert data have explicit production RLS/realtime coverage.
 - [x] Run `npm run smoke:careflow` as a release gate after the next deploy and keep evidence in [[qa-log]].
-- [ ] Run one manual live demo in a real browser after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
+- [ ] Run one human-operated live walkthrough after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
 - [ ] Verify production voice quality with human ears against Som's Google Maps standard: human, soft, gentle, non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].

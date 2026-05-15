@@ -48,11 +48,46 @@ function isValidText(text: unknown): text is string {
 }
 
 function readEnvValue(value: string | undefined): string {
-  return value?.trim() || '';
+  const trimmed = value?.trim() || '';
+  const unquoted = (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  )
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return unquoted.replace(/\\n/g, '').replace(/\r?\n/g, '').trim();
 }
 
 function getElevenLabsVoiceId(env: Record<string, string>): string {
-  return readEnvValue(env.ELEVENLABS_VOICE_ID) || DEFAULT_ELEVENLABS_VOICE_ID;
+  const configuredVoiceId = readEnvValue(env.ELEVENLABS_VOICE_ID);
+  return isValidVoiceId(configuredVoiceId) ? configuredVoiceId : DEFAULT_ELEVENLABS_VOICE_ID;
+}
+
+function shouldForwardVoiceSettings(env: Record<string, string>): boolean {
+  return readEnvValue(env.ELEVENLABS_ENABLE_VOICE_SETTINGS) === 'true';
+}
+
+function buildElevenLabsPayload({
+  env,
+  text,
+  voiceSettings,
+}: {
+  env: Record<string, string>;
+  text: string;
+  voiceSettings: unknown;
+}): string {
+  const payload: {
+    text: string;
+    model_id: string;
+    voice_settings?: unknown;
+  } = {
+    text: text.trim(),
+    model_id: readEnvValue(env.ELEVENLABS_MODEL_ID) || 'eleven_flash_v2_5',
+  };
+  if (shouldForwardVoiceSettings(env) && voiceSettings && typeof voiceSettings === 'object') {
+    payload.voice_settings = voiceSettings;
+  }
+  return JSON.stringify(payload);
 }
 
 function postElevenLabsTts({
@@ -148,11 +183,7 @@ export default defineConfig(({mode}) => {
               }
               const selectedVoiceId = isValidVoiceId(voiceId) ? voiceId : getElevenLabsVoiceId(env);
 
-              const payload = JSON.stringify({
-                text: text.trim(),
-                model_id: readEnvValue(env.ELEVENLABS_MODEL_ID) || 'eleven_flash_v2_5',
-                voice_settings: body.voice_settings,
-              });
+              const payload = buildElevenLabsPayload({ env, text, voiceSettings: body.voice_settings });
               const response = await postElevenLabsTts({
                 apiKey,
                 voiceId: selectedVoiceId,

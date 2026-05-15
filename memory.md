@@ -50,6 +50,7 @@ updated: 2026-05-15
 - The nested Expo app has now been moved to a backend-proxy pattern through `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL`; do not reintroduce public ElevenLabs/OpenRouter keys during the mobile port.
 - Hidden newlines in Vercel env vars caused `VITE_USE_ELEVENLABS` to evaluate as disabled in the frontend. Trim env values before using them. See [[decisions#2026-05-14 - Trim Environment Values Before Feature Gates]].
 - Hidden newlines in `ELEVENLABS_API_KEY` caused invalid header errors. Server handlers must trim provider keys.
+- Vercel provider env values can contain quotes and literal `\n` escapes, not only whitespace. Server routes and Vite dev middleware must normalize those before calling ElevenLabs.
 - Placeholder Supabase values can look "configured" unless validated. Demo fallback should activate for mock, placeholder, or malformed anon keys.
 - Completion dates must use local calendar time, not UTC string splitting, or late-night Hong Kong sessions can disappear from "today."
 - A blank Supabase migration is a real production risk. Schema files should not be left as placeholders once created with the CLI.

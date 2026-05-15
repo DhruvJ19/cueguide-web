@@ -1,7 +1,14 @@
 const viteEnv: Partial<ImportMetaEnv> = import.meta.env || {};
 
 function readEnvValue(value: string | undefined): string {
-  return value?.trim() || '';
+  const trimmed = value?.trim() || '';
+  const unquoted = (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  )
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return unquoted.replace(/\\n/g, '').replace(/\r?\n/g, '').trim();
 }
 
 export const config = {

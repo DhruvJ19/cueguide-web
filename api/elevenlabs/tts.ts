@@ -1,23 +1,39 @@
 import https from 'node:https';
 
-const DEFAULT_MODEL = process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_flash_v2_5';
+const DEFAULT_MODEL = 'eleven_flash_v2_5';
 const DEFAULT_VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us';
 const MAX_TTS_CHARS = 700;
 
+function readEnvValue(value: string | undefined): string {
+  const trimmed = value?.trim() || '';
+  const unquoted = (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  )
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return unquoted.replace(/\\n/g, '').replace(/\r?\n/g, '').trim();
+}
+
 function getApiKey(): string {
-  return process.env.ELEVENLABS_API_KEY?.trim() || '';
+  return readEnvValue(process.env.ELEVENLABS_API_KEY);
 }
 
 function getLocalAddress(): string {
-  return process.env.ELEVENLABS_LOCAL_ADDRESS?.trim() || '';
+  return readEnvValue(process.env.ELEVENLABS_LOCAL_ADDRESS);
 }
 
 function getDefaultVoiceId(): string {
-  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
+  const configuredVoiceId = readEnvValue(process.env.ELEVENLABS_VOICE_ID);
+  return isValidVoiceId(configuredVoiceId) ? configuredVoiceId : DEFAULT_VOICE_ID;
+}
+
+function getModelId(): string {
+  return readEnvValue(process.env.ELEVENLABS_MODEL_ID) || DEFAULT_MODEL;
 }
 
 function shouldForwardVoiceSettings(): boolean {
-  return process.env.ELEVENLABS_ENABLE_VOICE_SETTINGS?.trim() === 'true';
+  return readEnvValue(process.env.ELEVENLABS_ENABLE_VOICE_SETTINGS) === 'true';
 }
 
 function isValidVoiceId(voiceId: unknown): voiceId is string {
@@ -50,7 +66,7 @@ function buildTtsPayload({
     voice_settings?: unknown;
   } = {
     text: text.trim(),
-    model_id: DEFAULT_MODEL,
+    model_id: getModelId(),
   };
 
   if (shouldForwardVoiceSettings() && voiceSettings && typeof voiceSettings === 'object') {

@@ -329,3 +329,13 @@ Decision: Do not forward ElevenLabs `voice_settings` by default. Only enable for
 Reasoning: Production testing showed plain TTS returns `200 audio/mpeg`, while the same endpoint returns `401` when `voice_settings` are forwarded. Voice delivery is the hard production requirement; gentle tone remains controlled by prompt wording and playback rate until settings forwarding is proven safe.
 
 Linked: [[production-voice#Current Voice]], [[runbook#Production Voice]], [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]]
+
+## 2026-05-15 - Provider Env Values Are Normalized
+
+#decision #deployment #voice #reliability
+
+Decision: Normalize provider env values by stripping wrapping quotes, literal `\n` escapes, real newlines, and surrounding whitespace before using them in server routes or local API middleware.
+
+Reasoning: Production voice debugging showed a valid-looking Vercel voice id could reach ElevenLabs as a quoted string with an escaped newline, causing provider failure. Env parsing must defend against dashboard copy/paste artifacts instead of assuming clean values.
+
+Linked: [[production-voice#Tone Rules]], [[context#Environment Notes]], [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]]

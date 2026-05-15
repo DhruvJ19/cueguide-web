@@ -1,12 +1,28 @@
 const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
 const DEFAULT_VOICE_ID = 'hpp4J3VqNfWAUOO0d1Us';
 
+function readEnvValue(value: string | undefined): string {
+  const trimmed = value?.trim() || '';
+  const unquoted = (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  )
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return unquoted.replace(/\\n/g, '').replace(/\r?\n/g, '').trim();
+}
+
+function isValidVoiceId(voiceId: unknown): voiceId is string {
+  return typeof voiceId === 'string' && /^[A-Za-z0-9_-]{10,80}$/.test(voiceId);
+}
+
 function getApiKey(): string {
-  return process.env.ELEVENLABS_API_KEY?.trim() || '';
+  return readEnvValue(process.env.ELEVENLABS_API_KEY);
 }
 
 function getDefaultVoiceId(): string {
-  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
+  const configuredVoiceId = readEnvValue(process.env.ELEVENLABS_VOICE_ID);
+  return isValidVoiceId(configuredVoiceId) ? configuredVoiceId : DEFAULT_VOICE_ID;
 }
 
 export default async function handler(req: any, res: any) {

@@ -992,6 +992,7 @@ Observed:
 - `npm run proof:supabase` remained blocked as expected because `CUEGUIDE_SUPABASE_TEST_EMAIL` is missing.
 - Direct production TTS without forwarded `voice_settings` returned `200 audio/mpeg`.
 - Direct production TTS with forwarded `voice_settings` returned `401`, so the server now gates forwarding behind `ELEVENLABS_ENABLE_VOICE_SETTINGS=true`.
+- Vercel production env inspection showed the voice id could be shaped with quotes and a literal newline escape. Server API routes, Vite dev middleware, and public config parsing now normalize quoted and escaped env values before use.
 
 Rendered QA:
 

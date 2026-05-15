@@ -39,6 +39,7 @@ Acceptance is not just technical playback. The voice must pass Som's written sta
 - Trigger audio from explicit `Read aloud` actions so the patient controls when voice plays and one walkthrough does not overload the voice provider.
 - Treat `audio/mpeg` API success as delivery proof only. Human acceptance must be recorded separately before calling voice quality accepted.
 - Do not forward ElevenLabs `voice_settings` unless the selected account/key/model accepts them. Current production proof shows plain TTS succeeds while forwarded settings can return `401`, so prompt wording and playback rate remain the stable gentle-tone controls.
+- Normalize server-side ElevenLabs env values before provider calls. Quoted values or literal `\n` escapes can turn a valid voice id or API key into a provider `400` or `401`.
 
 ## Source
 

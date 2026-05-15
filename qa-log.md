@@ -1010,3 +1010,52 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[decisions#2026-05-15 - Patient Focus Mode Prioritizes The Primary Action]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+
+## 2026-05-15 - POV Trust Audit And Data Realism Gate
+
+Status: passed locally; production voice key blocked.
+
+Audit lens:
+
+- Caregiver: default Today now starts with the real next medication and no fake unread alert before the caregiver acts.
+- Patient: tablet Focus Mode still renders one large question-shaped medication prompt with `Done`, `Read aloud`, `Help`, and `Skip` available.
+- Som/CTO: voice readiness remains explicit; Settings does not claim acceptance until human hearing review passes.
+- Buyer/devil's advocate: Reports no longer depend on random sample data and now show deterministic medication-session adherence tied to generated medication routine IDs.
+- UI critic: mobile bottom navigation is reduced to five core care surfaces: Today, Medications, Session, Reports, Settings.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Observed:
+
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security checks passed with 0 vulnerabilities, 346 verified registry signatures, and 48 verified attestations.
+- Supply-chain dry run passed.
+- Local care-flow smoke passed at `http://127.0.0.1:3006`.
+- Local smoke medication: `Smoke Omega 1778862650733`.
+- Local smoke confirmed mobile no-overflow and first-run local onboarding.
+- Local ElevenLabs provider check returned `401`, matching the known invalid local key state.
+- Chrome/Computer Use could open the ElevenLabs dashboard URL but the page stayed blank, so key rotation could not be completed from the current automated session.
+
+Rendered QA:
+
+- Screenshot folder outside the repo: `/tmp/cueguide-pov-refined-20260515c`.
+- Desktop Today, Reports, Settings, and Medications rendered without framework overlay or relevant console errors.
+- Mobile Today, Medications, Reports, Settings, and Signup rendered without horizontal overflow.
+- Tablet patient step rendered without overflow; action order remained `Done`, `Read aloud`, `Help`, `Skip`.
+
+Known caveats:
+
+- Strict production ElevenLabs smoke is blocked until `ELEVENLABS_API_KEY` is rotated and re-set in Vercel.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[decisions#2026-05-15 - Seed Data Must Be Deterministic And Honest]], [[source-map#Market And Competitor Signals]], [[todo#P0 - Demo-Critical]]

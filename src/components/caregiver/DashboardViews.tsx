@@ -37,6 +37,15 @@ interface ReadinessState {
   events: boolean;
 }
 
+function getCareContextFacts(context: string | undefined): string[] {
+  if (!context) return [];
+  return context
+    .split('.')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
 export interface DashboardFormatters {
   formatStatus: (status: RoutineStatus | string) => string;
   formatEventStatus: (status: StepCompletion['status']) => string;
@@ -90,6 +99,8 @@ export function TodayView({
   onAcknowledgeAlert: (alertId: string) => void;
   formatters: Pick<DashboardFormatters, 'formatStatus' | 'formatAlertSeverity'>;
 }) {
+  const careContextFacts = getCareContextFacts(profile?.context);
+
   return (
     <div className="cg-day-layout">
       <div className="cg-main-stack">
@@ -193,7 +204,13 @@ export function TodayView({
               <strong>{profile?.name}</strong>
               <span>Stage: {profile?.stage}</span>
             </div>
-            <p>{profile?.context}</p>
+            <div className="cg-patient-facts" aria-label="Patient care cues">
+              <span><strong>Preferred name</strong>{profile?.preferredName || 'Not set'}</span>
+              <span><strong>Caregiver</strong>{profile?.primaryCaregiverName || 'Not set'}</span>
+              {careContextFacts.map((fact) => (
+                <span key={fact}>{fact}</span>
+              ))}
+            </div>
           </div>
         </Section>
       </aside>
@@ -637,9 +654,9 @@ export function SettingsView({
       <Section title="Settings" eyebrow="Voice, data, alerts, privacy">
         <div className="cg-settings-summary">
           <div>
-            <p className="cg-eyebrow">Readiness</p>
-            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready for review' : 'Production proof pending'}</h3>
-            <p>{voiceReviewReady ? 'Voice is accepted. Cloud data proof and alert evidence remain visible below.' : 'Voice needs human hearing approval before production review.'}</p>
+            <p className="cg-eyebrow">System checks</p>
+            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready for review' : 'Voice approval pending'}</h3>
+            <p>{voiceReviewReady ? 'Voice is accepted. Data, alerts, and privacy checks are below.' : 'Accept the patient voice only after it sounds human, soft, and gentle.'}</p>
           </div>
           <button className="cg-primary" disabled={!readiness.voice} onClick={onPlayPrimaryVoice}>
             <Volume2 size={17} /> Play primary voice

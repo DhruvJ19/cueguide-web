@@ -339,3 +339,23 @@ Decision: Normalize provider env values by stripping wrapping quotes, literal `\
 Reasoning: Production voice debugging showed a valid-looking Vercel voice id could reach ElevenLabs as a quoted string with an escaped newline, causing provider failure. Env parsing must defend against dashboard copy/paste artifacts instead of assuming clean values.
 
 Linked: [[production-voice#Tone Rules]], [[context#Environment Notes]], [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]]
+
+## 2026-05-15 - Seed Data Must Be Deterministic And Honest
+
+#decision #data #ux #trust
+
+Decision: Default local sample data should be deterministic, tied to the real medication-generated routine IDs, and should not create fake unread alerts before the caregiver does anything.
+
+Reasoning: Random reports and preloaded alerts make CueGuide look staged and cheap. For stakeholder trust, the app can include sample history, but the history must be stable, explainable, and consistent with the same medication/session model used by live patient flows.
+
+Linked: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]], [[source-map#Market And Competitor Signals]], [[memory#Product Memory]]
+
+## 2026-05-15 - Mobile Navigation Focuses The Care Loop
+
+#decision #ux #mobile #navigation
+
+Decision: Mobile caregiver navigation should prioritize the five core care-loop surfaces: Today, Medications, Session, Reports, and Settings. Routines remains available on desktop but is not a primary mobile destination.
+
+Reasoning: The mobile bottom bar was crowded and made a secondary library surface compete with the actual care loop. A caregiver on a phone needs the fastest path to schedule meds, start/review a session, and check readiness.
+
+Linked: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]], [[todo#P2 - Product Polish]], [[plans#1. Web Demo Core Loop]]

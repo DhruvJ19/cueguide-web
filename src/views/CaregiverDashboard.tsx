@@ -472,7 +472,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         </div>
         <nav>
           {tabs.map((tab) => (
-            <button key={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>
+            <button key={tab.id} data-tab={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>
               {tab.icon}
               <span>{tab.label}</span>
             </button>

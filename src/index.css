@@ -355,6 +355,10 @@ body {
 .auth-switch a {
   color: #166a5a;
   font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 4px;
 }
 
 .auth-success {
@@ -1191,6 +1195,31 @@ body:not(.light-mode) .cg-alert {
 .cg-profile-compact > div:not(.cg-avatar) {
   display: grid;
   gap: 2px;
+}
+
+.cg-patient-facts {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.cg-patient-facts span {
+  border: 1px solid #dbe3ee;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.cg-patient-facts strong {
+  display: block;
+  color: #101828;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
 }
 
 .cg-avatar {
@@ -2314,8 +2343,12 @@ body:not(.light-mode) .cg-alert {
   }
 
   .cg-nav nav {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 4px;
+  }
+
+  .cg-nav button[data-tab="routines"] {
+    display: none;
   }
 
   .cg-nav button {

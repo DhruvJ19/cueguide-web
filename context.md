@@ -58,6 +58,7 @@ updated: 2026-05-15
 | `scripts/prove-supabase-cloud.ts` | Authenticated Supabase proof for caregiver-owned patient, medication, completion, and alert save/load through RLS. |
 | `src/components/CommandPalette.tsx` | Keyboard navigation for real care destinations only; no fake analytics/device/compliance routes. |
 | `.mcp.json` | Read-only Supabase MCP project config; user OAuth/auth is still required before tools are available. |
+| `src/data.ts` | Deterministic local seed data for default patient, medications, routines, and sample history. Sample completions must use generated medication routine IDs. |
 | `Som_Evaluation/` | Som/Suman transcripts, specs, architecture, demo prep. |
 | `CueGuide/` | Nested Expo app, later mobile port target. |
 
@@ -83,6 +84,7 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 - `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
 - `ELEVENLABS_ENABLE_VOICE_SETTINGS` defaults to off because the current production key accepts plain TTS but rejects forwarded `voice_settings`; gentle tone is handled through prompt wording and playback rate unless this is explicitly enabled.
 - Server env values are normalized before provider calls because Vercel values can contain quotes or literal `\n` escapes.
+- Current local ElevenLabs key validation returns `401`; rotate/re-set `ELEVENLABS_API_KEY` before claiming strict production voice readiness.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.

@@ -58,6 +58,7 @@ updated: 2026-05-15
 - #ux Dementia-safe language remains a product differentiator: ask, do not command; one step at a time; caregiver sees clinical detail, patient sees calm guidance.
 - #data Daily caregiver use needs practical data controls: export local fallback data, verify cloud save/load, and make database mode visible.
 - #gtm Public GTM should wait for live data proof, onboarding/auth lifecycle, monitoring, compliance review, and real caregiver beta evidence.
+- #trust Sample data must never make the app look like it is fabricating live care events. Use deterministic history for trend surfaces and reserve unread alerts for real patient actions.
 
 ## Current Decisions Backed By Sources
 

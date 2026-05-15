@@ -82,6 +82,7 @@ updated: 2026-05-15
 - Latest daily-use production gate: [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Latest Supabase proof gate: [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
 - Latest multi-POV UI refinement gate: [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
+- Latest POV trust/data realism gate: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]].
 
 ## Context
 

@@ -62,7 +62,10 @@ updated: 2026-05-15
 - [x] Add local fallback data export so browser-stored patient/medication/session data can be backed up before demos or device changes.
 - [x] Split patient medication prompt action from location guidance so Focus Mode stays one-action-at-a-time.
 - [x] Run a multi-POV UI trust refinement pass on Today, Reports, Settings, and Patient Focus Mode.
+- [x] Remove fake default unread alert and make sample report history deterministic.
+- [x] Tighten mobile caregiver navigation to the five core care-loop surfaces.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
+- [ ] Rotate/re-set a valid ElevenLabs production key, redeploy, and rerun strict production voice smoke.
 
 ## P3 - Mobile Path
 

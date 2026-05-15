@@ -122,7 +122,7 @@ async function runSmoke(): Promise<void> {
     assert.match(summary || '', /not proof the pill was swallowed/i);
 
     await clickNav(page, 'Settings');
-    await page.getByText(/Patient voice/i).waitFor({ state: 'visible' });
+    await page.getByText('Patient voice', { exact: true }).waitFor({ state: 'visible' });
     if (requireElevenLabs) {
       await page.getByText(/Human voice review pending|Voice accepted|ElevenLabs active/i).first().waitFor({ state: 'visible', timeout: 15_000 });
     } else {
@@ -132,7 +132,7 @@ async function runSmoke(): Promise<void> {
 
     await clickNav(page, 'Reports');
     await page.getByText('Medication adherence', { exact: true }).waitFor({ state: 'visible' });
-    await page.getByText(/Help requests/i).waitFor({ state: 'visible' });
+    await page.getByText('Help requests', { exact: true }).waitFor({ state: 'visible' });
     await page.getByText(/Done is patient confirmation only/i).waitFor({ state: 'visible' });
 
     await page.setViewportSize({ width: 390, height: 844 });

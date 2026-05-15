@@ -100,6 +100,9 @@ Recent verified checks:
 - Daily Use Refinement production deploy `dpl_C63RmJYmnWC6BBvv2uNBAP2JQTQ9` passed strict smoke, production rendered QA, ElevenLabs `200 audio/mpeg`, prompt/location split, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Supabase proof gate was added on 2026-05-15, type-checked, and blocked correctly without `CUEGUIDE_SUPABASE_TEST_EMAIL`. See [[runbook#Supabase Verification]].
 - Multi-POV UI Trust Refinement passed locally on 2026-05-15 with row-based Today/Reports/Settings refinements, patient primary-action hierarchy, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
+- Default sample data must be deterministic and honest. Do not preload fake unread alerts; Reports history should use the same generated medication routine IDs as live medication sessions. See [[decisions#2026-05-15 - Seed Data Must Be Deterministic And Honest]].
+- Mobile caregiver navigation should stay focused on Today, Medications, Session, Reports, and Settings. Keep secondary routine-library work out of the fixed mobile nav unless it becomes core to the daily care loop. See [[decisions#2026-05-15 - Mobile Navigation Focuses The Care Loop]].
+- Production ElevenLabs remains blocked by an invalid local/production key state: direct `/v1/user` with the local key returns `401`, and Chrome could not complete dashboard key rotation because the ElevenLabs page rendered blank. Rotate/re-set `ELEVENLABS_API_KEY` before strict production voice claims. See [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]].
 
 ## Obsidian Maintenance Rules
 

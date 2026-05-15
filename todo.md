@@ -85,3 +85,4 @@ updated: 2026-05-15
 - [x] Completed Product Trust QA and Safety Pass locally: multi-POV audit, confirmation-limit UI, stricter secret scanner, local smoke, and Supabase auth caveat. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 - [x] Deployed Product Trust QA and Safety Pass and verified strict production smoke with ElevenLabs plus confirmation-limit assertions. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - [x] Verified fresh-user local setup with a real first medication and dashboard naming. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
+- [x] Deployed fresh-user onboarding hardening and verified strict production smoke. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].

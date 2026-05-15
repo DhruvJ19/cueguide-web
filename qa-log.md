@@ -699,3 +699,37 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[decisions#2026-05-15 - First Run Local Setup Is First-Class]], [[decisions#2026-05-15 - Medication Sessions Name The Medicine]], [[runbook#First-Run QA]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Fresh User Onboarding Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-2x6w7d0ue-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_3i1nbfSpDKHbURc6E3XV9in2oZDE`
+- Commit: `b399fb9f`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778816160998`
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+- Production rendered QA showed `Continue local setup` on signup, completed onboarding, and rendered `Morning Production Starter Med` in the dashboard.
+
+Rendered QA:
+
+- Browser plugin connection timed out, so direct Playwright was used.
+- Production mobile signup, onboarding medication step, and dashboard rendered without page errors, framework overlays, or horizontal overflow.
+- Only expected warning observed: Sentry DSN not configured.
+- Screenshot folder outside the repo: `/tmp/cueguide-qa-20260515-first-run-production`.
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.

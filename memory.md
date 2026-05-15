@@ -84,6 +84,7 @@ Recent verified checks:
 - Product Trust QA and Safety Pass passed locally on 2026-05-15 with confirmation-limit UI, expanded secret scanning, local smoke, security checks, screenshot QA, and Supabase auth caveat documented. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 - Product Trust QA production deploy `dpl_HZcXhLtPUhh4pBGiqSXrjMpJeVjQ` passed strict smoke with ElevenLabs `200 audio/mpeg`, confirmation-limit assertions, and no mobile overflow. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - Fresh-user onboarding trust pass verified signup -> local setup -> first medication -> dashboard on `127.0.0.1:3006`; dashboard showed `Morning Smoke Starter Med` and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
+- Fresh-user onboarding production deploy `dpl_3i1nbfSpDKHbURc6E3XV9in2oZDE` passed strict smoke with ElevenLabs `200 audio/mpeg`, local onboarding coverage, exact medication naming, and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

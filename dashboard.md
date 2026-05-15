@@ -69,6 +69,7 @@ updated: 2026-05-15
 - Latest product-trust safety gate: [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 - Latest production product-trust gate: [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - Latest first-run trust gate: [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
+- Latest first-run production gate: [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 
 ## Context
 

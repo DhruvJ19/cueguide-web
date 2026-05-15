@@ -1085,6 +1085,8 @@ Observed:
 - Production local onboarding flow passed.
 - Direct production TTS returned `401 application/json`.
 - Strict production smoke failed with `Expected ElevenLabs audio/mpeg response` and observed `401 application/json`.
+- Production visual sanity check rendered desktop Today, desktop Reports, mobile Today, and mobile Settings without horizontal overflow or framework overlays.
+- Production screenshot folder outside the repo: `/tmp/cueguide-prod-pov-trust-20260515`.
 
 Known caveats:
 

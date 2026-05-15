@@ -18,6 +18,7 @@ export const config = {
   },
   elevenlabs: {
     enabled: readEnvValue(viteEnv.VITE_USE_ELEVENLABS) === 'true',
+    allowBrowserFallback: readEnvValue(viteEnv.VITE_ALLOW_BROWSER_TTS_FALLBACK) === 'true',
   },
   vapid: {
     publicKey: readEnvValue(viteEnv.VITE_VAPID_PUBLIC_KEY),

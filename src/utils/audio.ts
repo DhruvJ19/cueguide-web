@@ -40,10 +40,11 @@ export async function playAudio(
   const transformed = gentle ? transformToGentle(text) : text;
 
   if (config.elevenlabs.enabled) {
-    await speakWithElevenLabs(transformed, gentle);
-  } else {
-    speakWithBrowserTTS(transformed, gentle);
+    const playedWithElevenLabs = await speakWithElevenLabs(transformed, gentle);
+    if (playedWithElevenLabs || !config.elevenlabs.allowBrowserFallback) return;
   }
+
+  speakWithBrowserTTS(transformed, gentle);
 }
 
 export { cancelSpeech, isSpeaking };

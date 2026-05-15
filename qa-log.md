@@ -1095,3 +1095,47 @@ Known caveats:
 - Authenticated Supabase cloud proof is still pending.
 
 Linked: [[production-voice]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - ElevenLabs Fallback Masking Fix
+
+Status: local fix passed; production deploy pending.
+
+Root cause:
+
+- Production `/api/elevenlabs/tts` returns `401 application/json`.
+- The frontend previously caught that failure and automatically played browser TTS.
+- That made the app sound like the same old robotic voice even when `VITE_USE_ELEVENLABS=true`.
+
+Change:
+
+- Added `VITE_ALLOW_BROWSER_TTS_FALLBACK`, defaulting to `false`.
+- `speakWithElevenLabs` now reports success/failure instead of silently falling back.
+- `playAudio` only uses browser TTS after an ElevenLabs failure when fallback is explicitly enabled.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `vercel env ls production`
+- Instrumented local browser check for `speechSynthesis.speak()`
+
+Observed:
+
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security checks passed with 0 vulnerabilities, 346 verified registry signatures, and 48 verified attestations.
+- Local care-flow smoke passed at `http://127.0.0.1:3006`.
+- Local smoke medication: `Smoke Omega 1778863386521`.
+- Instrumented browser check observed ElevenLabs `401 application/json` and `speechSynthesis.speak()` call count `0`.
+- Vercel production env has `VITE_USE_ELEVENLABS`, but no `VITE_ALLOW_BROWSER_TTS_FALLBACK`, so the production default is false.
+
+Known caveats:
+
+- This stops the bad fallback voice. It does not fix the invalid ElevenLabs key.
+- Strict production voice still requires rotating/re-setting `ELEVENLABS_API_KEY` and verifying `200 audio/mpeg`.
+
+Linked: [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]], [[production-voice]], [[todo#P0 - Demo-Critical]]

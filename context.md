@@ -80,6 +80,7 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 
 - `.env` and `.env.local` are ignored. Do not print secrets.
 - `VITE_USE_ELEVENLABS` is public feature-gate config and must be trimmed before comparison.
+- `VITE_ALLOW_BROWSER_TTS_FALLBACK` defaults to false. Keep it false in production so ElevenLabs failures do not play browser speech.
 - `ELEVENLABS_API_KEY` is server-only.
 - `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
 - `ELEVENLABS_ENABLE_VOICE_SETTINGS` defaults to off because the current production key accepts plain TTS but rejects forwarded `voice_settings`; gentle tone is handled through prompt wording and playback rate unless this is explicitly enabled.

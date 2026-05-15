@@ -86,7 +86,7 @@ export async function speakWithElevenLabs(
   gentle: boolean = false,
   onEnd?: () => void,
   voiceId?: string,
-): Promise<void> {
+): Promise<boolean> {
   try {
     const response = await fetch('/api/elevenlabs/tts', {
       method: 'POST',
@@ -118,14 +118,14 @@ export async function speakWithElevenLabs(
     };
     audio.onerror = () => {
       URL.revokeObjectURL(url);
-      speakWithBrowserTTS(text, gentle);
       onEnd?.();
     };
     await audio.play();
+    return true;
   } catch (error) {
-    console.warn('ElevenLabs TTS failed, using browser fallback:', error);
-    speakWithBrowserTTS(text, gentle);
+    console.warn('ElevenLabs TTS failed:', error);
     onEnd?.();
+    return false;
   }
 }
 

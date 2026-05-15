@@ -359,3 +359,13 @@ Decision: Mobile caregiver navigation should prioritize the five core care-loop 
 Reasoning: The mobile bottom bar was crowded and made a secondary library surface compete with the actual care loop. A caregiver on a phone needs the fastest path to schedule meds, start/review a session, and check readiness.
 
 Linked: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]], [[todo#P2 - Product Polish]], [[plans#1. Web Demo Core Loop]]
+
+## 2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice
+
+#decision #voice #production #som
+
+Decision: When `VITE_USE_ELEVENLABS=true`, CueGuide should not automatically play browser TTS after an ElevenLabs failure unless `VITE_ALLOW_BROWSER_TTS_FALLBACK=true` is explicitly enabled.
+
+Reasoning: The old fallback hid a broken ElevenLabs key by playing the same robotic browser voice, making it look like ElevenLabs was configured but low quality. Som's voice standard requires real ElevenLabs audio; a failed provider check should be obvious instead of silently sounding like the old prototype.
+
+Linked: [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Fix]], [[production-voice]], [[source-map#Som Feedback]]

@@ -66,6 +66,7 @@ updated: 2026-05-15
 - [x] Tighten mobile caregiver navigation to the five core care-loop surfaces.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
 - [ ] Rotate/re-set a valid ElevenLabs production key, redeploy, and rerun strict production voice smoke.
+- [x] Stop broken ElevenLabs requests from falling back to the old browser voice in production mode.
 
 ## P3 - Mobile Path
 

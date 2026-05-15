@@ -18,6 +18,7 @@ updated: 2026-05-15
 - Product Trust priority: keep voice acceptance honest, patient prompts question-shaped, and caregiver walkthrough evidence current. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
 - Current trust pass: auth/setup and local QA target repaired. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
 - Current UI/UX refactor: caregiver dashboard split into focused view modules and production secondary routes cleaned up. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
+- Latest production UI/UX refactor passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 
 ## Memory
 
@@ -72,6 +73,7 @@ updated: 2026-05-15
 - Latest first-run trust gate: [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - Latest first-run production gate: [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - Latest UI/UX refactor local gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
+- Latest UI/UX refactor production gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 
 ## Context
 

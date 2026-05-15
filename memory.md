@@ -87,6 +87,7 @@ Recent verified checks:
 - Fresh-user onboarding trust pass verified signup -> local setup -> first medication -> dashboard on `127.0.0.1:3006`; dashboard showed `Morning Smoke Starter Med` and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - Fresh-user onboarding production deploy `dpl_3i1nbfSpDKHbURc6E3XV9in2oZDE` passed strict smoke with ElevenLabs `200 audio/mpeg`, local onboarding coverage, exact medication naming, and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - UI/UX Trust Refactor local gate passed on 2026-05-15 with focused caregiver view modules, clinical secondary routes, real-route command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
+- UI/UX Trust Refactor production deploy `dpl_HbKpCDmC2n3oxAFPoHtMvWGiW66k` passed strict smoke with ElevenLabs `200 audio/mpeg`, mobile no-overflow, and production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

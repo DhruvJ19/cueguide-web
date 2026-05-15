@@ -89,3 +89,4 @@ updated: 2026-05-15
 - [x] Verified fresh-user local setup with a real first medication and dashboard naming. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - [x] Deployed fresh-user onboarding hardening and verified strict production smoke. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - [x] Completed the UI/UX Trust Refactor local gate: focused caregiver view modules, cleaner production secondary routes, clinical command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
+- [x] Deployed UI/UX Trust Refactor and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].

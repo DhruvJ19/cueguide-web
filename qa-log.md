@@ -780,9 +780,50 @@ Rendered QA:
 
 Known caveats:
 
-- Production deploy and strict production smoke are still pending for this refactor.
 - Human-ear ElevenLabs voice acceptance is still pending.
 - Authenticated Supabase cloud save/load/RLS proof remains pending.
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[decisions#2026-05-15 - Caregiver Views Are Focused Operations Modules]], [[todo#P2 - Product Polish]], [[context#Project Structure]]
+
+## 2026-05-15 - UI/UX Trust Refactor Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-m1kzcs9p4-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_HbKpCDmC2n3oxAFPoHtMvWGiW66k`
+- Commit: `cdd2bc9b`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778835685864`
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+
+Rendered QA:
+
+- Browser plugin connection had timed out locally earlier, so direct Playwright was used for production rendered QA.
+- Desktop Today, Command Palette, Medications, Reports, Settings, and Session rendered without page errors, framework overlays, console errors, or horizontal overflow.
+- Mobile Today, Medications, Signup, Onboarding, and Settings rendered without horizontal overflow.
+- Tablet Patient Focus Mode rendered greeting and step prompt with Read aloud, Help, Skip, and Done visible.
+- Privacy, Terms, and Not Found routes rendered with the clinical shell.
+- Screenshot folder outside the repo: `/tmp/cueguide-qa-20260515-ui-trust-refactor-production`.
+
+Deployment notes:
+
+- Vercel build completed successfully and aliased the deployment to production.
+- Vercel warned that the `name` property in `vercel.json` is deprecated; this is non-blocking cleanup.
+
+Known caveats:
+
+- Human-ear ElevenLabs voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[decisions#2026-05-15 - Caregiver Views Are Focused Operations Modules]], [[dashboard#Release Evidence]], [[todo#P2 - Product Polish]]

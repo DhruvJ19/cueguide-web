@@ -2,7 +2,7 @@
 aliases: [todo, tasks, backlog]
 tags: [project, todo, priorities, backlog]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 # CueGuide Todo
@@ -103,3 +103,4 @@ updated: 2026-05-15
 - [x] Completed Daily Use Refinement local gate: refill dates, shorter patient medication prompts, local backup export, full local gates, local smoke, and rendered flow QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - [x] Deployed Daily Use Refinement and verified strict production smoke plus targeted production rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - [x] Completed Multi-POV UI Trust Refinement local gate: caregiver/patient/Som/buyer/devil's-advocate audit, row-based Today/Reports/Settings cleanup, patient primary-action hierarchy, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
+- [x] Deployed the ElevenLabs fallback-masking fix and verified production Read Aloud no longer calls browser speech when ElevenLabs returns `401`. See [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Production Deploy]].

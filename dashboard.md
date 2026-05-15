@@ -2,7 +2,7 @@
 aliases: [dashboard, home, moc]
 tags: [project, dashboard, moc, obsidian]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 # CueGuide Dashboard
@@ -84,7 +84,7 @@ updated: 2026-05-15
 - Latest multi-POV UI refinement gate: [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
 - Latest POV trust/data realism gate: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]].
 - Latest POV trust production deploy: [[qa-log#2026-05-15 - POV Trust Audit Production Deploy]].
-- Latest ElevenLabs fallback fix: [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Fix]].
+- Latest ElevenLabs fallback fix: [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Production Deploy]].
 
 ## Context
 

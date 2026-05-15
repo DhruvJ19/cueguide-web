@@ -2,7 +2,7 @@
 aliases: [qa-log, verification-log, test-log]
 tags: [project, qa, verification, release]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 # CueGuide QA Log
@@ -1139,3 +1139,38 @@ Known caveats:
 - Strict production voice still requires rotating/re-setting `ELEVENLABS_API_KEY` and verifying `200 audio/mpeg`.
 
 Linked: [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]], [[production-voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - ElevenLabs Fallback Masking Production Deploy
+
+Status: deployed; production no longer masks a broken ElevenLabs key with browser speech.
+
+Deployment:
+
+- Vercel deployment: `dpl_CP6t3LuXNyebJJt9WTqQLn5W1MBq`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Commands:
+
+- `vercel --prod --yes`
+- Direct production TTS curl to `/api/elevenlabs/tts`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Instrumented production browser check for `speechSynthesis.speak()`
+
+Observed:
+
+- Deploy succeeded and aliased to `https://cueguide-web.vercel.app`.
+- Direct production TTS still returns `401 application/json`, confirming the current Vercel `ELEVENLABS_API_KEY` is not valid.
+- Fallback-tolerant production smoke passed.
+- Smoke medication: `Smoke Omega 1778863612372`.
+- Production mobile overflow check passed.
+- Production local onboarding flow passed.
+- Strict production smoke failed as intended with `Expected ElevenLabs audio/mpeg response` and observed `401 application/json`.
+- Instrumented production browser check observed ElevenLabs `401 application/json` and `speechSynthesis.speak()` call count `0`.
+
+Known caveats:
+
+- Production will not play the old browser voice while ElevenLabs is broken.
+- Real production voice remains blocked until a fresh valid `ELEVENLABS_API_KEY` is saved in Vercel and strict smoke returns `200 audio/mpeg`.
+
+Linked: [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]], [[production-voice]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]

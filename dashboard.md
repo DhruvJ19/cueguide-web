@@ -20,6 +20,7 @@ updated: 2026-05-15
 - Current UI/UX refactor: caregiver dashboard split into focused view modules and production secondary routes cleaned up. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - Latest production UI/UX refactor passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Latest daily-use refinement local gate added refill dates, shorter patient prompts, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
+- Latest daily-use production deploy passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 
 ## Memory
 
@@ -76,6 +77,7 @@ updated: 2026-05-15
 - Latest UI/UX refactor local gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - Latest UI/UX refactor production gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Latest daily-use refinement gate: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
+- Latest daily-use production gate: [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 
 ## Context
 

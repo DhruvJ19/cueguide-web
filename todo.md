@@ -94,3 +94,4 @@ updated: 2026-05-15
 - [x] Completed the UI/UX Trust Refactor local gate: focused caregiver view modules, cleaner production secondary routes, clinical command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - [x] Deployed UI/UX Trust Refactor and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - [x] Completed Daily Use Refinement local gate: refill dates, shorter patient medication prompts, local backup export, full local gates, local smoke, and rendered flow QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
+- [x] Deployed Daily Use Refinement and verified strict production smoke plus targeted production rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].

@@ -91,6 +91,7 @@ Recent verified checks:
 - UI/UX Trust Refactor local gate passed on 2026-05-15 with focused caregiver view modules, clinical secondary routes, real-route command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - UI/UX Trust Refactor production deploy `dpl_HbKpCDmC2n3oxAFPoHtMvWGiW66k` passed strict smoke with ElevenLabs `200 audio/mpeg`, mobile no-overflow, and production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Daily Use Refinement local gate passed on 2026-05-15 with refill dates, separated patient prompt/location guidance, local backup export, full gates, local smoke, and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
+- Daily Use Refinement production deploy `dpl_C63RmJYmnWC6BBvv2uNBAP2JQTQ9` passed strict smoke, production rendered QA, ElevenLabs `200 audio/mpeg`, prompt/location split, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

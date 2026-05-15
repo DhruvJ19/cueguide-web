@@ -886,3 +886,40 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[source-map#Market And Competitor Signals]], [[decisions#2026-05-15 - Patient Medication Prompts Separate Action From Location]], [[todo#P2 - Product Polish]]
+
+## 2026-05-15 - Daily Use Refinement Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-2s5b0eryq-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_C63RmJYmnWC6BBvv2uNBAP2JQTQ9`
+- Commit: `096636eb`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778840601097`
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+
+Rendered QA:
+
+- Production flow passed: onboarding refill date -> patient medication prompt -> caregiver Settings backup export.
+- Patient headline: `Mom, would you like to take the small oval white pill with a sip of water?`
+- Patient guidance: `The small oval white pill is in the Sunday pill organizer by the kettle. Take your time.`
+- Local backup download filename: `cueguide-local-backup-2026-05-15.json`.
+- Mobile onboarding and mobile Settings rendered without horizontal overflow.
+- Screenshot folder outside the repo: `/tmp/cueguide-daily-use-refinement-20260515-production`.
+
+Known caveats:
+
+- Human-ear ElevenLabs voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[source-map#Dementia And Accessibility Research]], [[decisions#2026-05-15 - Local Fallback Needs Data Export]], [[dashboard#Release Evidence]]

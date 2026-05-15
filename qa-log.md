@@ -1059,3 +1059,37 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[decisions#2026-05-15 - Seed Data Must Be Deterministic And Honest]], [[source-map#Market And Competitor Signals]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - POV Trust Audit Production Deploy
+
+Status: deployed; fallback smoke passed; strict ElevenLabs blocked.
+
+Deployment:
+
+- Vercel deployment: `dpl_47yk2DiuRXwoh6RhAByhZ35Qvtcv`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Commands:
+
+- `vercel --prod --yes`
+- Direct production TTS curl to `/api/elevenlabs/tts`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+
+Observed:
+
+- Deploy succeeded and aliased to `https://cueguide-web.vercel.app`.
+- Fallback-tolerant production smoke passed.
+- Smoke medication: `Smoke Omega 1778862981700`.
+- Production mobile overflow check passed.
+- Production local onboarding flow passed.
+- Direct production TTS returned `401 application/json`.
+- Strict production smoke failed with `Expected ElevenLabs audio/mpeg response` and observed `401 application/json`.
+
+Known caveats:
+
+- Production voice is not ready until a valid `ELEVENLABS_API_KEY` is rotated/re-set in Vercel and strict smoke returns `audio/mpeg`.
+- Browser speech remains the emergency fallback only; it is not accepted as production-quality voice for Som.
+- Authenticated Supabase cloud proof is still pending.
+
+Linked: [[production-voice]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]

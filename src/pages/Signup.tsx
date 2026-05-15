@@ -83,6 +83,11 @@ export default function SignupPage() {
       {error && <div className="auth-alert">{error}</div>}
 
       <form onSubmit={handleSignup} className="auth-form">
+        <div className={`auth-mode-banner ${isSupabaseConfigured ? 'cloud' : 'local'}`}>
+          <strong>{isSupabaseConfigured ? 'Cloud account path available' : 'Local setup active'}</strong>
+          <span>{isSupabaseConfigured ? 'Use email for cloud sign-in, or continue locally for this device.' : 'Data stays in this browser until Supabase is connected.'}</span>
+        </div>
+
         <label>
           <span>Your name</span>
           <input
@@ -120,11 +125,9 @@ export default function SignupPage() {
         </button>
       </form>
 
-      {!isSupabaseConfigured && (
-        <button type="button" className="cg-secondary auth-local" onClick={startLocalSetup}>
-          Continue local setup
-        </button>
-      )}
+      <button type="button" className="cg-secondary auth-local" onClick={startLocalSetup}>
+        Continue local setup
+      </button>
 
       <p className="auth-switch">
         Already have an account? <Link to="/login">Sign in</Link>

@@ -51,6 +51,7 @@ updated: 2026-05-15
 | `supabase/migrations/20260513093902_medication_alert_production_schema.sql` | Medication, alerts, and production data shape. |
 | `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` | Pending RLS/realtime hardening migration created for production policy coverage. |
 | `scripts/smoke-careflow.ts` | Browser smoke flow for medication setup, Focus Mode, alerts/session summary, voice, and mobile overflow. |
+| `.mcp.json` | Read-only Supabase MCP project config; user OAuth/auth is still required before tools are available. |
 | `Som_Evaluation/` | Som/Suman transcripts, specs, architecture, demo prep. |
 | `CueGuide/` | Nested Expo app, later mobile port target. |
 
@@ -74,6 +75,7 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 - `ELEVENLABS_API_KEY` is server-only.
 - `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
+- Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.
 
 ## Nested Expo App

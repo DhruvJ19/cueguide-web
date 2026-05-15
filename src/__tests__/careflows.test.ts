@@ -67,7 +67,7 @@ const routine = buildMedicationRoutine({
   nowIso: '2026-05-13T08:00:00.000Z',
 });
 
-assert.equal(routine.name, 'Morning Medication');
+assert.equal(routine.name, 'Morning Lisinopril');
 assert.equal(routine.category, 'medication');
 assert.equal(routine.steps.length, 2);
 assert.equal(routine.steps[0].medicationId, 'med-1');

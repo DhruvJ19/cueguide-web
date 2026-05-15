@@ -20,6 +20,13 @@ function getTimeLabel(time: string) {
   return 'Bedtime';
 }
 
+function getMedicationRoutineName(time: string, medications: Medication[]) {
+  const label = getTimeLabel(time);
+  if (medications.length === 1) return `${label} ${medications[0].name}`;
+  if (medications.length > 1) return `${label} Medications (${medications.length})`;
+  return `${label} Medication`;
+}
+
 export function getMedicationVisual(medication: Medication) {
   return `${medication.pillShape} ${medication.pillColor} pill`.trim();
 }
@@ -64,7 +71,7 @@ export function buildMedicationRoutine({
   return {
     id: routineId,
     patientId: patient.id,
-    name: `${getTimeLabel(scheduledTime)} Medication`,
+    name: getMedicationRoutineName(scheduledTime, activeAtTime),
     category: 'medication',
     scheduledTime,
     recurrence: ['daily'],

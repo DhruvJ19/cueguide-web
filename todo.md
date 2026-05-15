@@ -21,6 +21,7 @@ updated: 2026-05-15
 - [ ] Verify production voice quality with human ears against Som's exact email standard: Google Maps-like, human, soft, gentle, and non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
+- [x] Add read-only Supabase MCP project config so cloud schema verification is ready once user OAuth/auth is complete.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
 - [x] Fix local QA false-positive risk by moving CueGuide dev to isolated strict port `3006`.
 - [x] Replace legacy dark `/login`, `/signup`, `/onboarding`, and `/settings` surfaces with production-aligned care setup/readiness flows.
@@ -52,6 +53,7 @@ updated: 2026-05-15
 - [x] Make ElevenLabs readiness depend on a live server check instead of only the public feature flag.
 - [ ] Simplify the permanent Codex operating prompt into a short contract plus links to [[memory]], [[context]], and [[meta-optimization]].
 - [ ] Add a true authenticated production signup/save/load test account once Supabase CLI or MCP auth is available.
+- [x] Extend first-run smoke to cover signup -> local setup -> onboarding -> first medication -> dashboard.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
 
 ## P3 - Mobile Path
@@ -82,3 +84,4 @@ updated: 2026-05-15
 - [x] Deployed UI Trust Pass and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 - [x] Completed Product Trust QA and Safety Pass locally: multi-POV audit, confirmation-limit UI, stricter secret scanner, local smoke, and Supabase auth caveat. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 - [x] Deployed Product Trust QA and Safety Pass and verified strict production smoke with ElevenLabs plus confirmation-limit assertions. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
+- [x] Verified fresh-user local setup with a real first medication and dashboard naming. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].

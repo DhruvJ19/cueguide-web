@@ -153,6 +153,13 @@ Commands:
 - `npm ci --ignore-scripts --dry-run`
 - `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
 
+Smoke evidence:
+
+- Local smoke medication: `Smoke Omega 1778816038405`
+- Local smoke observed ElevenLabs `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding reported `localOnboarding: true`.
+
 Rendered QA:
 
 - Browser plugin connection timed out twice; direct Playwright was used.
@@ -640,3 +647,55 @@ Known caveats:
 - Human-ear voice acceptance is still pending.
 - Authenticated Supabase cloud save/load/RLS proof remains pending.
 - `cueguide-test.png` remains unrelated local work and must not be staged.
+
+## 2026-05-15 - Fresh User Onboarding Trust Pass
+
+Status: passed locally; production deploy pending.
+
+Why this pass happened:
+
+- A first-time caregiver needs an obvious path even before cloud auth is proven.
+- The smoke test exposed a real trust issue: after onboarding with one medication, the dashboard could still show a generic `Morning Medication` session name.
+- Som's feedback requires medication to mean the actual medicine, not just a category.
+
+Code changes verified:
+
+- `/signup` always shows `Continue local setup`, even when Supabase env is configured.
+- `/login` always shows `Continue with local data`.
+- `/onboarding` now explains the three setup steps, labels local/cloud data mode, and shows a patient prompt preview.
+- If Supabase is configured but there is no signed-in user, onboarding now completes locally instead of failing at the end.
+- Medication-generated routines now use the actual medication name when there is one scheduled medicine, such as `Morning Smoke Starter Med`.
+- `.mcp.json` configures the Supabase MCP server in read-only mode for project `kueqtpekkqapclczvahc`; user OAuth/auth is still required before live tools appear.
+- `scripts/smoke-careflow.ts` now covers signup -> local setup -> onboarding -> first medication -> dashboard.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Rendered QA:
+
+- Browser plugin connection timed out twice, so direct Playwright was used for the local rendered check.
+- Mobile signup, medication onboarding, and dashboard rendered without page errors, framework overlays, or horizontal overflow.
+- Dashboard showed `Morning Smoke Starter Med` in the first viewport.
+- Body and main opacity both measured `1`; the UI was not faded or covered by a transition overlay.
+- Screenshot folder outside the repo: `/tmp/cueguide-qa-20260515-onboarding-trust-fresh`.
+
+Supabase/data evidence:
+
+- `supabase --version` returned `2.98.2`.
+- `supabase projects list -o json` remains blocked by missing access token.
+- `https://mcp.supabase.com/mcp` returned unauthenticated `401`, confirming the MCP endpoint is reachable.
+- Live cloud save/load/RLS proof remains pending until Supabase CLI or MCP auth is completed.
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[decisions#2026-05-15 - First Run Local Setup Is First-Class]], [[decisions#2026-05-15 - Medication Sessions Name The Medicine]], [[runbook#First-Run QA]], [[todo#P0 - Demo-Critical]]

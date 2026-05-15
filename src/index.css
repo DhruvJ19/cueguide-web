@@ -290,6 +290,50 @@ body {
   line-height: 1.45;
 }
 
+.auth-mode-banner,
+.auth-step-heading,
+.auth-preview {
+  border: 1px solid #d7e0ea;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.auth-mode-banner.cloud {
+  border-color: #c7ded7;
+  background: #f2faf7;
+}
+
+.auth-mode-banner.local {
+  border-color: #fed7aa;
+  background: #fffaf3;
+}
+
+.auth-mode-banner strong,
+.auth-step-heading strong,
+.auth-preview span {
+  color: #172033;
+  font-size: 14px;
+}
+
+.auth-mode-banner span,
+.auth-step-heading p,
+.auth-preview p {
+  color: #5f6b7a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auth-step-heading span,
+.auth-preview span {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .auth-submit,
 .auth-local {
   width: 100%;

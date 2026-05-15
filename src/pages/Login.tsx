@@ -75,6 +75,11 @@ export default function LoginPage() {
       {error && <div className="auth-alert">{error}</div>}
 
       <form onSubmit={handleMagicLink} className="auth-form">
+        <div className={`auth-mode-banner ${isSupabaseConfigured ? 'cloud' : 'local'}`}>
+          <strong>{isSupabaseConfigured ? 'Cloud sign-in path available' : 'Local data mode active'}</strong>
+          <span>{isSupabaseConfigured ? 'Use email for cloud data, or open local data on this device.' : 'Use this device while cloud production proof is pending.'}</span>
+        </div>
+
         <label>
           <span>Email address</span>
           <input
@@ -91,11 +96,9 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {!isSupabaseConfigured && (
-        <button type="button" className="cg-secondary auth-local" onClick={enterLocalMode}>
-          Continue with local data
-        </button>
-      )}
+      <button type="button" className="cg-secondary auth-local" onClick={enterLocalMode}>
+        Continue with local data
+      </button>
 
       <p className="auth-switch">
         New to CueGuide? <Link to="/signup">Create caregiver account</Link>

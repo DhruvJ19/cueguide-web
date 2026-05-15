@@ -35,6 +35,20 @@ export default function OnboardingPage() {
   const canContinueCaregiver = caregiverName.trim().length > 0;
   const canContinuePatient = patientName.trim().length > 0;
   const canFinishMedication = medicationName.trim().length > 0 && dosage.trim().length > 0 && /^\d{2}:\d{2}$/.test(medicationTime.trim());
+  const stepLabels = [
+    {
+      title: 'Caregiver',
+      body: 'Who will review alerts and session history?',
+    },
+    {
+      title: 'Patient',
+      body: 'Keep this simple. These details shape calm prompts.',
+    },
+    {
+      title: 'First medication',
+      body: 'Add one real medication so Today has a useful starting point.',
+    },
+  ];
 
   const handleFinish = async () => {
     if (!canFinishMedication) return;
@@ -45,16 +59,21 @@ export default function OnboardingPage() {
       const now = new Date().toISOString();
       const patientId = uuidv4();
       let caregiverId = 'local-caregiver';
+      let cloudUserId: string | null = null;
+      let cloudUserEmail = '';
 
       if (isSupabaseConfigured) {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError || !user) throw new Error('Please sign in before creating a cloud patient profile.');
-        const caregiver = await db.caregivers.getOrCreate(
-          user.id,
-          caregiverName.trim(),
-          user.email || '',
-        );
-        caregiverId = caregiver?.id || user.id;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          cloudUserId = user.id;
+          cloudUserEmail = user.email || '';
+          const caregiver = await db.caregivers.getOrCreate(
+            user.id,
+            caregiverName.trim(),
+            cloudUserEmail,
+          );
+          caregiverId = caregiver?.id || user.id;
+        }
       }
 
       const nextProfile: PatientProfile = {
@@ -91,7 +110,7 @@ export default function OnboardingPage() {
       setMedications([firstMedication]);
       setRoutines([]);
 
-      if (isSupabaseConfigured) {
+      if (isSupabaseConfigured && cloudUserId) {
         await db.patients.save(nextProfile);
         await db.medications.save(firstMedication);
       }
@@ -115,6 +134,16 @@ export default function OnboardingPage() {
         {[0, 1, 2].map((index) => (
           <span key={index} className={index <= step ? 'active' : ''} />
         ))}
+      </div>
+      <div className="auth-step-heading">
+        <span>Step {step + 1} of 3</span>
+        <strong>{stepLabels[step].title}</strong>
+        <p>{stepLabels[step].body}</p>
+      </div>
+
+      <div className={`auth-mode-banner ${isSupabaseConfigured ? 'cloud' : 'local'}`}>
+        <strong>{isSupabaseConfigured ? 'Cloud-ready when signed in' : 'Local setup active'}</strong>
+        <span>{isSupabaseConfigured ? 'If no signed-in session is present, this setup stays local on this device.' : 'You can still complete the full medication loop without cloud credentials.'}</span>
       </div>
 
       {error && <div className="auth-alert">{error}</div>}
@@ -221,6 +250,12 @@ export default function OnboardingPage() {
               placeholder="the yellow pill box on the kitchen counter"
             />
           </label>
+          <div className="auth-preview">
+            <span>Patient prompt preview</span>
+            <p>
+              {preferredName.trim() || patientName.trim() || 'Dad'}, would you like to take the {pillShape.trim() || 'small round'} {pillColor.trim() || 'blue'} pill with a sip of water?
+            </p>
+          </div>
           <div className="auth-actions">
             <button type="button" className="cg-secondary" onClick={() => setStep(1)}>Back</button>
             <button type="button" disabled={!canFinishMedication || loading} className="cg-primary" onClick={handleFinish}>

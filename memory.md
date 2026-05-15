@@ -34,6 +34,8 @@ updated: 2026-05-15
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
 - Market review reinforces Som's concern: reminder apps and caregiver alerts already exist, so CueGuide must differentiate through dementia-safe patient guidance, caregiver event interpretation, and honest medication-confirmation language.
 - `Done` is patient confirmation only, not proof the pill was swallowed. Keep this explicit in caregiver Session/Reports and never imply verified administration without hardware, caregiver observation, or another confirmation source.
+- First-run local setup is a real supported path, even when Supabase browser env exists. Caregivers must always be able to choose local setup while cloud auth/proof is pending.
+- Medication session names should expose the actual medicine when one scheduled medication drives the routine, for example `Morning Lisinopril` instead of generic `Morning Medication`.
 
 ## Technical Lessons
 
@@ -48,6 +50,7 @@ updated: 2026-05-15
 - The highest leverage refactor is a typed data gateway with explicit save results; silent persistence errors make the app look fine while cloud writes fail.
 - Medication save paths now report typed persistence results, so caregiver UI can surface cloud save failures instead of silently swallowing them.
 - Browser-public env prefixes are blocked for provider secrets. Do not introduce ElevenLabs, AI, SMS auth, or other provider secrets as `VITE_*` or `EXPO_PUBLIC_*`; route through server APIs.
+- Supabase MCP is configured through `.mcp.json` in read-only mode for project `kueqtpekkqapclczvahc`. It still requires user OAuth/auth before MCP tools appear in Codex.
 
 ## Verification Memory
 
@@ -80,6 +83,7 @@ Recent verified checks:
 - UI Trust production deploy `dpl_BgUFtUjB5KxEVManqvgPL2GHRcrL` passed strict smoke with ElevenLabs `200 audio/mpeg`, no mobile overflow, and screenshot QA for Today, Medications, Reports, Settings, and mobile Login. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 - Product Trust QA and Safety Pass passed locally on 2026-05-15 with confirmation-limit UI, expanded secret scanning, local smoke, security checks, screenshot QA, and Supabase auth caveat documented. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 - Product Trust QA production deploy `dpl_HZcXhLtPUhh4pBGiqSXrjMpJeVjQ` passed strict smoke with ElevenLabs `200 audio/mpeg`, confirmation-limit assertions, and no mobile overflow. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
+- Fresh-user onboarding trust pass verified signup -> local setup -> first medication -> dashboard on `127.0.0.1:3006`; dashboard showed `Morning Smoke Starter Med` and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 
 ## Obsidian Maintenance Rules
 

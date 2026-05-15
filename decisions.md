@@ -218,7 +218,27 @@ Decision: Caregiver Session and Reports must explicitly state that `Done` means 
 
 Reasoning: Som asked how a caregiver knows medication was administered, and hardware competitors can provide stronger dispensing evidence. CueGuide should be useful without overstating what it can verify.
 
-Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]], [[todo#P2 - Product Polish]]
+Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]], [[memory#Product Memory]]
+
+## 2026-05-15 - First Run Local Setup Is First-Class
+
+#decision #auth #ux #resilience
+
+Decision: Signup, login, and onboarding must always expose a clear local setup path, even when Supabase browser env is present.
+
+Reasoning: During stakeholder QA, a configured-but-unauthenticated cloud path could make a first-time caregiver feel blocked. Until authenticated cloud save/load is proven, CueGuide must let the full medication loop run locally and label the data mode honestly.
+
+Linked: [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]], [[todo#P0 - Demo-Critical]], [[memory#Product Memory]]
+
+## 2026-05-15 - Medication Sessions Name The Medicine
+
+#decision #medication #ux #som
+
+Decision: A medication-generated routine with one scheduled medicine should use the actual medication name, for example `Morning Lisinopril`.
+
+Reasoning: Som pushed that `Medication` cannot be a generic category. The caregiver and patient flow should make the specific medicine visible wherever it drives the session.
+
+Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]], [[context#Project Structure]]
 
 ## 2026-05-15 - Public Provider Secret Names Are Blocked
 

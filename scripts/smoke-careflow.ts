@@ -143,6 +143,26 @@ async function runSmoke(): Promise<void> {
     );
     assert.equal(hasMobileOverflow, false);
 
+    await page.goto(new URL('/signup', targetUrl).toString(), { waitUntil: 'networkidle', timeout: 30_000 });
+    await page.getByRole('button', { name: /Continue local setup/i }).click();
+    await page.getByText(/Step 1 of 3/i).waitFor({ state: 'visible', timeout: 10_000 });
+    await page.getByPlaceholder('Sarah Chen').fill('Smoke Caregiver');
+    await page.getByRole('button', { name: /^Continue/i }).click();
+    await page.getByText(/Step 2 of 3/i).waitFor({ state: 'visible', timeout: 10_000 });
+    await page.getByPlaceholder('Robert Chen').fill('Smoke Patient');
+    await page.getByPlaceholder('Dad').fill('Mom');
+    await page.getByRole('button', { name: /^Continue/i }).click();
+    await page.getByText(/Step 3 of 3/i).waitFor({ state: 'visible', timeout: 10_000 });
+    await page.getByPlaceholder('Lisinopril').fill('Smoke Starter Med');
+    await page.getByPlaceholder('10 mg').fill('2 mg');
+    await page.getByRole('button', { name: /Open dashboard/i }).click();
+    await page.getByRole('heading', { name: /Care overview/i }).waitFor({ state: 'visible', timeout: 15_000 });
+    await page.getByRole('heading', { name: /Smoke Starter Med/i }).waitFor({ state: 'visible', timeout: 10_000 });
+    const onboardingOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
+    assert.equal(onboardingOverflow, false);
+
     if (requireElevenLabs) {
       assert.ok(
         ttsObservations.some((entry) => entry.status === 200 && entry.contentType === 'audio/mpeg'),
@@ -159,6 +179,7 @@ async function runSmoke(): Promise<void> {
       medicationName,
       elevenLabs: ttsObservations.filter((entry) => entry.status),
       mobileNoOverflow: true,
+      localOnboarding: true,
     }, null, 2));
   } finally {
     await browser.close();

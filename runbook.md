@@ -51,6 +51,20 @@ npm run smoke:careflow
 
 This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `audio/mpeg`.
 
+## First-Run QA
+
+- Open `/signup`.
+- Confirm `Continue local setup` is visible even when Supabase env is configured.
+- Complete caregiver, patient, and first medication steps.
+- Confirm the dashboard names the actual medication in the next session, for example `Morning Lisinopril`, not a generic medication label.
+- Confirm mobile width has no horizontal overflow.
+
+## Supabase Verification
+
+- `.mcp.json` points Codex to the Supabase MCP server in read-only mode for project `kueqtpekkqapclczvahc`.
+- User OAuth/auth is still required before Supabase MCP tools are available.
+- Until authenticated cloud save/load is verified, Settings and demo language must continue to treat cloud data proof as pending.
+
 ## Production Voice
 
 - Production voice must be ElevenLabs through `/api/elevenlabs/tts`.

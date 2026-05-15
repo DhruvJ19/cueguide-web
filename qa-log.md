@@ -923,3 +923,34 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[source-map#Dementia And Accessibility Research]], [[decisions#2026-05-15 - Local Fallback Needs Data Export]], [[dashboard#Release Evidence]]
+
+## 2026-05-15 - Supabase Proof Gate Added
+
+Status: gate added; cloud proof still blocked pending test caregiver credentials.
+
+Code changes verified:
+
+- Added `npm run proof:supabase`.
+- The proof signs in as a normal caregiver through Supabase anon auth.
+- The proof attempts caregiver-owned patient, medication, completion, and care alert create/read/delete.
+- The proof checks anonymous reads cannot see the proof patient.
+- The proof intentionally avoids service-role keys because they bypass RLS.
+
+Commands:
+
+- `npm run lint`
+- `npm run security:secrets`
+- `npm run proof:supabase`
+
+Observed result:
+
+- `npm run proof:supabase` is blocked as expected because `CUEGUIDE_SUPABASE_TEST_EMAIL` is not present in local env.
+- Supabase CLI still reports `Access token not provided` for project-list access.
+- Supabase changelog/docs note to preserve: RLS and grants are separate; newer Supabase projects may not expose public-schema tables to the Data API by default. The proof therefore checks live authenticated app behavior rather than trusting migration files only.
+
+Known caveats:
+
+- Authenticated cloud save/load/RLS proof is still pending until a test caregiver account exists.
+- The proof may expose schema mismatches when first run against the live project; those should be fixed before claiming cloud production readiness.
+
+Linked: [[runbook#Supabase Verification]], [[decisions#2026-05-15 - Supabase Proof Must Use Normal Auth]], [[todo#P0 - Demo-Critical]]

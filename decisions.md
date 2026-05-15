@@ -289,3 +289,23 @@ Decision: Local fallback mode should include a caregiver-visible export path for
 Reasoning: Until authenticated Supabase proof is complete, local fallback is a real operating mode. A daily caregiver workflow needs a basic backup path and clear data-management posture, especially before demos, device changes, or troubleshooting.
 
 Linked: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]], [[source-map#Market And Competitor Signals]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Supabase Proof Must Use Normal Auth
+
+#decision #supabase #security #qa
+
+Decision: Cloud-data readiness must be proven with a normal authenticated caregiver session through the anon client, not with a service-role key.
+
+Reasoning: Service-role keys bypass RLS and can make a broken browser data path look healthy. The production proof must create, read, and clean up patient, medication, completion, and care alert records under the same RLS constraints the web app uses.
+
+Linked: [[runbook#Supabase Verification]], [[todo#P0 - Demo-Critical]], [[context#Commands]]
+
+## 2026-05-15 - Responses End With A Self-Annealing Loop
+
+#decision #workflow #quality
+
+Decision: End meaningful project responses with a compact operating loop: current product score, next bottleneck, exact next action, proof required, and App Store/GTM implication.
+
+Reasoning: CueGuide needs constant convergence toward production quality. A repeated senior-product loop keeps every sprint tied to evidence, user value, architecture, testing, and release readiness instead of drifting into isolated fixes.
+
+Linked: [[memory#User Preferences]], [[todo#P0 - Demo-Critical]], [[plans#Quality Gates]]

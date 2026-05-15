@@ -21,6 +21,7 @@ updated: 2026-05-15
 - Latest production UI/UX refactor passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Latest daily-use refinement local gate added refill dates, shorter patient prompts, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Latest daily-use production deploy passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
+- Supabase proof gate exists but needs a normal test caregiver account before cloud readiness can be claimed. See [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
 
 ## Memory
 
@@ -78,6 +79,7 @@ updated: 2026-05-15
 - Latest UI/UX refactor production gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Latest daily-use refinement gate: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Latest daily-use production gate: [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
+- Latest Supabase proof gate: [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
 
 ## Context
 

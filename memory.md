@@ -14,6 +14,7 @@ updated: 2026-05-15
 
 - The user wants autonomous senior-engineer execution: inspect the repo, implement, verify, deploy, and report clearly.
 - The user is relying heavily on Codex and prefers non-technical explanations unless implementation detail matters.
+- End every meaningful response with a short self-annealing development loop: current score, next bottleneck, exact next action, proof required, and App Store/GTM implication.
 - The project folder is also an Obsidian vault. Core notes must stay graph-ready with wikilinks and clean YAML frontmatter.
 - Avoid generic AI-demo language. CueGuide must feel like a credible caregiver medication product.
 - Preserve unrelated local changes. `cueguide-test.png` has repeatedly been left uncommitted intentionally.
@@ -54,6 +55,7 @@ updated: 2026-05-15
 - Medication save paths now report typed persistence results, so caregiver UI can surface cloud save failures instead of silently swallowing them.
 - Browser-public env prefixes are blocked for provider secrets. Do not introduce ElevenLabs, AI, SMS auth, or other provider secrets as `VITE_*` or `EXPO_PUBLIC_*`; route through server APIs.
 - Supabase MCP is configured through `.mcp.json` in read-only mode for project `kueqtpekkqapclczvahc`. It still requires user OAuth/auth before MCP tools appear in Codex.
+- Supabase cloud data proof is now a repeatable gate: `npm run proof:supabase`. It requires a normal test caregiver email/password and must not use service-role keys because service-role bypasses RLS.
 
 ## Verification Memory
 
@@ -92,6 +94,7 @@ Recent verified checks:
 - UI/UX Trust Refactor production deploy `dpl_HbKpCDmC2n3oxAFPoHtMvWGiW66k` passed strict smoke with ElevenLabs `200 audio/mpeg`, mobile no-overflow, and production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - Daily Use Refinement local gate passed on 2026-05-15 with refill dates, separated patient prompt/location guidance, local backup export, full gates, local smoke, and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Daily Use Refinement production deploy `dpl_C63RmJYmnWC6BBvv2uNBAP2JQTQ9` passed strict smoke, production rendered QA, ElevenLabs `200 audio/mpeg`, prompt/location split, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
+- Supabase proof gate was added on 2026-05-15, type-checked, and blocked correctly without `CUEGUIDE_SUPABASE_TEST_EMAIL`. See [[runbook#Supabase Verification]].
 
 ## Obsidian Maintenance Rules
 

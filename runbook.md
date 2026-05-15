@@ -64,6 +64,14 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - `.mcp.json` points Codex to the Supabase MCP server in read-only mode for project `kueqtpekkqapclczvahc`.
 - User OAuth/auth is still required before Supabase MCP tools are available.
 - Until authenticated cloud save/load is verified, Settings and demo language must continue to treat cloud data proof as pending.
+- `npm run proof:supabase` is the release proof for authenticated cloud data.
+- Required local env for that proof:
+  - `VITE_SUPABASE_URL` or `SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY` or `SUPABASE_ANON_KEY`
+  - `CUEGUIDE_SUPABASE_TEST_EMAIL`
+  - `CUEGUIDE_SUPABASE_TEST_PASSWORD`
+- The proof must sign in as a normal caregiver, create/read/delete a patient, medication, completion, and care alert through the anon client, and verify anonymous reads cannot see the proof patient.
+- Do not use a service-role key for this proof; service-role bypasses RLS and does not prove production browser behavior.
 
 ## Production Voice
 
@@ -93,6 +101,18 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - Reports should explain caregiver review signals, not internal system readiness.
 - Settings can expose readiness, but copy should stay short and row-based.
 - If a surface needs more than one sentence to explain itself, simplify the surface before adding copy.
+
+## Self-Annealing Loop
+
+End meaningful project updates with:
+
+- Current product score.
+- Next bottleneck.
+- Exact next action.
+- Proof required.
+- App Store/GTM implication.
+
+Use this as a forcing function: every pass should either raise product quality, reduce risk, improve proof, or sharpen the route to mobile/App Store readiness.
 
 ## Stop Conditions
 

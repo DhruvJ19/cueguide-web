@@ -54,6 +54,7 @@ updated: 2026-05-15
 | `supabase/migrations/20260513093902_medication_alert_production_schema.sql` | Medication, alerts, and production data shape. |
 | `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` | Pending RLS/realtime hardening migration created for production policy coverage. |
 | `scripts/smoke-careflow.ts` | Browser smoke flow for medication setup, Focus Mode, alerts/session summary, voice, and mobile overflow. |
+| `scripts/prove-supabase-cloud.ts` | Authenticated Supabase proof for caregiver-owned patient, medication, completion, and alert save/load through RLS. |
 | `src/components/CommandPalette.tsx` | Keyboard navigation for real care destinations only; no fake analytics/device/compliance routes. |
 | `.mcp.json` | Read-only Supabase MCP project config; user OAuth/auth is still required before tools are available. |
 | `Som_Evaluation/` | Som/Suman transcripts, specs, architecture, demo prep. |
@@ -69,6 +70,7 @@ updated: 2026-05-15
 | `npm run security:all` | Lockfile, secret exposure, audit, signature checks. |
 | `npm ci --ignore-scripts --dry-run` | Supply-chain dry run. |
 | `npm run smoke:careflow` | Production/local browser smoke test for the medication demo loop. |
+| `npm run proof:supabase` | Authenticated Supabase save/load/RLS proof. Requires test caregiver email/password env. |
 
 Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3004` have served unrelated local apps during QA.
 

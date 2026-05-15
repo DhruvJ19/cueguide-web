@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit",
     "test": "tsx src/__tests__/careflows.test.ts",
     "smoke:careflow": "tsx scripts/smoke-careflow.ts",
+    "proof:supabase": "tsx scripts/prove-supabase-cloud.ts",
     "security:audit": "npm audit --audit-level=moderate && npm audit signatures",
     "security:lockfile": "tsx scripts/check-lockfile-security.ts",
     "security:secrets": "tsx scripts/check-secret-exposure.ts",

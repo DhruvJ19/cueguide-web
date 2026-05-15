@@ -26,6 +26,7 @@ import { getElevenLabsStatus, type VoiceStatus } from '../services/elevenlabs';
 import { playAudio } from '../utils/audio';
 import { config } from '../config/env';
 import { isSupabaseConfigured } from '../services/supabase';
+import { downloadLocalBackup } from '../services/localBackup';
 import {
   MedicationsView,
   ReportsView,
@@ -293,6 +294,10 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
     setFormErrors((current) => ({ ...current, [field]: '' }));
   };
 
+  const handleExportLocalData = () => {
+    downloadLocalBackup(window.localStorage, new Date().toISOString());
+  };
+
   const resetMedicationForm = () => {
     setDraftMedication(emptyMedication);
     setFormErrors({});
@@ -453,6 +458,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         onMarkVoiceAccepted={markVoiceAccepted}
         onResetVoiceReview={resetVoiceReview}
         onToggleAI={(enabled) => setAiConfig({ isEnabled: enabled })}
+        onExportLocalData={handleExportLocalData}
       />
     );
   };

@@ -269,3 +269,23 @@ Decision: Command palette and visible navigation should link only to real CueGui
 Reasoning: Fake enterprise destinations make the app feel like generic AI slop. For stakeholder trust, every action surfaced in navigation must map to a real caregiver or patient workflow.
 
 Linked: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]], [[memory#Product Memory]], [[plans#North Star]]
+
+## 2026-05-15 - Patient Medication Prompts Separate Action From Location
+
+#decision #ux #som #accessibility
+
+Decision: Patient Focus Mode medication headlines should contain one action only, while pill location appears as secondary guidance or Help text.
+
+Reasoning: Som's voice direction and dementia communication research both favor calm navigation, one step at a time. Putting action and location in one giant headline made patient mode feel heavier than necessary and less Google-Maps-like.
+
+Linked: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]], [[source-map#Som Feedback]], [[source-map#Dementia And Accessibility Research]]
+
+## 2026-05-15 - Local Fallback Needs Data Export
+
+#decision #data #ux #resilience
+
+Decision: Local fallback mode should include a caregiver-visible export path for browser-stored patient, medication, completion, alert, settings, and voice review data.
+
+Reasoning: Until authenticated Supabase proof is complete, local fallback is a real operating mode. A daily caregiver workflow needs a basic backup path and clear data-management posture, especially before demos, device changes, or troubleshooting.
+
+Linked: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]], [[source-map#Market And Competitor Signals]], [[todo#P0 - Demo-Critical]]

@@ -45,6 +45,7 @@ updated: 2026-05-15
 | `src/components/AuthLayout.tsx` | Shared light clinical auth/setup shell for login, signup, and onboarding. |
 | `src/services/focusSession.ts` | Pure Focus Mode step-event and completion-status logic. |
 | `src/services/medicationRoutine.ts` | Medication-to-routine generation. |
+| `src/services/localBackup.ts` | Local fallback data export for browser-stored patient, medication, session, alert, settings, and voice-review data. |
 | `src/services/careAlerts.ts` | Alert creation and medication validation. |
 | `src/services/elevenlabs.ts` | Browser-side wrapper that calls server voice APIs. |
 | `src/utils/audio.ts` | Audio orchestration and patient tone transformation. |

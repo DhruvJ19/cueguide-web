@@ -56,6 +56,9 @@ updated: 2026-05-15
 - [ ] Simplify the permanent Codex operating prompt into a short contract plus links to [[memory]], [[context]], and [[meta-optimization]].
 - [ ] Add a true authenticated production signup/save/load test account once Supabase CLI or MCP auth is available.
 - [x] Extend first-run smoke to cover signup -> local setup -> onboarding -> first medication -> dashboard.
+- [x] Add refill-date entry to first-run onboarding and medication editing.
+- [x] Add local fallback data export so browser-stored patient/medication/session data can be backed up before demos or device changes.
+- [x] Split patient medication prompt action from location guidance so Focus Mode stays one-action-at-a-time.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
 
 ## P3 - Mobile Path
@@ -90,3 +93,4 @@ updated: 2026-05-15
 - [x] Deployed fresh-user onboarding hardening and verified strict production smoke. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - [x] Completed the UI/UX Trust Refactor local gate: focused caregiver view modules, cleaner production secondary routes, clinical command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - [x] Deployed UI/UX Trust Refactor and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
+- [x] Completed Daily Use Refinement local gate: refill dates, shorter patient medication prompts, local backup export, full local gates, local smoke, and rendered flow QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].

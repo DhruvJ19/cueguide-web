@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ClipboardList,
   Database,
+  Download,
   Edit3,
   HeartPulse,
   HardDrive,
@@ -348,6 +349,10 @@ export function MedicationsView({
                 {formErrors.times && <small className="cg-field-error">{formErrors.times}</small>}
               </label>
               <label>
+                <span>Refill date</span>
+                <input type="date" value={draftMedication.refillDate || ''} onChange={(event) => onMedicationChange('refillDate', event.target.value)} />
+              </label>
+              <label>
                 <span>Caregiver instructions</span>
                 <textarea value={draftMedication.instructions} onChange={(event) => onMedicationChange('instructions', event.target.value)} placeholder="Caregiver notes or instructions" />
               </label>
@@ -600,6 +605,7 @@ export function SettingsView({
   onMarkVoiceAccepted,
   onResetVoiceReview,
   onToggleAI,
+  onExportLocalData,
 }: {
   voiceReviewReady: boolean;
   readiness: ReadinessState;
@@ -614,6 +620,7 @@ export function SettingsView({
   onMarkVoiceAccepted: () => void;
   onResetVoiceReview: () => void;
   onToggleAI: (enabled: boolean) => void;
+  onExportLocalData: () => void;
 }) {
   return (
     <div className="cg-main-stack">
@@ -667,11 +674,17 @@ export function SettingsView({
               />
               <ReadinessItem
                 icon={<HardDrive size={18} />}
-                label="Session events"
-                value={readiness.events ? 'Patient actions logged' : 'Run session to verify'}
-                detail="Begin, help, skip, done, timing, and mood events."
+                label="Local backup"
+                value="Export available"
+                detail="Download patient, medication, completion, alert, and voice-review data stored in this browser."
                 status={readiness.events ? 'ready' : 'review'}
               />
+              <div className="cg-data-actions">
+                <button type="button" onClick={onExportLocalData}>
+                  <Download size={16} /> Export local backup
+                </button>
+                <small>Use before device changes or stakeholder testing in local fallback mode.</small>
+              </div>
             </div>
           </div>
 

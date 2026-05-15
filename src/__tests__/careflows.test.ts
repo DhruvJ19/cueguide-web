@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { buildLocalBackup } from '../services/localBackup';
 import { buildMedicationRoutine } from '../services/medicationRoutine';
 import {
   createCareAlertsFromStepEvents,
@@ -73,6 +74,8 @@ assert.equal(routine.steps.length, 2);
 assert.equal(routine.steps[0].medicationId, 'med-1');
 assert.match(routine.steps[0].instruction, /small round blue pill/i);
 assert.match(routine.steps[0].instruction, /would you like/i);
+assert.doesNotMatch(routine.steps[0].instruction, /yellow pill box|kitchen counter/i);
+assert.match(routine.steps[0].helpText || '', /yellow pill box/i);
 assert.doesNotMatch(routine.steps[0].instruction, /blood pressure|Take with breakfast/i);
 assert.match(routine.steps[1].instruction, /sip of water/i);
 
@@ -197,6 +200,17 @@ assert.equal(safeCue.steps.length, 1);
 const gentleCue = transformToGentle('Take the blue pill with water!');
 assert.equal(gentleCue, 'Would you like to take the blue pill with a sip of water.');
 assert.doesNotMatch(gentleCue, /^Take\b|!/i);
+
+const backupStorage = new Map<string, string>([
+  ['cueguide-patient', JSON.stringify({ state: { profile: patient } })],
+  ['cueguide-medications', JSON.stringify({ state: { medications } })],
+  ['unrelated-key', 'ignore'],
+]);
+const backup = buildLocalBackup({
+  getItem: (key: string) => backupStorage.get(key) || null,
+} as Storage, '2026-05-15T00:00:00.000Z');
+assert.equal(backup.entries.length, 2);
+assert.deepEqual(backup.entries.map((entry) => entry.key), ['cueguide-patient', 'cueguide-medications']);
 
 const firstStarted = buildFocusStepEvent({
   status: 'started',

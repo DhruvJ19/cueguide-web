@@ -30,6 +30,7 @@ export default function OnboardingPage() {
   const [pillColor, setPillColor] = useState('blue');
   const [pillShape, setPillShape] = useState('small round');
   const [medicationTime, setMedicationTime] = useState('08:00');
+  const [refillDate, setRefillDate] = useState('');
   const [location, setLocation] = useState('the yellow pill box on the kitchen counter');
 
   const canContinueCaregiver = caregiverName.trim().length > 0;
@@ -101,6 +102,7 @@ export default function OnboardingPage() {
         times: [medicationTime.trim()],
         instructions: 'Offer with water. Ask gently and do not pressure.',
         location: location.trim(),
+        refillDate: refillDate.trim() || undefined,
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -241,6 +243,10 @@ export default function OnboardingPage() {
               <input type="text" value={pillShape} onChange={(event) => setPillShape(event.target.value)} placeholder="small round" />
             </label>
           </div>
+          <label>
+            <span>Refill date <em>optional</em></span>
+            <input type="date" value={refillDate} onChange={(event) => setRefillDate(event.target.value)} />
+          </label>
           <label>
             <span>Patient location cue</span>
             <input

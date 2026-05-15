@@ -32,6 +32,8 @@ updated: 2026-05-15
 - UI/UX Trust standard: keep production routes in one clinical shell, expose only real care destinations in navigation/command palette, and avoid fake enterprise surfaces that make the app feel like a prototype.
 - Product Trust standard: technical ElevenLabs delivery is not the same as human voice acceptance. Settings must show human review pending until a person marks the voice accepted for the walkthrough.
 - Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
+- Patient medication prompts should keep the headline to one action. Location belongs in secondary patient guidance or Help text so dementia-first screens do not become giant multi-sentence blocks.
+- Daily caregiver use needs practical data controls. Local fallback mode should offer export/backup and never imply cloud database proof before authenticated Supabase save/load/RLS is verified.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
 - Market review reinforces Som's concern: reminder apps and caregiver alerts already exist, so CueGuide must differentiate through dementia-safe patient guidance, caregiver event interpretation, and honest medication-confirmation language.
 - `Done` is patient confirmation only, not proof the pill was swallowed. Keep this explicit in caregiver Session/Reports and never imply verified administration without hardware, caregiver observation, or another confirmation source.
@@ -88,6 +90,7 @@ Recent verified checks:
 - Fresh-user onboarding production deploy `dpl_3i1nbfSpDKHbURc6E3XV9in2oZDE` passed strict smoke with ElevenLabs `200 audio/mpeg`, local onboarding coverage, exact medication naming, and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - UI/UX Trust Refactor local gate passed on 2026-05-15 with focused caregiver view modules, clinical secondary routes, real-route command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - UI/UX Trust Refactor production deploy `dpl_HbKpCDmC2n3oxAFPoHtMvWGiW66k` passed strict smoke with ElevenLabs `200 audio/mpeg`, mobile no-overflow, and production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
+- Daily Use Refinement local gate passed on 2026-05-15 with refill dates, separated patient prompt/location guidance, local backup export, full gates, local smoke, and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 
 ## Obsidian Maintenance Rules
 

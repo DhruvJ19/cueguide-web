@@ -827,3 +827,62 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[decisions#2026-05-15 - Caregiver Views Are Focused Operations Modules]], [[dashboard#Release Evidence]], [[todo#P2 - Product Polish]]
+
+## 2026-05-15 - Daily Use Refinement Local Gate
+
+Status: passed locally; production deploy pending.
+
+Why this pass happened:
+
+- The next QA lens was signup-to-daily-use, not another visual-only pass.
+- Research and Som transcript review pointed to three practical gaps: medication prompts were still too dense, refill management was incomplete, and local fallback data needed a caregiver-manageable export path.
+
+Code changes verified:
+
+- Medication prompt headline now contains one action only; medication location appears as separate patient guidance.
+- Onboarding and medication edit now include `Refill date`.
+- Settings now includes `Export local backup` for local fallback data: patient, medications, routines, completions, alerts, settings, and voice review state.
+- Local backup logic is covered in the careflow test suite.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Smoke evidence:
+
+- Target URL: `http://127.0.0.1:3006`
+- Medication created and edited: `Smoke Omega 1778840415040`
+- Local smoke observed ElevenLabs `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+
+Rendered QA:
+
+- Browser plugin connection timed out, so direct Playwright was used.
+- Full local flow passed: signup -> local setup -> onboarding with refill date -> dashboard -> edit medication refill/schedule -> patient session -> Help -> Skip -> Done -> caregiver session -> Settings export.
+- Patient headline: `Mom, would you like to take the small oval white pill with a sip of water?`
+- Patient guidance: `The small oval white pill is in the Sunday pill organizer by the kettle. Take your time.`
+- Local backup download filename matched `cueguide-local-backup-YYYY-MM-DD.json`.
+- Mobile onboarding and mobile Settings rendered without horizontal overflow.
+- Screenshot folder outside the repo: `/tmp/cueguide-daily-use-refinement-20260515-local-v3`.
+
+Research applied:
+
+- Alzheimer's Association communication/agitation guidance: one step, calm permission-shaped language.
+- AARP medication management guidance: caregiver workflows need medication details, refill coordination, and practical review.
+- Hero and Medisafe competitor signals: missed-dose/refill/caregiver notifications are table stakes, so CueGuide must differentiate with dementia-safe guidance and honest confirmation limits.
+- HHS/FTC health app guidance: data controls and privacy claims must stay honest.
+
+Known caveats:
+
+- Production deploy and strict production smoke are still pending for this refinement.
+- Human-ear ElevenLabs voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[source-map#Market And Competitor Signals]], [[decisions#2026-05-15 - Patient Medication Prompts Separate Action From Location]], [[todo#P2 - Product Polish]]

@@ -19,6 +19,7 @@ updated: 2026-05-15
 - Current trust pass: auth/setup and local QA target repaired. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
 - Current UI/UX refactor: caregiver dashboard split into focused view modules and production secondary routes cleaned up. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - Latest production UI/UX refactor passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
+- Latest daily-use refinement local gate added refill dates, shorter patient prompts, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 
 ## Memory
 
@@ -74,6 +75,7 @@ updated: 2026-05-15
 - Latest first-run production gate: [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
 - Latest UI/UX refactor local gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 - Latest UI/UX refactor production gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
+- Latest daily-use refinement gate: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 
 ## Context
 

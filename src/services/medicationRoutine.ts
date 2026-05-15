@@ -33,8 +33,7 @@ export function getMedicationVisual(medication: Medication) {
 
 export function getMedicationPrompt(medication: Medication, patient: PatientProfile) {
   const visual = getMedicationVisual(medication);
-  const location = medication.location || 'the yellow pill box on the kitchen counter';
-  return `${patient.preferredName}, would you like to take the ${visual} with a sip of water? It is in ${location}.`;
+  return `${patient.preferredName}, would you like to take the ${visual} with a sip of water?`;
 }
 
 export function buildMedicationRoutine({
@@ -59,7 +58,7 @@ export function buildMedicationRoutine({
     medicationId: medication.id,
     position: index + 1,
     instruction: getMedicationPrompt(medication, patient),
-    helpText: `Look for the ${getMedicationVisual(medication)} in ${medication.location || 'the yellow pill box'}. Take your time.`,
+    helpText: `The ${getMedicationVisual(medication)} is in ${medication.location || 'the yellow pill box'}. Take your time.`,
     icon: 'Pill',
     estimatedSeconds: 120,
   }));

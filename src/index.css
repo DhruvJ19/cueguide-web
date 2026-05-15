@@ -1525,6 +1525,34 @@ body:not(.light-mode) .cg-alert {
   padding: 13px;
 }
 
+.cg-data-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #d7e4ee;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.cg-data-actions button {
+  min-height: 42px;
+  border-radius: 8px;
+  border: 1px solid #bfd1de;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  color: #0f4f46;
+  background: #ffffff;
+}
+
+.cg-data-actions small {
+  color: #667085;
+  line-height: 1.4;
+}
+
 .cg-settings-board {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2049,6 +2077,14 @@ body:not(.light-mode) .cg-alert {
   margin-bottom: 24px;
 }
 
+.patient-guidance {
+  margin: -4px 0 24px;
+  max-width: 760px;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.35;
+  color: #375447;
+}
+
 .patient-actions {
   display: grid;
   grid-template-columns: 1.1fr 1fr 1fr 1.25fr;
@@ -2187,8 +2223,14 @@ body:not(.light-mode) .cg-alert {
   .cg-med-table-head,
   .cg-form-row,
   .patient-actions,
+  .cg-data-actions,
   .patient-moods {
     grid-template-columns: 1fr;
+  }
+
+  .cg-data-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .cg-med-table-head {

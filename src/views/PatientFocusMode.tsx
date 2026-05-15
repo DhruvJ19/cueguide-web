@@ -44,6 +44,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   const currentStep = routine.steps[currentStepIndex];
   const currentCue = cueData?.steps[currentStepIndex];
   const completedCount = countCompletedSteps(stepEvents);
+  const patientStepGuidance = helpText || (currentStep?.medicationId ? currentCue?.help_text || currentStep.helpText : null);
 
   const promptContext = useMemo(() => {
     const today = new Date();
@@ -238,7 +239,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       <div className="patient-panel">
         <p className="patient-kicker">Step {currentStepIndex + 1} of {routine.steps.length}</p>
         <h1>{currentCue?.text || currentStep.instruction}</h1>
-        {helpText && <p className="patient-help">{helpText}</p>}
+        {patientStepGuidance && <p className={helpText ? 'patient-help' : 'patient-guidance'}>{patientStepGuidance}</p>}
         <div className="patient-actions">
           <button onClick={handleReadAloud}><Volume2 size={26} /> Read aloud</button>
           <button onClick={handleHelp}><HelpCircle size={26} /> Help</button>

@@ -249,3 +249,23 @@ Decision: Security checks now fail when provider-secret-style names use browser-
 Reasoning: Local ignored env files and nested mobile examples can silently teach the wrong integration pattern. The root web app and future Expo port must keep ElevenLabs, AI, and SMS provider secrets server-side.
 
 Linked: [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]], [[runbook#Stop Conditions]], [[todo#P1 - Production Hardening]]
+
+## 2026-05-15 - Caregiver Views Are Focused Operations Modules
+
+#decision #ux #architecture #maintainability
+
+Decision: Keep `CaregiverDashboard` as the stable route shell, but move Today, Medications, Routines, Session, Reports, and Settings into focused internal view modules.
+
+Reasoning: The previous single-file dashboard made every UI pass slower and encouraged repetitive card layouts. Focused modules make the caregiver product easier to refine screen by screen while preserving routes, stores, smoke coverage, and the web-first production target.
+
+Linked: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]], [[context#Project Structure]], [[todo#P2 - Product Polish]]
+
+## 2026-05-15 - Navigation Shows Real Care Surfaces Only
+
+#decision #ux #product
+
+Decision: Command palette and visible navigation should link only to real CueGuide care surfaces, not placeholder analytics, devices, compliance, or report-generation screens.
+
+Reasoning: Fake enterprise destinations make the app feel like generic AI slop. For stakeholder trust, every action surfaced in navigation must map to a real caregiver or patient workflow.
+
+Linked: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]], [[memory#Product Memory]], [[plans#North Star]]

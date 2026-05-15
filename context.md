@@ -20,6 +20,7 @@ updated: 2026-05-15
 - Current production-revamp working set also includes Obsidian notes, readiness UI, smoke QA, and Supabase RLS migration work.
 - Current UI direction: [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] with light caregiver operations screens and a separate warm patient Focus Mode.
 - Current Product Trust pass separates ElevenLabs API readiness from human voice acceptance and keeps medication prompts question-shaped.
+- Current UI/UX Trust refactor splits caregiver screens into focused view modules and keeps production secondary routes in the same clinical shell.
 
 ## Technical Stack
 
@@ -38,6 +39,7 @@ updated: 2026-05-15
 | Path | Purpose |
 | --- | --- |
 | `src/views/CaregiverDashboard.tsx` | Main caregiver shell: Today, Medications, Routines, Live Session, Reports, Settings. |
+| `src/components/caregiver/DashboardViews.tsx` | Focused caregiver view modules used by the main shell: Today, Medications, Routines, Session, Reports, and Settings. |
 | `src/views/PatientFocusMode.tsx` | Patient one-step-at-a-time experience. |
 | `src/components/caregiver/CaregiverPrimitives.tsx` | Shared caregiver UI primitives for sections, stats, empty states, and readiness rows. |
 | `src/components/AuthLayout.tsx` | Shared light clinical auth/setup shell for login, signup, and onboarding. |
@@ -51,6 +53,7 @@ updated: 2026-05-15
 | `supabase/migrations/20260513093902_medication_alert_production_schema.sql` | Medication, alerts, and production data shape. |
 | `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` | Pending RLS/realtime hardening migration created for production policy coverage. |
 | `scripts/smoke-careflow.ts` | Browser smoke flow for medication setup, Focus Mode, alerts/session summary, voice, and mobile overflow. |
+| `src/components/CommandPalette.tsx` | Keyboard navigation for real care destinations only; no fake analytics/device/compliance routes. |
 | `.mcp.json` | Read-only Supabase MCP project config; user OAuth/auth is still required before tools are available. |
 | `Som_Evaluation/` | Som/Suman transcripts, specs, architecture, demo prep. |
 | `CueGuide/` | Nested Expo app, later mobile port target. |

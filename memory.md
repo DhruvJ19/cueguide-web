@@ -29,6 +29,7 @@ updated: 2026-05-15
 - The accepted UI direction is **Hybrid Care OS**: light clinical caregiver operations UI, separate warm dementia-first patient mode, no dark card soup, no generic AI-demo styling.
 - Second-pass UI quality standard: caregiver screens must act like operations surfaces, not static cards. Use attention queues, next-dose/refill states, session timelines, narrative reports, and grouped readiness rows.
 - UI Trust standard: reduce explanation copy until the next caregiver action is obvious. Today should lead with next medication, start session, attention state, and schedule; Reports should show care interpretation, not system plumbing.
+- UI/UX Trust standard: keep production routes in one clinical shell, expose only real care destinations in navigation/command palette, and avoid fake enterprise surfaces that make the app feel like a prototype.
 - Product Trust standard: technical ElevenLabs delivery is not the same as human voice acceptance. Settings must show human review pending until a person marks the voice accepted for the walkthrough.
 - Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
@@ -85,6 +86,7 @@ Recent verified checks:
 - Product Trust QA production deploy `dpl_HZcXhLtPUhh4pBGiqSXrjMpJeVjQ` passed strict smoke with ElevenLabs `200 audio/mpeg`, confirmation-limit assertions, and no mobile overflow. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - Fresh-user onboarding trust pass verified signup -> local setup -> first medication -> dashboard on `127.0.0.1:3006`; dashboard showed `Morning Smoke Starter Med` and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - Fresh-user onboarding production deploy `dpl_3i1nbfSpDKHbURc6E3XV9in2oZDE` passed strict smoke with ElevenLabs `200 audio/mpeg`, local onboarding coverage, exact medication naming, and no mobile overflow. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
+- UI/UX Trust Refactor local gate passed on 2026-05-15 with focused caregiver view modules, clinical secondary routes, real-route command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 
 ## Obsidian Maintenance Rules
 

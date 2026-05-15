@@ -733,3 +733,56 @@ Known caveats:
 - Human-ear voice acceptance is still pending.
 - Authenticated Supabase cloud save/load/RLS proof remains pending.
 - `cueguide-test.png` remains unrelated local work and must not be staged.
+
+## 2026-05-15 - UI/UX Trust Refactor Local Gate
+
+Status: passed locally; production deploy pending.
+
+Why this pass happened:
+
+- The caregiver UI still felt too crowded, wordy, and uneven after earlier passes.
+- The next trust blocker was not a new feature; it was structure, visual hierarchy, real navigation surfaces, and removing leftover starter/AI-demo residue.
+
+Code changes verified:
+
+- `src/views/CaregiverDashboard.tsx` now delegates Today, Medications, Routines, Session, Reports, and Settings to focused caregiver view components.
+- `src/components/caregiver/DashboardViews.tsx` centralizes the main caregiver screen layouts and keeps the public route behavior stable.
+- The command palette now exposes real care destinations only: Today, Medications, Routines, Session, Reports, Settings, and Patient mode.
+- Privacy, Terms, Not Found, Auth Callback, and error surfaces now use the light clinical CueGuide shell instead of dark/glass starter styling.
+- App metadata now describes caregiver medication support instead of an AI companion starter app.
+- Patient Focus Mode button hierarchy, spacing, and type sizing were tightened without changing the one-action-at-a-time workflow.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Smoke evidence:
+
+- Target URL: `http://127.0.0.1:3006`
+- Medication created and edited: `Smoke Omega 1778835520950`
+- Local smoke observed ElevenLabs `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+
+Rendered QA:
+
+- Browser plugin connection timed out, so direct Playwright was used for rendered QA.
+- Desktop Today, Command Palette, Medications, Reports, Settings, and Session rendered without page errors, framework overlays, or horizontal overflow.
+- Mobile Today, Medications, Signup, Onboarding, and Settings rendered without horizontal overflow.
+- Tablet Patient Focus Mode rendered greeting and step prompt with Read aloud, Help, Skip, and Done visible.
+- Privacy, Terms, and Not Found routes rendered with the clinical shell.
+- Screenshot folder outside the repo: `/tmp/cueguide-qa-20260515-ui-trust-refactor-local-final`.
+
+Known caveats:
+
+- Production deploy and strict production smoke are still pending for this refactor.
+- Human-ear ElevenLabs voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[decisions#2026-05-15 - Caregiver Views Are Focused Operations Modules]], [[todo#P2 - Product Polish]], [[context#Project Structure]]

@@ -42,6 +42,8 @@ updated: 2026-05-15
 - [x] Replace the dark card-heavy caregiver shell with the [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] light clinical UI direction.
 - [x] Upgrade the caregiver shell from visual cleanup into operational surfaces: attention queue, next-dose/refill medication rows, Live Session timeline, narrative Reports, and grouped readiness Settings.
 - [x] Run the UI Trust Pass: reduce crowded copy, compact Today, simplify mobile header, make Reports caregiver-focused, and redeploy with strict production smoke.
+- [x] Refactor the caregiver dashboard into focused Today, Medications, Routines, Session, Reports, and Settings view modules.
+- [x] Remove remaining dark/glass starter styling from production secondary routes and command palette.
 - [x] Tighten README so it describes CueGuide, not the original AI Studio starter.
 - [x] Add [[runbook]] for demo/test/deploy steps after browser QA passes.
 - [x] Add [[qa-log]] for dated verification evidence.
@@ -86,3 +88,4 @@ updated: 2026-05-15
 - [x] Deployed Product Trust QA and Safety Pass and verified strict production smoke with ElevenLabs plus confirmation-limit assertions. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - [x] Verified fresh-user local setup with a real first medication and dashboard naming. See [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - [x] Deployed fresh-user onboarding hardening and verified strict production smoke. See [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
+- [x] Completed the UI/UX Trust Refactor local gate: focused caregiver view modules, cleaner production secondary routes, clinical command palette, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].

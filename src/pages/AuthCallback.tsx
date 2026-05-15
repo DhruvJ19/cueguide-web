@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db, isSupabaseConfigured, supabase } from '../services/supabase';
-import { Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -43,24 +43,31 @@ export default function AuthCallbackPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-        <div className="glass-panel p-10 max-w-md w-full border border-red-500/20 text-center">
-          <h1 className="text-xl font-semibold text-content mb-3">Authentication failed</h1>
-          <p className="text-red-400 text-sm mb-6">{error}</p>
-          <a href="/login" className="text-indigo-500 font-medium hover:underline">
-            Back to login
-          </a>
-        </div>
-      </div>
+      <main className="legal-shell">
+        <section className="legal-card legal-card-narrow" aria-labelledby="auth-failed-title">
+          <div className="legal-brand">
+            <div><AlertTriangle size={20} /></div>
+            <span>CueGuide</span>
+          </div>
+          <p className="cg-eyebrow">Sign-in issue</p>
+          <h1 id="auth-failed-title">Authentication failed</h1>
+          <p className="legal-lead">{error}</p>
+          <div className="legal-actions">
+            <a href="/login">Back to login</a>
+          </div>
+        </section>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg">
-      <div className="text-center">
-        <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-4" />
-        <p className="text-content-muted text-sm">Signing you in...</p>
-      </div>
-    </div>
+    <main className="legal-shell">
+      <section className="legal-card legal-card-narrow auth-callback-card" aria-label="Signing in">
+        <Loader2 size={34} />
+        <p className="cg-eyebrow">CueGuide</p>
+        <h1>Signing you in</h1>
+        <p className="legal-lead">Preparing the caregiver workspace.</p>
+      </section>
+    </main>
   );
 }

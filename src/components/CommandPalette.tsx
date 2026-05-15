@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Command, Activity, Calendar, Settings, Shield, User, X } from 'lucide-react';
+import { Search, Calendar, ClipboardList, FileText, LayoutDashboard, Pill, Radio, Settings, User, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { useSettingsStore } from '../store/settingsStore';
 
 interface Props {
   isOpen: boolean;
@@ -32,14 +31,13 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
   }, [isOpen, onClose]);
 
   const commands = [
-    { id: 'nav-routines', icon: <Calendar />, title: 'Manage Routines', section: 'Navigation', action: () => onNavigate('routines') },
-    { id: 'nav-analytics', icon: <Activity />, title: 'View Analytics', section: 'Navigation', action: () => onNavigate('analytics') },
-    { id: 'nav-devices', icon: <Command />, title: 'Manage Devices', section: 'Navigation', action: () => onNavigate('devices') },
-    { id: 'nav-compliance', icon: <Shield />, title: 'PHI Compliance', section: 'Navigation', action: () => onNavigate('compliance') },
-    { id: 'nav-reports', icon: <Search />, title: 'Generate Reports', section: 'Navigation', action: () => onNavigate('reports') },
-    
-    { id: 'action-patient', icon: <User size={18} />, title: 'Switch to Patient Mode', section: 'Actions', action: () => setRole('patient') },
-    { id: 'action-logout', icon: <Shield size={18} />, title: 'View Privacy Settings', section: 'Actions', action: () => onNavigate('compliance') },
+    { id: 'nav-today', icon: <LayoutDashboard />, title: 'Care overview', section: 'Navigation', action: () => onNavigate('today') },
+    { id: 'nav-medications', icon: <Pill />, title: 'Medications', section: 'Navigation', action: () => onNavigate('medications') },
+    { id: 'nav-routines', icon: <Calendar />, title: 'Routines', section: 'Navigation', action: () => onNavigate('routines') },
+    { id: 'nav-session', icon: <Radio />, title: 'Live session', section: 'Navigation', action: () => onNavigate('session') },
+    { id: 'nav-reports', icon: <FileText />, title: 'Reports', section: 'Navigation', action: () => onNavigate('reports') },
+    { id: 'nav-settings', icon: <Settings />, title: 'Settings', section: 'Navigation', action: () => onNavigate('settings') },
+    { id: 'action-patient', icon: <User size={18} />, title: 'Open patient mode', section: 'Actions', action: () => setRole('patient') },
   ];
 
   interface CommandItem {
@@ -64,33 +62,32 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-[999]"
+            className="command-backdrop"
           />
-          <div className="fixed inset-0 flex items-start justify-center pt-[15vh] z-[1000] pointer-events-none">
+          <div className="command-layer">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-              className="w-full max-w-2xl bg-panel backdrop-blur-2xl border border-line rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
+              className="command-shell"
             >
-              <div className="flex items-center px-4 py-4 border-b border-line relative">
-                <Search className="text-content-faint mr-3" size={20} />
+              <div className="command-search-row">
+                <Search size={20} />
                 <input
                   ref={inputRef}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Type a command or search..."
-                  className="w-full bg-transparent text-lg text-content placeholder:text-content-faint outline-none font-light"
+                  placeholder="Find a care screen"
                 />
-                <button onClick={onClose} className="p-1 rounded-md text-content-faint hover:text-content hover:bg-panel-hover transition-colors">
+                <button onClick={onClose}>
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="max-h-[60vh] overflow-y-auto p-2 custom-scrollbar">
+              <div className="command-results">
                 {filteredCommands.length === 0 ? (
-                  <div className="p-8 text-center text-content-muted">No results found.</div>
+                  <div className="command-empty">No results found.</div>
                 ) : (
                   Object.entries(
                     filteredCommands.reduce((acc, cmd) => {
@@ -98,11 +95,9 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                       return acc;
                     }, {} as Record<string, typeof commands>)
                   ).map(([section, cmds]) => (
-                    <div key={section} className="mb-4">
-                      <div className="px-3 py-2 text-xs font-bold uppercase tracking-widest text-indigo-400">
-                        {section}
-                      </div>
-                      <div className="space-y-1">
+                    <div key={section} className="command-section">
+                      <div className="command-section-label">{section}</div>
+                      <div className="command-list">
                         {cmds.map((cmd) => (
                           <button
                             key={cmd.id}
@@ -110,9 +105,9 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                               cmd.action();
                               onClose();
                             }}
-                            className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-300 text-content transition-all group text-left"
+                            className="command-item"
                           >
-                            <span className="text-content-muted group-hover:text-indigo-400 mr-3 transition-colors">
+                            <span>
                               {React.createElement(cmd.icon.type, { size: 18 })}
                             </span>
                             <span className="font-medium">{cmd.title}</span>
@@ -123,9 +118,9 @@ export default function CommandPalette({ isOpen, onClose, onNavigate }: Props) {
                   ))
                 )}
               </div>
-              <div className="px-4 py-3 bg-panel-hover border-t border-line text-xs text-content-faint flex items-center justify-between">
-                <span>Use <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">↑</kbd> <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">↓</kbd> to navigate</span>
-                <span>Press <kbd className="bg-line px-1.5 py-0.5 rounded font-mono">esc</kbd> to close</span>
+              <div className="command-footer">
+                <span>Search care screens</span>
+                <span>Press <kbd>esc</kbd> to close</span>
               </div>
             </motion.div>
           </div>

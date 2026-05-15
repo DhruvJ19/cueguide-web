@@ -42,18 +42,20 @@ type CaregiverInitialTab = 'today' | 'medications' | 'routines' | 'session' | 'r
 
 function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-8 text-content">
-      <div className="glass-panel p-8 max-w-md w-full border border-red-500/30">
-        <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-xl flex items-center justify-center mb-6">
-           <AlertTriangle size={24} />
+    <main className="legal-shell">
+      <section className="legal-card legal-card-narrow" aria-labelledby="app-error-title">
+        <div className="legal-brand">
+          <div><AlertTriangle size={20} /></div>
+          <span>CueGuide</span>
         </div>
-        <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
-        <p className="text-content-muted mb-6 text-sm">{error.message}</p>
-        <button id="error-fallback-retry-btn" onClick={resetErrorBoundary} className="w-full py-3 bg-content text-bg font-bold rounded-xl hover:opacity-80 transition-opacity">
+        <p className="cg-eyebrow">Care workspace</p>
+        <h1 id="app-error-title">Something went wrong</h1>
+        <p className="legal-lead">{error.message}</p>
+        <button id="error-fallback-retry-btn" onClick={resetErrorBoundary} className="cg-primary">
           Try again
         </button>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 

@@ -17,6 +17,7 @@ updated: 2026-05-15
 - Current priority: confirm live ElevenLabs audio, production data posture, and stakeholder readiness. See [[todo#P0 - Demo-Critical]].
 - Product Trust priority: keep voice acceptance honest, patient prompts question-shaped, and caregiver walkthrough evidence current. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
 - Current trust pass: auth/setup and local QA target repaired. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
+- Current UI/UX refactor: caregiver dashboard split into focused view modules and production secondary routes cleaned up. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 
 ## Memory
 
@@ -70,6 +71,7 @@ updated: 2026-05-15
 - Latest production product-trust gate: [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 - Latest first-run trust gate: [[qa-log#2026-05-15 - Fresh User Onboarding Trust Pass]].
 - Latest first-run production gate: [[qa-log#2026-05-15 - Fresh User Onboarding Production Deploy]].
+- Latest UI/UX refactor local gate: [[qa-log#2026-05-15 - UI/UX Trust Refactor Local Gate]].
 
 ## Context
 

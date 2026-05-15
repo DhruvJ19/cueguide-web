@@ -22,6 +22,7 @@ updated: 2026-05-15
 - Latest daily-use refinement local gate added refill dates, shorter patient prompts, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Latest daily-use production deploy passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Supabase proof gate exists but needs a normal test caregiver account before cloud readiness can be claimed. See [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
+- Latest multi-POV UI trust refinement passed locally and is ready for production deploy/smoke. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
 
 ## Memory
 
@@ -80,6 +81,7 @@ updated: 2026-05-15
 - Latest daily-use refinement gate: [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Latest daily-use production gate: [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Latest Supabase proof gate: [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
+- Latest multi-POV UI refinement gate: [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
 
 ## Context
 

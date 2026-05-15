@@ -21,6 +21,7 @@ updated: 2026-05-15
 - Current UI direction: [[decisions#2026-05-14 - Hybrid Care OS Visual Direction|Hybrid Care OS]] with light caregiver operations screens and a separate warm patient Focus Mode.
 - Current Product Trust pass separates ElevenLabs API readiness from human voice acceptance and keeps medication prompts question-shaped.
 - Current UI/UX Trust refactor splits caregiver screens into focused view modules and keeps production secondary routes in the same clinical shell.
+- Current multi-POV UI refinement favors row-based care operations surfaces over repeated cards, with Patient Focus Mode showing one dominant `Done` action plus visible support controls.
 
 ## Technical Stack
 
@@ -80,6 +81,7 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 - `VITE_USE_ELEVENLABS` is public feature-gate config and must be trimmed before comparison.
 - `ELEVENLABS_API_KEY` is server-only.
 - `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
+- `ELEVENLABS_ENABLE_VOICE_SETTINGS` defaults to off because the current production key accepts plain TTS but rejects forwarded `voice_settings`; gentle tone is handled through prompt wording and playback rate unless this is explicitly enabled.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.

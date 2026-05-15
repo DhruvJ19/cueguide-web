@@ -241,10 +241,10 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
         <h1>{currentCue?.text || currentStep.instruction}</h1>
         {patientStepGuidance && <p className={helpText ? 'patient-help' : 'patient-guidance'}>{patientStepGuidance}</p>}
         <div className="patient-actions">
+          <button className="patient-done" onClick={handleDone}><Check size={30} /> Done</button>
           <button onClick={handleReadAloud}><Volume2 size={26} /> Read aloud</button>
           <button onClick={handleHelp}><HelpCircle size={26} /> Help</button>
           <button onClick={handleSkip}><SkipForward size={26} /> Skip</button>
-          <button className="patient-done" onClick={handleDone}><Check size={30} /> Done</button>
         </div>
         <p className="patient-note">{completedCount} completed so far. There is no rush.</p>
       </div>

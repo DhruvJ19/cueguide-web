@@ -309,3 +309,23 @@ Decision: End meaningful project responses with a compact operating loop: curren
 Reasoning: CueGuide needs constant convergence toward production quality. A repeated senior-product loop keeps every sprint tied to evidence, user value, architecture, testing, and release readiness instead of drifting into isolated fixes.
 
 Linked: [[memory#User Preferences]], [[todo#P0 - Demo-Critical]], [[plans#Quality Gates]]
+
+## 2026-05-15 - Patient Focus Mode Prioritizes The Primary Action
+
+#decision #ux #accessibility #som
+
+Decision: Patient Focus Mode should visually prioritize `Done` as the one primary action, with `Read aloud`, `Help`, and `Skip` available as secondary support controls.
+
+Reasoning: Dementia-first screens need one obvious path without hiding safety/support options. Som's guidance favors calm navigation and asking rather than ordering; a dominant confirmation action plus visible support controls is clearer than four equal-weight buttons.
+
+Linked: [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]], [[source-map#Som Feedback]], [[memory#Product Memory]]
+
+## 2026-05-15 - ElevenLabs Settings Forwarding Is Gated
+
+#decision #voice #production #qa
+
+Decision: Do not forward ElevenLabs `voice_settings` by default. Only enable forwarding with `ELEVENLABS_ENABLE_VOICE_SETTINGS=true` after strict smoke proves the selected account, key, voice, and model still return `audio/mpeg`.
+
+Reasoning: Production testing showed plain TTS returns `200 audio/mpeg`, while the same endpoint returns `401` when `voice_settings` are forwarded. Voice delivery is the hard production requirement; gentle tone remains controlled by prompt wording and playback rate until settings forwarding is proven safe.
+
+Linked: [[production-voice#Current Voice]], [[runbook#Production Voice]], [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]]

@@ -25,6 +25,7 @@ Acceptance is not just technical playback. The voice must pass Som's written sta
 | Voice | Bella - Professional, Bright, Warm |
 | Voice id | `hpp4J3VqNfWAUOO0d1Us` |
 | Model | `eleven_flash_v2_5` |
+| Voice settings forwarding | Off by default; enable only with `ELEVENLABS_ENABLE_VOICE_SETTINGS=true` after strict smoke proves `audio/mpeg` |
 | Human review | Pending until marked accepted in Settings |
 
 ## Tone Rules
@@ -37,6 +38,7 @@ Acceptance is not just technical playback. The voice must pass Som's written sta
 - Medication prompts should sound like gentle navigation: calm, specific, and non-scolding.
 - Trigger audio from explicit `Read aloud` actions so the patient controls when voice plays and one walkthrough does not overload the voice provider.
 - Treat `audio/mpeg` API success as delivery proof only. Human acceptance must be recorded separately before calling voice quality accepted.
+- Do not forward ElevenLabs `voice_settings` unless the selected account/key/model accepts them. Current production proof shows plain TTS succeeds while forwarded settings can return `401`, so prompt wording and playback rate remain the stable gentle-tone controls.
 
 ## Source
 

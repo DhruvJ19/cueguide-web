@@ -34,6 +34,8 @@ updated: 2026-05-15
 - Product Trust standard: technical ElevenLabs delivery is not the same as human voice acceptance. Settings must show human review pending until a person marks the voice accepted for the walkthrough.
 - Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
 - Patient medication prompts should keep the headline to one action. Location belongs in secondary patient guidance or Help text so dementia-first screens do not become giant multi-sentence blocks.
+- Patient Focus Mode should make `Done` the dominant visual action while keeping `Read aloud`, `Help`, and `Skip` visible as secondary support controls.
+- Caregiver screens should keep moving toward row-based operations surfaces. Repeated stat/card blocks are acceptable only when they improve scanning; otherwise use queues, rows, and concise care signals.
 - Daily caregiver use needs practical data controls. Local fallback mode should offer export/backup and never imply cloud database proof before authenticated Supabase save/load/RLS is verified.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
 - Market review reinforces Som's concern: reminder apps and caregiver alerts already exist, so CueGuide must differentiate through dementia-safe patient guidance, caregiver event interpretation, and honest medication-confirmation language.
@@ -76,6 +78,7 @@ Recent verified checks:
 - Vite build uses manual vendor chunks for Supabase, motion, charts, PDF, AI, and general vendor code; the large-bundle warning is cleared.
 - Local hardening smoke at `127.0.0.1:3004` passed the full caregiver medication loop, patient action logging, report view, and mobile overflow check. See [[qa-log#2026-05-14 - Production-Hardening Local Gate]].
 - Production smoke at `https://cueguide-web.vercel.app` passed strict ElevenLabs verification with six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Deploy Smoke]].
+- Current production ElevenLabs key/model accepts plain TTS but can reject forwarded `voice_settings` with `401`. Keep settings forwarding off unless `ELEVENLABS_ENABLE_VOICE_SETTINGS=true` is proven by strict smoke.
 - Production voice hardening deploy `dpl_9coWq2n2muPJoHihUN5XbU1nkxqU` passed strict smoke with Bella selected and six `200 audio/mpeg` TTS responses. See [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].
 - Stakeholder alpha deploy `dpl_C1ScBDEzNWq57dXvrVe5NSWqe5nm` passed strict production smoke with explicit-Read-aloud ElevenLabs audio and no mobile overflow. See [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
 - Hybrid Care OS UI turnaround passed local gates, local care-flow smoke, screenshot QA, mobile/tablet overflow checks, and production ElevenLabs endpoint verification. See [[qa-log#2026-05-14 - Hybrid Care OS UI Turnaround Local Gate]].
@@ -95,6 +98,7 @@ Recent verified checks:
 - Daily Use Refinement local gate passed on 2026-05-15 with refill dates, separated patient prompt/location guidance, local backup export, full gates, local smoke, and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - Daily Use Refinement production deploy `dpl_C63RmJYmnWC6BBvv2uNBAP2JQTQ9` passed strict smoke, production rendered QA, ElevenLabs `200 audio/mpeg`, prompt/location split, and local backup export. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Supabase proof gate was added on 2026-05-15, type-checked, and blocked correctly without `CUEGUIDE_SUPABASE_TEST_EMAIL`. See [[runbook#Supabase Verification]].
+- Multi-POV UI Trust Refinement passed locally on 2026-05-15 with row-based Today/Reports/Settings refinements, patient primary-action hierarchy, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
 
 ## Obsidian Maintenance Rules
 

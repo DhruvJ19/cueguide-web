@@ -954,3 +954,58 @@ Known caveats:
 - The proof may expose schema mismatches when first run against the live project; those should be fixed before claiming cloud production readiness.
 
 Linked: [[runbook#Supabase Verification]], [[decisions#2026-05-15 - Supabase Proof Must Use Normal Auth]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Multi-POV UI Trust Refinement Local Gate
+
+Status: passed locally; production deploy pending.
+
+Audit lens:
+
+- Caregiver: Today now leads with next medication, start action, concise dose/alert/review/refill signals, and a row-based medication plan.
+- Patient: Focus Mode now makes `Done` the dominant action while keeping `Read aloud`, `Help`, and `Skip` visible.
+- Som/CTO: Reports and Session keep the confirmation-limit language; patient prompt remains question-shaped and non-commanding.
+- Buyer/devil's advocate: Settings now separates voice acceptance and cloud proof instead of implying production readiness.
+- UI critic: Reports moved from stat-card blocks to care-signal rows; Settings moved away from crowded two-column readiness cards.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `npm run proof:supabase`
+
+Observed:
+
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security checks passed with 0 vulnerabilities, 346 verified registry signatures, and 48 verified attestations.
+- Supply-chain dry run passed.
+- Local care-flow smoke passed at `http://127.0.0.1:3006`.
+- Smoke medications included `Smoke Omega 1778860084567`, `Smoke Omega 1778860287139`, and `Smoke Omega 1778860423103`.
+- Local fallback-mode smoke tolerated local ElevenLabs `401` and confirmed browser fallback path; strict production smoke still requires `audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- First-run local onboarding path reported `localOnboarding: true`.
+- `npm run proof:supabase` remained blocked as expected because `CUEGUIDE_SUPABASE_TEST_EMAIL` is missing.
+- Direct production TTS without forwarded `voice_settings` returned `200 audio/mpeg`.
+- Direct production TTS with forwarded `voice_settings` returned `401`, so the server now gates forwarding behind `ELEVENLABS_ENABLE_VOICE_SETTINGS=true`.
+
+Rendered QA:
+
+- Screenshot folder outside the repo: `/tmp/cueguide-multipov-refined-20260515`.
+- Desktop Today, Reports, Settings rendered without framework overlay or console errors.
+- Mobile Today rendered without horizontal overflow and now has `110px` bottom padding for fixed navigation.
+- Tablet Patient Focus Mode rendered without overflow; action order is `Done`, `Read aloud`, `Help`, `Skip`.
+- Browser plugin path timed out during setup, so Playwright was used as the validation fallback.
+
+Known caveats:
+
+- Production deploy and strict production smoke are still pending for this refinement.
+- Human-ear ElevenLabs voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[decisions#2026-05-15 - Patient Focus Mode Prioritizes The Primary Action]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

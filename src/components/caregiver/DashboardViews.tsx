@@ -91,7 +91,7 @@ export function TodayView({
   formatters: Pick<DashboardFormatters, 'formatStatus' | 'formatAlertSeverity'>;
 }) {
   return (
-    <div className="cg-content-grid">
+    <div className="cg-day-layout">
       <div className="cg-main-stack">
         <section className="cg-command-panel" aria-label="Medication guidance overview">
           <div className="cg-next-primary">
@@ -106,12 +106,12 @@ export function TodayView({
               <Pill size={18} /> Start patient session
             </button>
           </div>
-          <div className="cg-summary-list" aria-label="Care status summary">
+          <div className="cg-command-queue" aria-label="Care status summary">
             <button type="button" className="cg-brief-row" onClick={() => onNavigate('medications')}>
               <Pill size={18} />
               <span>
-                <strong>Medication list</strong>
-                <small>{activeDoseCount} scheduled dose{activeDoseCount === 1 ? '' : 's'} today</small>
+                <strong>{activeDoseCount} doses today</strong>
+                <small>Review schedule and pill cues</small>
               </span>
               <ChevronRight size={16} />
             </button>
@@ -119,21 +119,19 @@ export function TodayView({
               <Bell size={18} />
               <span>
                 <strong>{unreadAlertCount > 0 ? `${unreadAlertCount} alert${unreadAlertCount === 1 ? '' : 's'}` : 'No open alerts'}</strong>
-                <small>{needsReviewCount > 0 ? `${needsReviewCount} session${needsReviewCount === 1 ? '' : 's'} need review` : 'Patient events are quiet'}</small>
+                <small>{needsReviewCount > 0 ? `${needsReviewCount} session${needsReviewCount === 1 ? '' : 's'} need review` : 'No patient action needed'}</small>
               </span>
               <ChevronRight size={16} />
             </button>
+            <div className="cg-care-strip" aria-label="Care metrics">
+              <span><strong>{completedTodayCount}</strong> confirmed</span>
+              <span><strong>{unreadAlertCount + needsReviewCount}</strong> review</span>
+              <span><strong>{refillAttentionCount}</strong> refill</span>
+            </div>
           </div>
         </section>
 
-        <div className="cg-status-strip">
-          <StatCard label="Doses" value={`${activeDoseCount}`} note="today" tone="ready" />
-          <StatCard label="Confirmed" value={`${completedTodayCount}`} note="patient taps" tone="ready" />
-          <StatCard label="Review" value={`${unreadAlertCount + needsReviewCount}`} note="alerts" tone={unreadAlertCount + needsReviewCount > 0 ? 'attention' : 'ready'} />
-          <StatCard label="Refills" value={`${refillAttentionCount}`} note="soon" tone={refillAttentionCount > 0 ? 'attention' : 'muted'} />
-        </div>
-
-        <Section title="Today’s Schedule">
+        <Section title="Today’s medication plan">
           <div className="cg-schedule">
             {allRoutines.length === 0 && (
               <EmptyState
@@ -162,10 +160,10 @@ export function TodayView({
       </div>
 
       <aside className="cg-side-stack">
-        <Section title="Attention">
+        <Section title="Caregiver attention">
           <div className="cg-alert-list">
             {alerts.length === 0 && (
-              <EmptyState title="No alerts" body="Help, skipped steps, and long pauses will appear here." />
+              <EmptyState title="No alerts" body="Help, skip, and long-pause events will appear here." />
             )}
             {overdueRoutines.length > 0 && (
               <div className="cg-system-alert">
@@ -188,11 +186,13 @@ export function TodayView({
             ))}
           </div>
         </Section>
-        <Section title="Patient">
-          <div className="cg-profile">
+        <Section title="Patient context">
+          <div className="cg-profile cg-profile-compact">
             <div className="cg-avatar"><HeartPulse size={30} /></div>
-            <strong>{profile?.name}</strong>
-            <span>Stage: {profile?.stage}</span>
+            <div>
+              <strong>{profile?.name}</strong>
+              <span>Stage: {profile?.stage}</span>
+            </div>
             <p>{profile?.context}</p>
           </div>
         </Section>
@@ -492,6 +492,32 @@ export function ReportsView({
   formatters: Pick<DashboardFormatters, 'formatStatus'>;
 }) {
   const completedMedicationCount = medicationCompletions.filter((completion) => completion.status === 'completed').length;
+  const careSignals = [
+    {
+      label: 'Medication adherence',
+      value: adherenceLabel,
+      detail: medicationCompletions.length < 2 ? 'Needs more sessions' : `${completedMedicationCount} of ${medicationCompletions.length} recent sessions`,
+      icon: <CheckCircle2 size={20} />,
+    },
+    {
+      label: 'Help requests',
+      value: `${helpEvents.length}`,
+      detail: 'patient tapped Help',
+      icon: <Bell size={20} />,
+    },
+    {
+      label: 'Skipped steps',
+      value: `${skippedEvents.length}`,
+      detail: 'caregiver review',
+      icon: <ClipboardList size={20} />,
+    },
+    {
+      label: 'Common mood',
+      value: topMood,
+      detail: 'session mood',
+      icon: <HeartPulse size={20} />,
+    },
+  ];
 
   return (
     <div className="cg-content-grid cg-reports-layout">
@@ -511,31 +537,15 @@ export function ReportsView({
               <span style={{ width: `${medicationCompletions.length < 2 ? 18 : adherenceRate}%` }} />
             </div>
           </div>
-          <div className="cg-report-grid">
-            <div className="cg-report-card">
-              <CheckCircle2 size={22} />
-              <span>Medication adherence</span>
-              <strong>{adherenceLabel}</strong>
-              <small>{medicationCompletions.length < 2 ? 'Needs more sessions' : 'recent sessions'}</small>
-            </div>
-            <div className="cg-report-card">
-              <Bell size={22} />
-              <span>Help requests</span>
-              <strong>{helpEvents.length}</strong>
-              <small>patient tapped Help</small>
-            </div>
-            <div className="cg-report-card">
-              <ClipboardList size={22} />
-              <span>Skipped steps</span>
-              <strong>{skippedEvents.length}</strong>
-              <small>caregiver review</small>
-            </div>
-            <div className="cg-report-card">
-              <HeartPulse size={22} />
-              <span>Common mood</span>
-              <strong>{topMood}</strong>
-              <small>session mood</small>
-            </div>
+          <div className="cg-report-signal-list">
+            {careSignals.map((signal) => (
+              <div key={signal.label} className="cg-report-signal">
+                {signal.icon}
+                <span>{signal.label}</span>
+                <strong>{signal.value}</strong>
+                <small>{signal.detail}</small>
+              </div>
+            ))}
           </div>
           <div className="cg-safety-note cg-report-safety-note">
             <ShieldCheck size={18} />
@@ -583,7 +593,7 @@ export function ReportsView({
             <span><Pill size={16} /> Confirm the next scheduled dose</span>
             <span><Bell size={16} /> Review any Help or Skip events</span>
             <span><HeartPulse size={16} /> Watch mood after medication prompts</span>
-            <span><Volume2 size={16} /> Accept voice tone after hearing test</span>
+            <span><ClipboardList size={16} /> Update caregiver notes only if a pattern repeats</span>
           </div>
         </Section>
       </aside>
@@ -627,9 +637,9 @@ export function SettingsView({
       <Section title="Settings" eyebrow="Voice, data, alerts, privacy">
         <div className="cg-settings-summary">
           <div>
-            <p className="cg-eyebrow">Care loop</p>
-            <h3>{voiceReviewReady && readiness.events ? 'Ready for review' : 'Needs final checks'}</h3>
-            <p>Voice, data, AI, alerts, and privacy are tracked here.</p>
+            <p className="cg-eyebrow">Readiness</p>
+            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready for review' : 'Production proof pending'}</h3>
+            <p>{voiceReviewReady ? 'Voice is accepted. Cloud data proof and alert evidence remain visible below.' : 'Voice needs human hearing approval before production review.'}</p>
           </div>
           <button className="cg-primary" disabled={!readiness.voice} onClick={onPlayPrimaryVoice}>
             <Volume2 size={17} /> Play primary voice

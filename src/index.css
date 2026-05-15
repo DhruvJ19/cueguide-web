@@ -74,7 +74,7 @@ body {
   color: var(--content);
   transition: background-color 0.2s ease, color 0.2s ease;
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -635,7 +635,8 @@ body:not(.light-mode) .cg-toggle {
   padding: 24px 28px 34px;
 }
 
-.cg-content-grid {
+.cg-content-grid,
+.cg-day-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
   gap: 20px;
@@ -655,7 +656,7 @@ body:not(.light-mode) .cg-toggle {
   background: #ffffff;
   border: 1px solid #dbe3ee;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+  box-shadow: none;
 }
 
 body:not(.light-mode) .cg-command-panel,
@@ -669,7 +670,7 @@ body:not(.light-mode) .cg-routine-card {
 .cg-command-panel {
   padding: 16px;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  grid-template-columns: minmax(0, 1.16fr) minmax(260px, 0.84fr);
   gap: 14px;
   align-items: stretch;
 }
@@ -728,9 +729,38 @@ body:not(.light-mode) .cg-command-copy h2 {
   width: fit-content;
 }
 
+.cg-command-queue,
 .cg-summary-list {
   display: grid;
   gap: 10px;
+}
+
+.cg-care-strip {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  background: #dbe3ee;
+}
+
+.cg-care-strip span {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 10px;
+  background: #f8fafc;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.cg-care-strip strong {
+  color: #101828;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .cg-brief-row {
@@ -994,6 +1024,13 @@ body:not(.light-mode) .cg-routine-card h3 {
   gap: 8px;
 }
 
+.cg-schedule {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+}
+
 .cg-schedule-row,
 .cg-med-row,
 .cg-log-row {
@@ -1005,6 +1042,15 @@ body:not(.light-mode) .cg-routine-card h3 {
   border: 1px solid #dbe3ee;
   border-radius: 8px;
   background: #ffffff;
+}
+
+.cg-schedule-row {
+  border-width: 0 0 1px;
+  border-radius: 0;
+}
+
+.cg-schedule-row:last-child {
+  border-bottom-width: 0;
 }
 
 .cg-med-row {
@@ -1130,6 +1176,21 @@ body:not(.light-mode) .cg-alert {
   -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.cg-profile-compact {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.cg-profile-compact p {
+  grid-column: 1 / -1;
+  -webkit-line-clamp: 4;
+}
+
+.cg-profile-compact > div:not(.cg-avatar) {
+  display: grid;
+  gap: 2px;
 }
 
 .cg-avatar {
@@ -1496,6 +1557,51 @@ body:not(.light-mode) .cg-alert {
   line-height: 1.05;
 }
 
+.cg-report-signal-list {
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  overflow: hidden;
+  display: grid;
+  margin-top: 12px;
+}
+
+.cg-report-signal {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 11px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #dbe3ee;
+}
+
+.cg-report-signal:last-child {
+  border-bottom: 0;
+}
+
+.cg-report-signal svg {
+  color: #166a5a;
+}
+
+.cg-report-signal span {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cg-report-signal strong {
+  color: #101828;
+  font-size: 20px;
+  justify-self: end;
+}
+
+.cg-report-signal small {
+  grid-column: 2 / -1;
+  color: #5f6b7a;
+}
+
 .cg-insight-list {
   display: grid;
   gap: 10px;
@@ -1516,11 +1622,11 @@ body:not(.light-mode) .cg-alert {
 
 .cg-readiness-item {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 8px 12px;
   align-items: center;
   border: 1px solid #dbe3ee;
-  background: #ffffff;
+  background: #fbfcfe;
   border-radius: 8px;
   padding: 13px;
 }
@@ -1555,9 +1661,21 @@ body:not(.light-mode) .cg-alert {
 
 .cg-settings-board {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 14px;
   align-items: start;
+}
+
+.cg-settings-group {
+  border: 0;
+  border-top: 1px solid #dbe3ee;
+  border-radius: 0;
+  padding: 14px 0 0;
+}
+
+.cg-settings-group:first-child {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .cg-readiness-icon {
@@ -1578,7 +1696,7 @@ body:not(.light-mode) .cg-alert {
 }
 
 .cg-readiness-item small {
-  grid-column: 2;
+  grid-column: 2 / -1;
   color: #5f6b7a;
   line-height: 1.4;
 }
@@ -1601,11 +1719,11 @@ body:not(.light-mode) .cg-alert {
 
 .cg-voice-status {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 10px 12px;
   align-items: center;
   border: 1px solid #dbe3ee;
-  background: #ffffff;
+  background: #fbfcfe;
   border-radius: 8px;
   padding: 13px;
 }
@@ -1617,7 +1735,6 @@ body:not(.light-mode) .cg-alert {
 }
 
 .cg-voice-status button {
-  grid-column: 1 / -1;
   border: 1px solid #cfd8e6;
   background: #f8fafc;
   color: #172033;
@@ -1811,6 +1928,7 @@ body:not(.light-mode) .cg-alert {
 }
 
 .cg-voice-review-actions {
+  grid-column: 1 / -1;
   border-top: 1px solid #dbe3ee;
   padding-top: 10px;
 }
@@ -2087,7 +2205,7 @@ body:not(.light-mode) .cg-alert {
 
 .patient-actions {
   display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr 1.25fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -2106,16 +2224,19 @@ body:not(.light-mode) .cg-alert {
   font-weight: 800;
 }
 
-.patient-actions button:first-child {
+.patient-actions button:nth-child(2) {
   background: #eef4ea;
   border-color: #d7e3d2;
 }
 
-.patient-actions button:nth-child(3) {
+.patient-actions button:nth-child(4) {
   color: #4d5d52;
 }
 
 .patient-actions .patient-done {
+  grid-column: 1 / -1;
+  min-height: 88px;
+  font-size: 24px;
   color: white;
   border-color: #23745b;
   background: #23745b;
@@ -2212,6 +2333,7 @@ body:not(.light-mode) .cg-alert {
   }
 
   .cg-content-grid,
+  .cg-day-layout,
   .cg-command-panel,
   .cg-settings-summary,
   .cg-settings-board,
@@ -2252,7 +2374,7 @@ body:not(.light-mode) .cg-alert {
   }
 
   .cg-page {
-    padding: 18px;
+    padding: 18px 18px 110px;
   }
 
   .cg-command-panel {

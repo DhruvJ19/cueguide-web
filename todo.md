@@ -61,6 +61,7 @@ updated: 2026-05-15
 - [x] Add refill-date entry to first-run onboarding and medication editing.
 - [x] Add local fallback data export so browser-stored patient/medication/session data can be backed up before demos or device changes.
 - [x] Split patient medication prompt action from location guidance so Focus Mode stays one-action-at-a-time.
+- [x] Run a multi-POV UI trust refinement pass on Today, Reports, Settings, and Patient Focus Mode.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
 
 ## P3 - Mobile Path
@@ -97,3 +98,4 @@ updated: 2026-05-15
 - [x] Deployed UI/UX Trust Refactor and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI/UX Trust Refactor Production Deploy]].
 - [x] Completed Daily Use Refinement local gate: refill dates, shorter patient medication prompts, local backup export, full local gates, local smoke, and rendered flow QA. See [[qa-log#2026-05-15 - Daily Use Refinement Local Gate]].
 - [x] Deployed Daily Use Refinement and verified strict production smoke plus targeted production rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
+- [x] Completed Multi-POV UI Trust Refinement local gate: caregiver/patient/Som/buyer/devil's-advocate audit, row-based Today/Reports/Settings cleanup, patient primary-action hierarchy, full local gates, local smoke, and screenshot QA. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].

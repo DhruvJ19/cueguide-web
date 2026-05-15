@@ -16,6 +16,10 @@ function getDefaultVoiceId(): string {
   return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID;
 }
 
+function shouldForwardVoiceSettings(): boolean {
+  return process.env.ELEVENLABS_ENABLE_VOICE_SETTINGS?.trim() === 'true';
+}
+
 function isValidVoiceId(voiceId: unknown): voiceId is string {
   return typeof voiceId === 'string' && /^[A-Za-z0-9_-]{10,80}$/.test(voiceId);
 }
@@ -31,6 +35,29 @@ function readBody(body: unknown): Record<string, unknown> {
   } catch {
     return {};
   }
+}
+
+function buildTtsPayload({
+  text,
+  voiceSettings,
+}: {
+  text: string;
+  voiceSettings: unknown;
+}): string {
+  const payload: {
+    text: string;
+    model_id: string;
+    voice_settings?: unknown;
+  } = {
+    text: text.trim(),
+    model_id: DEFAULT_MODEL,
+  };
+
+  if (shouldForwardVoiceSettings() && voiceSettings && typeof voiceSettings === 'object') {
+    payload.voice_settings = voiceSettings;
+  }
+
+  return JSON.stringify(payload);
 }
 
 function postElevenLabsTts({
@@ -97,11 +124,7 @@ export default async function handler(req: any, res: any) {
   }
   const selectedVoiceId = isValidVoiceId(voiceId) ? voiceId : getDefaultVoiceId();
 
-  const payload = JSON.stringify({
-    text: text.trim(),
-    model_id: DEFAULT_MODEL,
-    voice_settings,
-  });
+  const payload = buildTtsPayload({ text, voiceSettings: voice_settings });
   const response = await postElevenLabsTts({
     apiKey,
     voiceId: selectedVoiceId,

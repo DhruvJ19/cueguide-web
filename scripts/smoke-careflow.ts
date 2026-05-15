@@ -14,9 +14,11 @@ interface TtsObservation {
 
 function isAllowedConsoleMessage(message: ConsoleMessage): boolean {
   const text = message.text();
+  const locationUrl = message.location().url;
   if (message.type() === 'warning' && text.includes('Sentry DSN not configured')) return true;
   if (!requireElevenLabs && text.includes('ElevenLabs TTS failed')) return true;
   if (!requireElevenLabs && text.includes('429 (Too Many Requests)')) return true;
+  if (!requireElevenLabs && locationUrl.includes('/api/elevenlabs/') && text.includes('Failed to load resource')) return true;
   return false;
 }
 

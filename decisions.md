@@ -209,3 +209,23 @@ Decision: Som's exact written standard — Google Maps voice directions that sou
 Reasoning: Som did not ask for generic TTS. He gave a specific interaction model: navigation-like guidance that feels calm, human, and gentle. CueGuide should not mark voice accepted until a human confirms that standard in the live product.
 
 Linked: [[production-voice#Requirement]], [[source-map#Som Feedback]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Patient Done Is Confirmation Not Proof
+
+#decision #safety #ux #product
+
+Decision: Caregiver Session and Reports must explicitly state that `Done` means patient confirmation inside CueGuide, not proof that medication was physically swallowed.
+
+Reasoning: Som asked how a caregiver knows medication was administered, and hardware competitors can provide stronger dispensing evidence. CueGuide should be useful without overstating what it can verify.
+
+Linked: [[source-map#Som Feedback]], [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]], [[todo#P2 - Product Polish]]
+
+## 2026-05-15 - Public Provider Secret Names Are Blocked
+
+#decision #security #mobile #production
+
+Decision: Security checks now fail when provider-secret-style names use browser-public prefixes such as `VITE_*` or `EXPO_PUBLIC_*`, except for approved non-secret public config like Supabase anon keys and public phone/display settings.
+
+Reasoning: Local ignored env files and nested mobile examples can silently teach the wrong integration pattern. The root web app and future Expo port must keep ElevenLabs, AI, and SMS provider secrets server-side.
+
+Linked: [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]], [[runbook#Stop Conditions]], [[todo#P1 - Production Hardening]]

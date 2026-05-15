@@ -531,3 +531,71 @@ Known caveats:
 - Human-ear voice review against Som's Google Maps standard remains required.
 - Live Supabase migrations/RLS still need authenticated verification before cloud-data production readiness.
 - Build still reports a large bundle warning.
+
+## 2026-05-15 - Product Trust QA And Safety Pass
+
+Status: passed locally; production deploy pending.
+
+Why this pass happened:
+
+- Today was reframed as truth-finding from caregiver, patient, Som/CTO, buyer, and devil's-advocate perspectives.
+- Live production audit confirmed basic rendering health, but caregiver surfaces did not clearly state the biggest safety caveat: `Done` is patient confirmation only, not proof the pill was swallowed.
+- Local ignored `.env` still had legacy browser-public provider-secret-style names; those were hardened before the next build.
+
+Multi-POV findings:
+
+- Caregiver: core loop is understandable, but Live Session and Reports needed explicit confirmation-limit language.
+- Patient: Focus Mode stayed large, readable, one-action-at-a-time, and non-commanding in screenshot QA.
+- Som/CTO: ElevenLabs production TTS returned `200 audio/mpeg`; human-ear voice acceptance is still pending against the Google Maps standard.
+- Buyer/investor: Reports now avoids implying physical administration proof and frames Help/Skip/Done as review signals.
+- Devil's advocate: Supabase production proof is still blocked without CLI/MCP auth; Settings must continue showing local fallback/cloud-proof caveats.
+
+Code changes verified:
+
+- Live Session now says pressing Done means the patient confirmed the prompt in CueGuide and is not proof the pill was swallowed.
+- Reports now includes the same confirmation limit beside adherence signals.
+- Caregiver timeline uses `Confirmed` instead of `Done` for completed patient events.
+- Header and alert microcopy were tightened for grammar and professional casing.
+- AI readiness copy now states AI does not change schedules or create urgency autonomously.
+- Secret scanner now blocks browser-public provider secret names across tracked files and local env files, and scans built `dist` output for bundled provider secrets.
+- Nested Expo `.env.example` no longer suggests a public Twilio account SID.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Smoke evidence:
+
+- Local smoke medication: `Smoke Omega 1778813866462`
+- Local smoke observed ElevenLabs `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+
+Browser QA evidence:
+
+- Live production audit before patch captured desktop Today, Medications, Session, Reports, Settings; mobile Today, Medications, Settings, Login, Signup, Onboarding; and tablet Patient Focus Mode.
+- Patched local screenshot QA captured confirmation-limit Session and Reports screens.
+- No console errors, page errors, framework overlays, tiny controls, or horizontal overflow were observed in the automated pass.
+- Screenshot folders outside the repo:
+  - `/tmp/cueguide-qa-20260515-trust-sprint-audit`
+  - `/tmp/cueguide-qa-20260515-trust-sprint-patched`
+
+Supabase/data evidence:
+
+- `supabase --version` returned `2.98.2`.
+- Supabase MCP endpoint returned `401`, which means the endpoint is reachable but unauthenticated.
+- `supabase projects list` is blocked: `Access token not provided`.
+- Local Supabase database is not running on `127.0.0.1:54322`, so local migration list is blocked.
+- Migration file `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` contains RLS policies, grants, indexes, and realtime publication coverage for `medications`, `completions`, and `care_alerts`, but live cloud proof remains pending.
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.
+
+Linked: [[source-map#Som Feedback]], [[decisions#2026-05-15 - Patient Done Is Confirmation Not Proof]], [[runbook]], [[todo#P0 - Demo-Critical]]

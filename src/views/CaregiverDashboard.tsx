@@ -107,12 +107,16 @@ function formatStatus(status: RoutineStatus | string): string {
 function formatEventStatus(status: StepCompletion['status']): string {
   const labels: Record<StepCompletion['status'], string> = {
     started: 'Started',
-    completed: 'Done',
+    completed: 'Confirmed',
     skipped: 'Skipped',
     help_requested: 'Help requested',
     stuck: 'Stuck too long',
   };
   return labels[status];
+}
+
+function formatAlertSeverity(severity: string): string {
+  return severity.charAt(0).toUpperCase() + severity.slice(1).toLowerCase();
 }
 
 function getNextDoseLabel(medication: Medication, currentTime: string): string {
@@ -281,7 +285,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
   const headerContext = profile?.name ? `${profile.name} care plan` : 'Patient care plan';
   const headerStatus = unreadAlerts.length > 0
-    ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? '' : 's'} need review`
+    ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? ' needs' : 's need'} review`
     : nextRoutine
       ? `${nextRoutine.name} at ${nextRoutine.scheduledTime}`
       : 'Care plan ready';
@@ -388,7 +392,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
 
         <div className="cg-status-strip">
           <StatCard label="Doses" value={`${activeDoseCount}`} note="today" tone="ready" />
-          <StatCard label="Done" value={`${completedToday.length}`} note="sessions" tone="ready" />
+          <StatCard label="Confirmed" value={`${completedToday.length}`} note="patient taps" tone="ready" />
           <StatCard label="Review" value={`${unreadAlerts.length + needsReviewToday.length}`} note="alerts" tone={unreadAlerts.length + needsReviewToday.length > 0 ? 'attention' : 'ready'} />
           <StatCard label="Refills" value={`${refillAttentionCount}`} note="soon" tone={refillAttentionCount > 0 ? 'attention' : 'muted'} />
         </div>
@@ -446,7 +450,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                 <span>
                   <strong>{alert.title}</strong>
                   <small>{alert.message}</small>
-                  <em>{alert.severity} · {alert.status === 'unread' ? 'tap to acknowledge' : 'acknowledged'}</em>
+                  <em>{formatAlertSeverity(alert.severity)} · {alert.status === 'unread' ? 'Tap to acknowledge' : 'Acknowledged'}</em>
                 </span>
               </button>
             ))}
@@ -621,6 +625,13 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
               <p className="cg-eyebrow">Latest session</p>
               <h2>{latestRoutine?.name || 'Medication session'}</h2>
               <p>{sessionStatusNote}</p>
+              <div className="cg-safety-note">
+                <ShieldCheck size={18} />
+                <span>
+                  <strong>Confirmation limit</strong>
+                  <small>{profile?.preferredName || 'The patient'} pressing Done means the prompt was confirmed in CueGuide. It is not proof the pill was swallowed.</small>
+                </span>
+              </div>
             </div>
             <div className="cg-session-metrics">
               <StatCard label="Status" value={formatStatus(latestCompletion.status)} note="caregiver only" tone={latestCompletion.status === 'completed' ? 'ready' : 'attention'} />
@@ -696,6 +707,13 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
               <small>session mood</small>
             </div>
           </div>
+          <div className="cg-safety-note cg-report-safety-note">
+            <ShieldCheck size={18} />
+            <span>
+              <strong>Confirmation limit</strong>
+              <small>Done is patient confirmation only. Treat missed, Help, and Skip events as caregiver review signals, not medical proof.</small>
+            </span>
+          </div>
           <div className="cg-insight-list">
             <div>
               <strong>Medication review</strong>
@@ -722,7 +740,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
                     <strong>{routine?.name || 'Care session'}</strong>
                     <span>{completion.date} · {completion.stepsCompleted} of {completion.stepsTotal} steps</span>
                   </div>
-                  <span className={`cg-status ${completion.status}`}>{completion.status}</span>
+                  <span className={`cg-status ${completion.status}`}>{formatStatus(completion.status)}</span>
                 </div>
               );
             })}
@@ -790,7 +808,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
               icon={<Database size={18} />}
               label="Care data"
               value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
-              detail={readiness.data ? 'Cloud env is present. Live save/load proof still needs evidence.' : 'Browser persistence is active. Cloud proof is still pending.'}
+              detail={readiness.data ? 'Cloud env is present. Authenticated save/load proof still needs evidence.' : 'Local browser persistence is active. Cloud production proof is still pending.'}
               status={readiness.data ? 'review' : 'fallback'}
             />
             <ReadinessItem
@@ -810,7 +828,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
               icon={<BrainCircuit size={18} />}
               label="AI cue generation"
               value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
-              detail="Prompts stay short, warm, and non-scolding."
+              detail="Cue text stays short and warm. AI does not change schedules or create urgency autonomously."
               status={readiness.ai ? 'review' : 'fallback'}
             />
             <ReadinessItem

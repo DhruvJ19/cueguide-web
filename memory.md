@@ -33,6 +33,7 @@ updated: 2026-05-15
 - Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].
 - Market review reinforces Som's concern: reminder apps and caregiver alerts already exist, so CueGuide must differentiate through dementia-safe patient guidance, caregiver event interpretation, and honest medication-confirmation language.
+- `Done` is patient confirmation only, not proof the pill was swallowed. Keep this explicit in caregiver Session/Reports and never imply verified administration without hardware, caregiver observation, or another confirmation source.
 
 ## Technical Lessons
 
@@ -46,6 +47,7 @@ updated: 2026-05-15
 - A blank Supabase migration is a real production risk. Schema files should not be left as placeholders once created with the CLI.
 - The highest leverage refactor is a typed data gateway with explicit save results; silent persistence errors make the app look fine while cloud writes fail.
 - Medication save paths now report typed persistence results, so caregiver UI can surface cloud save failures instead of silently swallowing them.
+- Browser-public env prefixes are blocked for provider secrets. Do not introduce ElevenLabs, AI, SMS auth, or other provider secrets as `VITE_*` or `EXPO_PUBLIC_*`; route through server APIs.
 
 ## Verification Memory
 
@@ -76,6 +78,7 @@ Recent verified checks:
 - Local ports `3000` and `3004` served unrelated apps during QA; CueGuide local dev now uses strict `127.0.0.1:3006`. See [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
 - Login, signup, onboarding, and `/settings` now use the light clinical CueGuide shell and label local fallback honestly. See [[decisions#2026-05-15 - Auth And Setup Must Be Honest About Data Mode]].
 - UI Trust production deploy `dpl_BgUFtUjB5KxEVManqvgPL2GHRcrL` passed strict smoke with ElevenLabs `200 audio/mpeg`, no mobile overflow, and screenshot QA for Today, Medications, Reports, Settings, and mobile Login. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
+- Product Trust QA and Safety Pass passed locally on 2026-05-15 with confirmation-limit UI, expanded secret scanning, local smoke, security checks, screenshot QA, and Supabase auth caveat documented. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
 
 ## Obsidian Maintenance Rules
 

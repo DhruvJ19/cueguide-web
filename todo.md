@@ -33,6 +33,7 @@ updated: 2026-05-15
 - [x] Remove public-provider-secret patterns from the nested [[CueGuide/BUILD_SUMMARY|Expo app]] before mobile porting.
 - [x] Verify Supabase RLS policies and table coverage against [[context#Project Structure]].
 - [x] Audit generated bundle for provider secrets after every env/deploy change.
+- [x] Block browser-public provider-secret env names across root web and nested Expo examples.
 - [x] Reduce large bundle warning through route/component chunking if time allows.
 
 ## P2 - Product Polish
@@ -79,3 +80,4 @@ updated: 2026-05-15
 - [x] Completed Product Trust local gate: question-shaped medication prompts, voice review state, Focus Mode state tests, browser QA, production TTS samples, and chunked build. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
 - [x] Deployed Product Trust pass and verified strict production smoke plus production tablet prompt QA. See [[qa-log#2026-05-15 - Product Trust Production Deploy]].
 - [x] Deployed UI Trust Pass and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
+- [x] Completed Product Trust QA and Safety Pass locally: multi-POV audit, confirmation-limit UI, stricter secret scanner, local smoke, and Supabase auth caveat. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].

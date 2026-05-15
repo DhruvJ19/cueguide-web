@@ -117,6 +117,7 @@ async function runSmoke(): Promise<void> {
     const summary = await page.locator('.cg-session-summary, .cg-live-panel').first().textContent();
     assert.match(summary || '', /Medication/);
     assert.match(summary || '', /Steps|patient actions logged/);
+    assert.match(summary || '', /not proof the pill was swallowed/i);
 
     await clickNav(page, 'Settings');
     await page.getByText(/Patient voice/i).waitFor({ state: 'visible' });
@@ -130,6 +131,7 @@ async function runSmoke(): Promise<void> {
     await clickNav(page, 'Reports');
     await page.getByText('Medication adherence', { exact: true }).waitFor({ state: 'visible' });
     await page.getByText(/Help requests/i).waitFor({ state: 'visible' });
+    await page.getByText(/Done is patient confirmation only/i).waitFor({ state: 'visible' });
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30_000 });

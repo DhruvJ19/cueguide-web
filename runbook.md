@@ -85,9 +85,11 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - ElevenLabs production smoke does not return `audio/mpeg`.
 - Settings does not show `ElevenLabs active`, `Human voice review pending`, or `Voice accepted` accurately.
 - Patient medication prompt includes caregiver-only instructions or command language such as `next take`.
+- Caregiver Session or Reports imply `Done` proves the medication was physically swallowed.
 - Browser console shows unhandled app errors.
 - Mobile-width smoke reports horizontal overflow.
 - Provider secrets appear in tracked files or `dist`.
+- Provider-secret-style env names use browser-public prefixes such as `VITE_*` or `EXPO_PUBLIC_*`.
 - Supabase RLS migration is incomplete when claiming production data readiness.
 - Supabase production env names exist but live migrations/RLS have not been verified with an authenticated Supabase session.
 

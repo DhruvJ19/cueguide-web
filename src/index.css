@@ -1346,6 +1346,43 @@ body:not(.light-mode) .cg-alert {
   background: #fffaf3;
 }
 
+.cg-safety-note {
+  border: 1px solid #c7ded7;
+  background: #f2faf7;
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  color: #103f36;
+}
+
+.cg-safety-note svg {
+  color: #166a5a;
+  margin-top: 1px;
+}
+
+.cg-safety-note span {
+  display: grid;
+  gap: 3px;
+}
+
+.cg-safety-note strong {
+  color: #103f36;
+  font-size: 14px;
+}
+
+.cg-safety-note small {
+  color: #46655e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.cg-report-safety-note {
+  margin-top: 12px;
+}
+
 .cg-report-card {
   min-height: 128px;
   border: 1px solid #dbe3ee;

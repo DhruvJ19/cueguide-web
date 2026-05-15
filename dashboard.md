@@ -67,6 +67,7 @@ updated: 2026-05-15
 - Latest auth/setup gate: [[qa-log#2026-05-15 - Auth And Setup Trust Pass]].
 - Latest UI trust gate: [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 - Latest product-trust safety gate: [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
+- Latest production product-trust gate: [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 
 ## Context
 

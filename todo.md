@@ -81,3 +81,4 @@ updated: 2026-05-15
 - [x] Deployed Product Trust pass and verified strict production smoke plus production tablet prompt QA. See [[qa-log#2026-05-15 - Product Trust Production Deploy]].
 - [x] Deployed UI Trust Pass and verified strict production smoke plus production screenshot QA. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 - [x] Completed Product Trust QA and Safety Pass locally: multi-POV audit, confirmation-limit UI, stricter secret scanner, local smoke, and Supabase auth caveat. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
+- [x] Deployed Product Trust QA and Safety Pass and verified strict production smoke with ElevenLabs plus confirmation-limit assertions. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].

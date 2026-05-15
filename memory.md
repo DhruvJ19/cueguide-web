@@ -79,6 +79,7 @@ Recent verified checks:
 - Login, signup, onboarding, and `/settings` now use the light clinical CueGuide shell and label local fallback honestly. See [[decisions#2026-05-15 - Auth And Setup Must Be Honest About Data Mode]].
 - UI Trust production deploy `dpl_BgUFtUjB5KxEVManqvgPL2GHRcrL` passed strict smoke with ElevenLabs `200 audio/mpeg`, no mobile overflow, and screenshot QA for Today, Medications, Reports, Settings, and mobile Login. See [[qa-log#2026-05-15 - UI Trust Pass Production Deploy]].
 - Product Trust QA and Safety Pass passed locally on 2026-05-15 with confirmation-limit UI, expanded secret scanning, local smoke, security checks, screenshot QA, and Supabase auth caveat documented. See [[qa-log#2026-05-15 - Product Trust QA And Safety Pass]].
+- Product Trust QA production deploy `dpl_HZcXhLtPUhh4pBGiqSXrjMpJeVjQ` passed strict smoke with ElevenLabs `200 audio/mpeg`, confirmation-limit assertions, and no mobile overflow. See [[qa-log#2026-05-15 - Product Trust QA Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

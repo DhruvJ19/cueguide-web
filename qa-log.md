@@ -599,3 +599,44 @@ Known caveats:
 - `cueguide-test.png` remains unrelated local work and must not be staged.
 
 Linked: [[source-map#Som Feedback]], [[decisions#2026-05-15 - Patient Done Is Confirmation Not Proof]], [[runbook]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-15 - Product Trust QA Production Deploy
+
+Status: passed.
+
+Production deployment:
+
+- Alias: `https://cueguide-web.vercel.app`
+- Deployment: `https://cueguide-qw2luwq7n-dhruvjainhk-4433s-projects.vercel.app`
+- Vercel deployment id: `dpl_HZcXhLtPUhh4pBGiqSXrjMpJeVjQ`
+- Commit: `49c79624`
+
+Verified:
+
+- `npm run smoke:careflow`
+- Target URL: `https://cueguide-web.vercel.app`
+- Medication created and edited: `Smoke Omega 1778814819747`
+- Patient flow completed Begin, Read aloud, Help, Skip, Done, and mood close.
+- Production ElevenLabs proxy returned `200 audio/mpeg`.
+- Mobile-width caregiver smoke reported no horizontal overflow.
+- Smoke now asserts the caregiver Session says `not proof the pill was swallowed`.
+- Smoke now asserts Reports says `Done is patient confirmation only`.
+
+Rendered QA:
+
+- Production Reports rendered the confirmation-limit note without console errors, page errors, or horizontal overflow.
+- Production Settings rendered the Google Maps voice standard.
+- Production mobile Signup rendered without horizontal overflow.
+- Screenshot folder outside the repo: `/tmp/cueguide-qa-20260515-product-trust-production`.
+
+Deployment notes:
+
+- Initial Vercel deploy stayed queued for several minutes, then became ready.
+- A redundant prebuilt deploy was started while troubleshooting the queue and remains nonessential because the first production deployment passed smoke.
+- `vercel pull --environment production` created ignored `.vercel/.env.production.local`; `.vercel/` remains gitignored.
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending.
+- Authenticated Supabase cloud save/load/RLS proof remains pending.
+- `cueguide-test.png` remains unrelated local work and must not be staged.

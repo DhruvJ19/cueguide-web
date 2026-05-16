@@ -1271,8 +1271,10 @@ Status: deployed; production now reports the accurate ElevenLabs quota blocker.
 Deployment:
 
 - Vercel deployment: `dpl_Ff54ZYNNJ7RqnJ6mgKhbyStCaeuN`
+- Final docs-aligned Vercel deployment: `dpl_C8Nh7XdUavTHpmhBt58CM1Ps1en9`
 - Production URL: `https://cueguide-web.vercel.app`
-- Commit: `3a560a07`
+- Code commit: `3a560a07`
+- Evidence commit: `82bf2427`
 
 Commands:
 

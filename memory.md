@@ -108,7 +108,7 @@ Recent verified checks:
 - Voice acceptance now requires an actual heard ElevenLabs sample. Settings should not allow `Mark accepted` from a mere config/voices check, and Patient Focus Mode should respond calmly when audio is unavailable. See [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]].
 - The ElevenLabs production key was rotated on 2026-05-16 and can read `/v1/voices`, but TTS is quota-blocked: ElevenLabs reported `quota_exceeded` with `1` credit remaining and `32` credits required for the Som-standard sample. The next voice blocker is account credits, not key validity. See [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]].
 - Settings voice readiness should not auto-generate paid TTS on page load. Use voice-library readiness for key/voice state, then prove real audio through explicit caregiver sample playback and strict smoke. See [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]].
-- Production deploy `dpl_Ff54ZYNNJ7RqnJ6mgKhbyStCaeuN` now surfaces ElevenLabs `quota_exceeded` clearly in Settings and keeps production smoke passing in fallback-tolerant mode. Strict voice smoke remains blocked until credits are added. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
+- Production deploy `dpl_C8Nh7XdUavTHpmhBt58CM1Ps1en9` now surfaces ElevenLabs `quota_exceeded` clearly in Settings and keeps production smoke passing in fallback-tolerant mode. Strict voice smoke remains blocked until credits are added. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

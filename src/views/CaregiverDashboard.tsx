@@ -269,7 +269,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const voiceReadinessDetail = voiceReviewReady
     ? `${voiceStatus.selectedVoiceName || 'Production voice'} passed the Google Maps standard: human, soft, gentle.`
     : readiness.voice
-      ? `Server voice works. Accept only if it sounds like calm Google Maps directions.`
+      ? `Voice library is reachable. Play a sample to confirm paid TTS audio and Google Maps-level tone.`
       : voiceStatus.message;
   const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
   const headerContext = profile?.name ? `${profile.name} care plan` : 'Patient care plan';

@@ -76,6 +76,35 @@ function buildTtsPayload({
   return JSON.stringify(payload);
 }
 
+interface ElevenLabsTtsResponse {
+  status: number;
+  ok: boolean;
+  body: Buffer;
+}
+
+function extractSafeElevenLabsError(body: Buffer): {
+  code: string;
+  message: string;
+  status: string;
+} {
+  const fallback = {
+    code: 'elevenlabs_request_failed',
+    message: 'ElevenLabs request failed',
+    status: 'failed',
+  };
+
+  try {
+    const parsed = JSON.parse(body.toString('utf8'));
+    const detail = parsed?.detail && typeof parsed.detail === 'object' ? parsed.detail : parsed;
+    const code = typeof detail?.code === 'string' ? detail.code : fallback.code;
+    const message = typeof detail?.message === 'string' ? detail.message : fallback.message;
+    const status = typeof detail?.status === 'string' ? detail.status : fallback.status;
+    return { code, message, status };
+  } catch {
+    return fallback;
+  }
+}
+
 function postElevenLabsTts({
   apiKey,
   voiceId,
@@ -86,7 +115,7 @@ function postElevenLabsTts({
   voiceId: string;
   localAddress: string;
   payload: string;
-}): Promise<{ status: number; ok: boolean; audio: Buffer }> {
+}): Promise<ElevenLabsTtsResponse> {
   return new Promise((resolve, reject) => {
     const req = https.request(
       {
@@ -109,7 +138,7 @@ function postElevenLabsTts({
           resolve({
             status,
             ok: status >= 200 && status < 300,
-            audio: Buffer.concat(chunks),
+            body: Buffer.concat(chunks),
           });
         });
       },
@@ -149,10 +178,15 @@ export default async function handler(req: any, res: any) {
   });
 
   if (!response.ok) {
-    return res.status(response.status).json({ error: 'ElevenLabs request failed' });
+    const error = extractSafeElevenLabsError(response.body);
+    return res.status(response.status).json({
+      error: error.message,
+      code: error.code,
+      status: error.status,
+    });
   }
 
   res.setHeader('Content-Type', 'audio/mpeg');
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).send(response.audio);
+  return res.status(200).send(response.body);
 }

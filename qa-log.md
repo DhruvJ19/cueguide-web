@@ -1218,6 +1218,52 @@ Known caveats:
 
 Linked: [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]], [[production-voice]], [[todo#P0 - Demo-Critical]]
 
+## 2026-05-16 - ElevenLabs Key Rotation And Quota Gate
+
+Status: fresh production key installed; ElevenLabs TTS blocked by account credits, not invalid credentials.
+
+Actions:
+
+- Rotated `ELEVENLABS_API_KEY` in Vercel production using the secure env store.
+- Updated ignored `.env.local` with the same server-only key.
+- Verified the key can read the ElevenLabs voice library.
+- Updated the app so Settings does not consume TTS credits on page load and quota errors are visible to caregivers.
+
+Commands:
+
+- `vercel env rm ELEVENLABS_API_KEY production --yes`
+- `vercel env add ELEVENLABS_API_KEY production --sensitive`
+- Direct ElevenLabs `/v1/voices` validation
+- Direct ElevenLabs `/v1/text-to-speech/.../stream` validation
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Observed:
+
+- Vercel production now shows `ELEVENLABS_API_KEY` created on 2026-05-16.
+- ElevenLabs `/v1/voices` returned `200` with `21` voices.
+- ElevenLabs TTS returned `quota_exceeded`: account had `1` credit remaining and the sample required `32` credits.
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security checks passed with 0 vulnerabilities, 346 verified registry signatures, and 48 verified attestations.
+- Dry-run clean install passed.
+- Local fallback-tolerant smoke passed.
+- Smoke medication: `Smoke Omega 1778920744785`.
+- Local mobile overflow check passed.
+- Local onboarding flow passed.
+
+Known caveats:
+
+- Strict ElevenLabs production smoke cannot pass until the ElevenLabs account has enough TTS credits.
+- Human voice acceptance is still pending because a real sample cannot be heard while the account is quota-blocked.
+
+Linked: [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]
+
 ## 2026-05-16 - Voice Acceptance UX Production Deploy
 
 Status: deployed; production voice behavior is honest, but real ElevenLabs audio is still blocked.

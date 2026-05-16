@@ -20,7 +20,25 @@ export interface VoiceStatus {
   message: string;
 }
 
-export type AudioPlaybackResult = 'elevenlabs' | 'browser' | 'blocked' | 'empty';
+export type AudioPlaybackResult = 'elevenlabs' | 'browser' | 'blocked' | 'quota' | 'empty';
+
+interface ElevenLabsApiErrorPayload {
+  error?: string;
+  code?: string;
+  status?: string;
+}
+
+class ElevenLabsClientError extends Error {
+  code: string;
+  status: number;
+
+  constructor(message: string, code: string, status: number) {
+    super(message);
+    this.name = 'ElevenLabsClientError';
+    this.code = code;
+    this.status = status;
+  }
+}
 
 const GENTLE_SETTINGS: VoiceSettings = {
   stability: 0.68,
@@ -39,7 +57,7 @@ let cachedVoiceStatus: VoiceStatus | null = null;
 
 async function fetchVoicePayload(): Promise<{ voices: Voice[]; selectedVoiceId: string; selectedVoice: Voice | null }> {
   const res = await fetch('/api/elevenlabs/voices');
-  if (!res.ok) throw new Error(`ElevenLabs voices unavailable: ${res.status}`);
+  if (!res.ok) throw await buildClientError(res, 'ElevenLabs voices unavailable');
   const data = await res.json();
   return {
     voices: data.voices || [],
@@ -48,20 +66,20 @@ async function fetchVoicePayload(): Promise<{ voices: Voice[]; selectedVoiceId: 
   };
 }
 
-async function assertTtsReady(): Promise<void> {
-  const res = await fetch('/api/elevenlabs/tts', {
-    method: 'POST',
-    headers: {
-      Accept: 'audio/mpeg',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ text: 'Voice check.' }),
-  });
-  const contentType = (res.headers.get('content-type') || '').split(';')[0];
-  if (!res.ok || contentType !== 'audio/mpeg') {
-    throw new Error(`ElevenLabs TTS unavailable: ${res.status} ${contentType || 'unknown content type'}`);
+async function buildClientError(response: Response, fallbackMessage: string): Promise<ElevenLabsClientError> {
+  try {
+    const payload = await response.json() as ElevenLabsApiErrorPayload;
+    const message = payload.error || fallbackMessage;
+    const code = payload.code || payload.status || 'elevenlabs_request_failed';
+    return new ElevenLabsClientError(message, code, response.status);
+  } catch {
+    return new ElevenLabsClientError(fallbackMessage, 'elevenlabs_request_failed', response.status);
   }
-  await res.arrayBuffer();
+}
+
+function isQuotaError(error: unknown): boolean {
+  if (!(error instanceof ElevenLabsClientError)) return false;
+  return error.code === 'quota_exceeded' || /quota|credit/i.test(error.message);
 }
 
 export async function fetchVoices(): Promise<Voice[]> {
@@ -79,14 +97,13 @@ export async function getElevenLabsStatus(): Promise<VoiceStatus> {
   if (cachedVoiceStatus) return cachedVoiceStatus;
   try {
     const data = await fetchVoicePayload();
-    await assertTtsReady();
     cachedVoices = data.voices;
     const selectedVoiceName = data.selectedVoice?.name || 'production voice';
     cachedVoiceStatus = {
       ok: Boolean(data.selectedVoiceId),
       selectedVoiceId: data.selectedVoiceId,
       selectedVoiceName,
-      message: `Server voice ready: ${selectedVoiceName}`,
+      message: `Voice library ready: ${selectedVoiceName}. Play a sample to confirm paid TTS audio.`,
     };
     return cachedVoiceStatus;
   } catch (error) {
@@ -105,7 +122,7 @@ export async function speakWithElevenLabs(
   gentle: boolean,
   onEnd?: () => void,
   voiceId?: string,
-): Promise<boolean> {
+): Promise<'elevenlabs' | 'quota' | 'blocked'> {
   try {
     const response = await fetch('/api/elevenlabs/tts', {
       method: 'POST',
@@ -122,7 +139,7 @@ export async function speakWithElevenLabs(
     });
 
     if (!response.ok) {
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+      throw await buildClientError(response, `ElevenLabs API error: ${response.status}`);
     }
 
     const arrayBuffer = await response.arrayBuffer();
@@ -140,11 +157,11 @@ export async function speakWithElevenLabs(
       onEnd?.();
     };
     await audio.play();
-    return true;
+    return 'elevenlabs';
   } catch (error) {
     console.warn('ElevenLabs TTS failed:', error);
     onEnd?.();
-    return false;
+    return isQuotaError(error) ? 'quota' : 'blocked';
   }
 }
 

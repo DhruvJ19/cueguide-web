@@ -106,6 +106,8 @@ Recent verified checks:
 - POV trust production deploy `dpl_47yk2DiuRXwoh6RhAByhZ35Qvtcv` passed fallback-tolerant production smoke and mobile/onboarding checks, but strict production voice failed with ElevenLabs `401 application/json`. See [[qa-log#2026-05-15 - POV Trust Audit Production Deploy]].
 - When `VITE_USE_ELEVENLABS=true`, browser TTS fallback is now opt-in through `VITE_ALLOW_BROWSER_TTS_FALLBACK=true`. Keep it false for production so a broken ElevenLabs key cannot sound like the old robotic browser voice. See [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]].
 - Voice acceptance now requires an actual heard ElevenLabs sample. Settings should not allow `Mark accepted` from a mere config/voices check, and Patient Focus Mode should respond calmly when audio is unavailable. See [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]].
+- The ElevenLabs production key was rotated on 2026-05-16 and can read `/v1/voices`, but TTS is quota-blocked: ElevenLabs reported `quota_exceeded` with `1` credit remaining and `32` credits required for the Som-standard sample. The next voice blocker is account credits, not key validity. See [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]].
+- Settings voice readiness should not auto-generate paid TTS on page load. Use voice-library readiness for key/voice state, then prove real audio through explicit caregiver sample playback and strict smoke. See [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]].
 
 ## Obsidian Maintenance Rules
 

@@ -25,6 +25,29 @@ function getDefaultVoiceId(): string {
   return isValidVoiceId(configuredVoiceId) ? configuredVoiceId : DEFAULT_VOICE_ID;
 }
 
+async function readSafeElevenLabsError(response: Response): Promise<{
+  code: string;
+  message: string;
+  status: string;
+}> {
+  const fallback = {
+    code: 'elevenlabs_request_failed',
+    message: 'ElevenLabs request failed',
+    status: 'failed',
+  };
+
+  try {
+    const parsed = await response.json();
+    const detail = parsed?.detail && typeof parsed.detail === 'object' ? parsed.detail : parsed;
+    const code = typeof detail?.code === 'string' ? detail.code : fallback.code;
+    const message = typeof detail?.message === 'string' ? detail.message : fallback.message;
+    const status = typeof detail?.status === 'string' ? detail.status : fallback.status;
+    return { code, message, status };
+  } catch {
+    return fallback;
+  }
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -41,7 +64,12 @@ export default async function handler(req: any, res: any) {
   });
 
   if (!response.ok) {
-    return res.status(response.status).json({ error: 'ElevenLabs request failed' });
+    const error = await readSafeElevenLabsError(response);
+    return res.status(response.status).json({
+      error: error.message,
+      code: error.code,
+      status: error.status,
+    });
   }
 
   const data = await response.json();

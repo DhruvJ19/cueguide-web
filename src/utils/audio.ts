@@ -37,13 +37,14 @@ export function transformToGentle(text: string): string {
 
 export function getPatientAudioNotice(result: AudioPlaybackResult): string | null {
   if (result === 'empty') return null;
-  if (result === 'blocked') return 'Let us use the words on screen for now.';
+  if (result === 'blocked' || result === 'quota') return 'Let us use the words on screen for now.';
   return 'Reading aloud now.';
 }
 
 export function getCaregiverVoiceSampleMessage(result: AudioPlaybackResult): string {
   if (result === 'elevenlabs') return 'Last sample used ElevenLabs audio. Accept only after it sounds human, soft, and gentle.';
   if (result === 'browser') return 'Last sample used browser speech. This is not acceptable for production voice review.';
+  if (result === 'quota') return 'ElevenLabs is connected, but the account is out of TTS credits. Add credits before stakeholder voice review.';
   if (result === 'blocked') return 'Voice sample is blocked because ElevenLabs did not return audio. Rotate or re-set the server key.';
   return 'No voice sample has played yet.';
 }
@@ -59,8 +60,9 @@ export async function playAudio(
   const transformed = gentle ? transformToGentle(text) : text;
 
   if (config.elevenlabs.enabled) {
-    const playedWithElevenLabs = await speakWithElevenLabs(transformed, gentle);
-    if (playedWithElevenLabs) return 'elevenlabs';
+    const elevenLabsResult = await speakWithElevenLabs(transformed, gentle);
+    if (elevenLabsResult === 'elevenlabs') return 'elevenlabs';
+    if (elevenLabsResult === 'quota') return 'quota';
     if (!config.elevenlabs.allowBrowserFallback) return 'blocked';
   }
 

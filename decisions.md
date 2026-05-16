@@ -379,3 +379,13 @@ Decision: Caregivers cannot mark the patient voice accepted until a voice sample
 Reasoning: A voices-list check is not enough for Som's standard. The app must prove the actual TTS path returns audio and the caregiver must hear it before accepting it as human, soft, and gentle. Patient-facing copy should never expose technical failure language.
 
 Linked: [[qa-log#2026-05-16 - Voice Acceptance UX Local Gate]], [[source-map#Som Feedback]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - Voice Readiness Must Not Burn TTS Credits
+
+#decision #voice #production #cost #qa
+
+Decision: Settings voice readiness should verify that the ElevenLabs server key can read the selected voice library, but it should not auto-generate TTS audio on page load. Actual paid TTS should run only when the patient or caregiver explicitly taps `Read aloud` or plays a voice sample.
+
+Reasoning: After rotating the production key, ElevenLabs accepted voice-library reads but rejected TTS with `quota_exceeded`: the account had `1` credit remaining and the sample needed `32`. Auto-generating a TTS sample during readiness checks wastes credits and creates confusing failures. The strict smoke test and caregiver sample playback remain the proper evidence gates for real audio.
+
+Linked: [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]

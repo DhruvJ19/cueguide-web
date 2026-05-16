@@ -80,6 +80,7 @@ This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `
 - Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
 - Keep `ELEVENLABS_ENABLE_VOICE_SETTINGS=false` unless a strict smoke test proves forwarded `voice_settings` still returns `audio/mpeg`.
 - If strict voice smoke returns `400` or `401`, check for quoted env values or literal `\n` escapes before rotating the key.
+- If ElevenLabs returns `model_not_found`, verify `ELEVENLABS_MODEL_ID=eleven_flash_v2_5`; a one-character typo will block all TTS even with a valid funded key.
 - Settings must show the voice library/server key state from a live server check, then `Human voice review pending` until a person plays and accepts a real ElevenLabs sample.
 - If TTS returns `quota_exceeded`, the key is valid but the ElevenLabs account needs credits before voice acceptance or strict production smoke can pass.
 - Test the three Som-standard samples in Settings: small blue pill with water, yellow box location, and "Take your time. I can wait with you."

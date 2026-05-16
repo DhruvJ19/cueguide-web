@@ -389,3 +389,13 @@ Decision: Settings voice readiness should verify that the ElevenLabs server key 
 Reasoning: After rotating the production key, ElevenLabs accepted voice-library reads but rejected TTS with `quota_exceeded`: the account had `1` credit remaining and the sample needed `32`. Auto-generating a TTS sample during readiness checks wastes credits and creates confusing failures. The strict smoke test and caregiver sample playback remain the proper evidence gates for real audio.
 
 Linked: [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - Validate Voice Key, Voice Id, And Model Before Deploy
+
+#decision #voice #deployment #qa
+
+Decision: Any future ElevenLabs key rotation must validate three things before production deploy: the key can read `/v1/voices`, the configured `ELEVENLABS_VOICE_ID` exists in that account, and a tiny TTS sample returns `audio/mpeg` using `ELEVENLABS_MODEL_ID=eleven_flash_v2_5`.
+
+Reasoning: The funded key fixed the quota problem, but local validation first exposed a model typo (`eleve_flash_v2_5`) that would have made production fail even with a valid paid account. Voice readiness needs key, voice, model, and audio proof as one sequence.
+
+Linked: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]], [[runbook#Production Voice]], [[memory#Technical Lessons]]

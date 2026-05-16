@@ -88,6 +88,7 @@ updated: 2026-05-16
 - Latest voice acceptance UX gate: [[qa-log#2026-05-16 - Voice Acceptance UX Production Deploy]].
 - Latest ElevenLabs credential gate: [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]].
 - Latest ElevenLabs quota deploy: [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
+- Latest strict ElevenLabs voice gate: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 
 ## Context
 

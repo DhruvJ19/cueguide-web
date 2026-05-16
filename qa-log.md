@@ -1302,6 +1302,51 @@ Known caveats:
 
 Linked: [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]], [[todo#P0 - Demo-Critical]], [[runbook#Production Voice]]
 
+## 2026-05-16 - Funded ElevenLabs Key Strict Production Smoke
+
+Status: passed; production now returns real ElevenLabs `audio/mpeg`.
+
+Deployment:
+
+- Vercel deployment: `dpl_5VpzgfDzjSEmPx7KqFV4j7BZNUfH`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Actions:
+
+- Replaced `ELEVENLABS_API_KEY` in Vercel production with a funded-account key.
+- Confirmed the funded account includes the selected Bella voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
+- Corrected `ELEVENLABS_MODEL_ID` to `eleven_flash_v2_5`.
+- Updated ignored `.env.local` with the funded server-only key and corrected model id.
+
+Commands:
+
+- Direct ElevenLabs `/v1/voices` validation against the funded key.
+- Direct ElevenLabs TTS validation with `Voice check.`
+- `vercel env rm/add ELEVENLABS_API_KEY production`
+- `vercel env rm/add ELEVENLABS_MODEL_ID production`
+- `vercel --prod --yes`
+- Direct production `/api/elevenlabs/voices` check.
+- Direct production `/api/elevenlabs/tts` check.
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+
+Observed:
+
+- Funded key `/v1/voices` returned `21` voices.
+- The configured Bella voice exists in the funded account.
+- Local direct TTS with the funded key returned `200 audio/mpeg` with `14,673` bytes after correcting the model id.
+- Production `/api/elevenlabs/voices` returned `200 application/json`.
+- Production `/api/elevenlabs/tts` returned `200 audio/mpeg` with `50,618` bytes for the Som-standard blue-pill prompt.
+- Strict production care-flow smoke passed with ElevenLabs required.
+- Smoke medication: `Smoke Omega 1778922456370`.
+- Production mobile no-overflow check passed.
+- Local onboarding smoke path passed inside strict production smoke.
+
+Known caveats:
+
+- Human-ear acceptance is still required before marking `Voice accepted` for Som: the voice must sound Google Maps-like, human, soft, gentle, and non-commanding.
+
+Linked: [[decisions#2026-05-16 - Validate Voice Key, Voice Id, And Model Before Deploy]], [[todo#P0 - Demo-Critical]], [[runbook#Production Voice]]
+
 ## 2026-05-16 - Voice Acceptance UX Production Deploy
 
 Status: deployed; production voice behavior is honest, but real ElevenLabs audio is still blocked.

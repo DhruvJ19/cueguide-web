@@ -85,7 +85,8 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 - `ELEVENLABS_VOICE_ID` is server-side production voice selection; current target is `hpp4J3VqNfWAUOO0d1Us`.
 - `ELEVENLABS_ENABLE_VOICE_SETTINGS` defaults to off because the current production key accepts plain TTS but rejects forwarded `voice_settings`; gentle tone is handled through prompt wording and playback rate unless this is explicitly enabled.
 - Server env values are normalized before provider calls because Vercel values can contain quotes or literal `\n` escapes.
-- Current local ElevenLabs key validation returns `401`; rotate/re-set `ELEVENLABS_API_KEY` before claiming strict production voice readiness.
+- Current funded ElevenLabs key is installed in Vercel production and local `.env.local`.
+- `ELEVENLABS_MODEL_ID` must be `eleven_flash_v2_5`; `eleve_flash_v2_5` returns `model_not_found`.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.

@@ -18,7 +18,7 @@ updated: 2026-05-16
 - [ ] Run one human-operated live walkthrough after hard refresh: medication session -> Begin -> Read aloud -> Help -> Skip -> Done -> caregiver session summary.
 - [x] Verify the audible voice is ElevenLabs in the user-facing browser, not browser speech fallback. See [[memory#Technical Lessons]].
 - [x] Verify the three Som-standard production TTS sample prompts return `audio/mpeg` through `/api/elevenlabs/tts`. See [[qa-log#2026-05-15 - Product Trust Local Gate]].
-- [ ] Add/top up ElevenLabs TTS credits before rerunning strict production voice smoke.
+- [x] Add/top up ElevenLabs TTS credits or swap to a funded ElevenLabs account before rerunning strict production voice smoke. See [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - [ ] Verify production voice quality with human ears against Som's exact email standard: Google Maps-like, human, soft, gentle, and non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
@@ -66,8 +66,8 @@ updated: 2026-05-16
 - [x] Remove fake default unread alert and make sample report history deterministic.
 - [x] Tighten mobile caregiver navigation to the five core care-loop surfaces.
 - [ ] Continue market-backed product differentiation work: caregiver interpretation, proof of confirmation limits, and voice-first patient support beyond generic med reminders.
-- [x] Rotate/re-set a valid ElevenLabs production key in Vercel; current blocker is account TTS quota, not key validity.
-- [ ] Rerun strict production voice smoke after ElevenLabs credits are available.
+- [x] Rotate/re-set a valid funded ElevenLabs production key in Vercel.
+- [x] Rerun strict production voice smoke after funded ElevenLabs key is available. See [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - [x] Stop broken ElevenLabs requests from falling back to the old browser voice in production mode.
 
 ## P3 - Mobile Path

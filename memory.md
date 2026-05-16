@@ -110,6 +110,8 @@ Recent verified checks:
 - Production deploy `dpl_C8Nh7XdUavTHpmhBt58CM1Ps1en9` now surfaces ElevenLabs `quota_exceeded` clearly in Settings and keeps production smoke passing in fallback-tolerant mode. Strict voice smoke remains blocked until credits are added. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 - Funded ElevenLabs account key is now installed and strict production voice smoke passes. Production `/api/elevenlabs/tts` returned `200 audio/mpeg` for the Som-standard blue-pill prompt, and strict `npm run smoke:careflow` passed with `CUEGUIDE_REQUIRE_ELEVENLABS=true`. See [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - ElevenLabs key rotation must validate key access, configured voice id, model id, and tiny TTS audio before deploy. The funded-key pass caught a local `ELEVENLABS_MODEL_ID` typo (`eleve_flash_v2_5`) before production. See [[decisions#2026-05-16 - Validate Voice Key, Voice Id, And Model Before Deploy]].
+- `ELEVENLABS_LOCAL_ADDRESS` is optional and brittle with VPN/Wi-Fi changes. Server TTS should retry once without it before failing so local QA can still prove real ElevenLabs audio. See [[decisions#2026-05-16 - Local Voice Networking Must Fail Softly]].
+- UI trust work should keep moving away from nested cards: open page sections, row/table anatomy for caregiver operations, compact Settings readiness, and direct language like `Needs attention` instead of harsh failure labels. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

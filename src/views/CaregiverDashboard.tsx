@@ -54,7 +54,7 @@ const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode }> = [
   { id: 'today', label: 'Today', icon: <LayoutDashboard size={18} /> },
   { id: 'medications', label: 'Medications', icon: <Pill size={18} /> },
   { id: 'routines', label: 'Routines', icon: <ClipboardList size={18} /> },
-  { id: 'session', label: 'Session', icon: <Radio size={18} /> },
+  { id: 'session', label: 'Live Session', icon: <Radio size={18} /> },
   { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
   { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ];
@@ -87,7 +87,7 @@ function formatStatus(status: RoutineStatus | string): string {
     completed: 'Complete',
     partial: 'Needs review',
     missed: 'Missed',
-    past_due: 'Past due',
+    past_due: 'Needs attention',
   };
   return labels[status] || status.replace('_', ' ');
 }
@@ -272,7 +272,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
       ? `Voice library is reachable. Play a sample to confirm paid TTS audio and Google Maps-level tone.`
       : voiceStatus.message;
   const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
-  const headerContext = profile?.name ? `${profile.name} care plan` : 'Patient care plan';
+  const headerContext = profile?.name ? `${profile.name} care plan` : 'Care plan';
   const headerStatus = unreadAlerts.length > 0
     ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? ' needs' : 's need'} review`
     : nextRoutine

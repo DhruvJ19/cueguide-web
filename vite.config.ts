@@ -136,6 +136,26 @@ function postElevenLabsTts({
   });
 }
 
+async function postElevenLabsTtsWithNetworkFallback({
+  apiKey,
+  voiceId,
+  localAddress,
+  payload,
+}: {
+  apiKey: string;
+  voiceId: string;
+  localAddress: string;
+  payload: string;
+}): Promise<{ status: number; ok: boolean; contentType: string; body: Buffer }> {
+  try {
+    return await postElevenLabsTts({ apiKey, voiceId, localAddress, payload });
+  } catch (error) {
+    if (!localAddress) throw error;
+    console.warn('ElevenLabs TTS failed with configured local address; retrying without local address.');
+    return postElevenLabsTts({ apiKey, voiceId, localAddress: '', payload });
+  }
+}
+
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
@@ -184,7 +204,7 @@ export default defineConfig(({mode}) => {
               const selectedVoiceId = isValidVoiceId(voiceId) ? voiceId : getElevenLabsVoiceId(env);
 
               const payload = buildElevenLabsPayload({ env, text, voiceSettings: body.voice_settings });
-              const response = await postElevenLabsTts({
+              const response = await postElevenLabsTtsWithNetworkFallback({
                 apiKey,
                 voiceId: selectedVoiceId,
                 localAddress: readEnvValue(env.ELEVENLABS_LOCAL_ADDRESS),

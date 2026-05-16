@@ -1381,3 +1381,50 @@ Known caveats:
 - This deploy improves honesty and patient/caregiver UX around voice failure. It does not solve the missing valid ElevenLabs key.
 
 Linked: [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]], [[production-voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - UI Trust And Voice Network Fallback Production Deploy
+
+Status: passed; production deploy is live with stricter ElevenLabs smoke and cleaner caregiver UI.
+
+Deployment:
+
+- Vercel deployment: `dpl_86m78SA1jHwkfAaA184Pu1GXzoSb`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Changes verified:
+
+- Reduced caregiver card nesting by opening primary sections and keeping rows/tables as the main layout.
+- Replaced the remote Inter import with a system clinical font stack and normalized nonstandard font weights.
+- Renamed caregiver `Session` navigation to `Live Session` on desktop while keeping compact mobile navigation.
+- Replaced harsh `Past due` primary language with `Needs attention` and caregiver-review language.
+- Tightened Settings copy from repeated page-level cards into `System readiness`, voice, data, AI/alerts, and privacy sections.
+- Added ElevenLabs TTS network fallback: if a configured local network address fails, the server retries without that address before returning a provider failure.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- Direct local `/api/elevenlabs/tts` check
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- `vercel --prod --yes`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Production screenshot QA for desktop Today, desktop Settings, mobile Today, and mobile Settings.
+
+Observed:
+
+- Local direct TTS returned `200 audio/mpeg` with `51,871` bytes.
+- Strict local smoke passed with ElevenLabs `200 audio/mpeg`, no mobile overflow, and local onboarding coverage.
+- Production strict smoke passed with ElevenLabs `200 audio/mpeg`.
+- Production smoke medication: `Smoke Omega 1778924452174`.
+- Production mobile viewport reported no horizontal overflow.
+- Browser console only reported the expected Sentry-disabled warning.
+
+Known caveats:
+
+- Human-ear voice acceptance is still pending; do not mark `Voice accepted` until the user confirms the live voice meets Som's human, soft, gentle standard.
+- Supabase authenticated cloud persistence proof remains pending until test credentials are available.
+
+Linked: [[decisions#2026-05-16 - Local Voice Networking Must Fail Softly]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

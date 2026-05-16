@@ -399,3 +399,13 @@ Decision: Any future ElevenLabs key rotation must validate three things before p
 Reasoning: The funded key fixed the quota problem, but local validation first exposed a model typo (`eleve_flash_v2_5`) that would have made production fail even with a valid paid account. Voice readiness needs key, voice, model, and audio proof as one sequence.
 
 Linked: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]], [[runbook#Production Voice]], [[memory#Technical Lessons]]
+
+## 2026-05-16 - Local Voice Networking Must Fail Softly
+
+#decision #voice #reliability #qa
+
+Decision: If `ELEVENLABS_LOCAL_ADDRESS` is configured and the ElevenLabs TTS request fails at the network layer, the server should retry once without the local address before returning a provider failure.
+
+Reasoning: The local voice path can break when VPN or Wi-Fi routing changes, even when the server key, voice id, model id, and production route are valid. Retrying without the local address keeps development and stakeholder testing from falling back to the old browser voice because of a brittle local network binding.
+
+Linked: [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]], [[context#Environment Notes]], [[production-voice]]

@@ -22,6 +22,7 @@ updated: 2026-05-15
 - Current Product Trust pass separates ElevenLabs API readiness from human voice acceptance and keeps medication prompts question-shaped.
 - Current UI/UX Trust refactor splits caregiver screens into focused view modules and keeps production secondary routes in the same clinical shell.
 - Current multi-POV UI refinement favors row-based care operations surfaces over repeated cards, with Patient Focus Mode showing one dominant `Done` action plus visible support controls.
+- Current UI trust pass removes more nested section chrome, uses a system clinical font stack, and labels caregiver timing issues as `Needs attention` instead of harsh patient-facing failure language.
 
 ## Technical Stack
 
@@ -87,6 +88,7 @@ Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3
 - Server env values are normalized before provider calls because Vercel values can contain quotes or literal `\n` escapes.
 - Current funded ElevenLabs key is installed in Vercel production and local `.env.local`.
 - `ELEVENLABS_MODEL_ID` must be `eleven_flash_v2_5`; `eleve_flash_v2_5` returns `model_not_found`.
+- `ELEVENLABS_LOCAL_ADDRESS` is optional. If it fails due VPN or network routing, the server retries ElevenLabs TTS once without the local address.
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.

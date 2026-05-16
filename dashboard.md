@@ -89,6 +89,7 @@ updated: 2026-05-16
 - Latest ElevenLabs credential gate: [[qa-log#2026-05-16 - ElevenLabs Key Rotation And Quota Gate]].
 - Latest ElevenLabs quota deploy: [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 - Latest strict ElevenLabs voice gate: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
+- Latest UI trust and voice reliability deploy: [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 
 ## Context
 

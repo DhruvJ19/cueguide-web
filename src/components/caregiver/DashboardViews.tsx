@@ -106,7 +106,7 @@ export function TodayView({
       <div className="cg-main-stack">
         <section className="cg-command-panel" aria-label="Medication guidance overview">
           <div className="cg-next-primary">
-            <p className="cg-eyebrow">{nextRoutineIsPastDue ? 'Past due' : 'Next medication'}</p>
+            <p className="cg-eyebrow">{nextRoutineIsPastDue ? 'Needs attention' : 'Next medication'}</p>
             <h2>{nextRoutine?.name || 'No medication scheduled'}</h2>
             <div className="cg-meta-grid">
               <span><strong>{nextRoutine?.scheduledTime || '--:--'}</strong> Time</span>
@@ -180,8 +180,8 @@ export function TodayView({
               <div className="cg-system-alert">
                 <AlertTriangle size={16} />
                 <span>
-                  <strong>{overdueRoutines.length} session{overdueRoutines.length === 1 ? '' : 's'} past scheduled time</strong>
-                  <small>Use caregiver review language only. Patient prompts remain calm.</small>
+                  <strong>{overdueRoutines.length} session{overdueRoutines.length === 1 ? '' : 's'} need caregiver review</strong>
+                  <small>Check timing and context. Patient prompts remain calm.</small>
                 </span>
               </div>
             )}
@@ -543,7 +543,7 @@ export function ReportsView({
           <div className="cg-report-lead">
             <div>
               <p className="cg-eyebrow">Current signal</p>
-              <h3>{medicationCompletions.length < 2 ? 'Trend evidence is still building' : `${adherenceRate}% medication-session adherence`}</h3>
+              <h3>{medicationCompletions.length < 2 ? 'Trend evidence is still building' : `${adherenceRate}% session completion`}</h3>
               <p>
                 {medicationCompletions.length < 2
                   ? 'Run more medication sessions before treating this as a trend.'
@@ -655,12 +655,12 @@ export function SettingsView({
 }) {
   return (
     <div className="cg-main-stack">
-      <Section title="Settings" eyebrow="Voice, data, alerts, privacy">
+      <Section title="System readiness">
         <div className="cg-settings-summary">
           <div>
             <p className="cg-eyebrow">System checks</p>
-            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready for review' : 'Voice approval pending'}</h3>
-            <p>{voiceReviewReady ? 'Voice is accepted. Data, alerts, and privacy checks are below.' : 'Accept the patient voice only after it sounds human, soft, and gentle.'}</p>
+            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready' : 'Voice review needed'}</h3>
+            <p>{voiceReviewReady ? 'Voice accepted. Data, alerts, and privacy status are below.' : 'Approve only after the voice sounds human, soft, and gentle.'}</p>
           </div>
           <button className="cg-primary" disabled={!readiness.voice} onClick={onPlayPrimaryVoice}>
             <Volume2 size={17} /> Play primary voice
@@ -676,7 +676,7 @@ export function SettingsView({
                 <Volume2 size={18} />
                 <div>
                   <strong>Google Maps voice standard</strong>
-                  <p>Human, soft, gentle, and non-commanding.</p>
+                  <p>Human, soft, gentle, and question-shaped.</p>
                 </div>
                 <div className="cg-voice-prompts">
                   {voicePrompts.map((prompt, index) => (

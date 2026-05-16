@@ -1264,6 +1264,42 @@ Known caveats:
 
 Linked: [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]
 
+## 2026-05-16 - ElevenLabs Quota Handling Production Deploy
+
+Status: deployed; production now reports the accurate ElevenLabs quota blocker.
+
+Deployment:
+
+- Vercel deployment: `dpl_Ff54ZYNNJ7RqnJ6mgKhbyStCaeuN`
+- Production URL: `https://cueguide-web.vercel.app`
+- Commit: `3a560a07`
+
+Commands:
+
+- `vercel --prod --yes`
+- Direct production `/api/elevenlabs/voices` check
+- Direct production `/api/elevenlabs/tts` check
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- Production Playwright visual QA for Settings quota state, Reports, desktop, and mobile Today
+
+Observed:
+
+- Deploy succeeded and aliased to `https://cueguide-web.vercel.app`.
+- Production `/api/elevenlabs/voices` returned `200 application/json`.
+- Production `/api/elevenlabs/tts` returned `401 application/json` with `code: quota_exceeded`.
+- Settings showed: `ElevenLabs is connected, but the account is out of TTS credits. Add credits before stakeholder voice review.`
+- Fallback-tolerant production smoke passed.
+- Smoke medication: `Smoke Omega 1778921139238`.
+- Production mobile Today no-overflow check passed.
+- Production visual QA found no desktop or mobile overflow.
+
+Known caveats:
+
+- Strict voice smoke remains intentionally blocked until ElevenLabs credits are added.
+- The user still needs to do human-ear acceptance after credits are available.
+
+Linked: [[decisions#2026-05-16 - Voice Readiness Must Not Burn TTS Credits]], [[todo#P0 - Demo-Critical]], [[runbook#Production Voice]]
+
 ## 2026-05-16 - Voice Acceptance UX Production Deploy
 
 Status: deployed; production voice behavior is honest, but real ElevenLabs audio is still blocked.

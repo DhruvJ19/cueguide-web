@@ -108,3 +108,4 @@ updated: 2026-05-16
 - [x] Deployed the ElevenLabs fallback-masking fix and verified production Read Aloud no longer calls browser speech when ElevenLabs returns `401`. See [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Production Deploy]].
 - [x] Hardened voice acceptance UX locally: patient gets calm blocked-audio text and caregiver cannot mark voice accepted until an ElevenLabs sample plays. See [[qa-log#2026-05-16 - Voice Acceptance UX Local Gate]].
 - [x] Deployed voice acceptance UX hardening and verified production blocks browser speech plus voice acceptance when ElevenLabs returns `401`. See [[qa-log#2026-05-16 - Voice Acceptance UX Production Deploy]].
+- [x] Rotated the ElevenLabs production key and deployed quota-aware voice handling. Strict voice smoke now waits on ElevenLabs account credits, not code or env validity. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].

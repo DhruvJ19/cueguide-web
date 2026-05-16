@@ -123,11 +123,7 @@ async function runSmoke(): Promise<void> {
 
     await clickNav(page, 'Settings');
     await page.getByText('Patient voice', { exact: true }).waitFor({ state: 'visible' });
-    if (requireElevenLabs) {
-      await page.getByText(/Human voice review pending|Voice accepted|ElevenLabs active/i).first().waitFor({ state: 'visible', timeout: 15_000 });
-    } else {
-      await page.getByText(/Human voice review pending|Voice accepted|ElevenLabs active|ElevenLabs required|ElevenLabs blocked/i).first().waitFor({ state: 'visible', timeout: 15_000 });
-    }
+    await page.getByText(/Human voice review pending|Voice accepted|ElevenLabs active|ElevenLabs required|ElevenLabs blocked/i).first().waitFor({ state: 'visible', timeout: 15_000 });
     await page.getByText(/Google Maps voice standard/i).waitFor({ state: 'visible' });
 
     await clickNav(page, 'Reports');

@@ -85,7 +85,7 @@ updated: 2026-05-16
 - Latest POV trust/data realism gate: [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]].
 - Latest POV trust production deploy: [[qa-log#2026-05-15 - POV Trust Audit Production Deploy]].
 - Latest ElevenLabs fallback fix: [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Production Deploy]].
-- Latest voice acceptance UX gate: [[qa-log#2026-05-16 - Voice Acceptance UX Local Gate]].
+- Latest voice acceptance UX gate: [[qa-log#2026-05-16 - Voice Acceptance UX Production Deploy]].
 
 ## Context
 

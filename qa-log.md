@@ -1177,7 +1177,7 @@ Linked: [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browse
 
 ## 2026-05-16 - Voice Acceptance UX Local Gate
 
-Status: local QA passed; production deploy pending.
+Status: production deployed; app-level voice gate passed; strict ElevenLabs audio still blocked by invalid key.
 
 Change:
 
@@ -1215,5 +1215,40 @@ Observed:
 Known caveats:
 
 - Local and production voice are still blocked until a fresh valid `ELEVENLABS_API_KEY` is saved and strict smoke returns `200 audio/mpeg`.
+
+Linked: [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]], [[production-voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - Voice Acceptance UX Production Deploy
+
+Status: deployed; production voice behavior is honest, but real ElevenLabs audio is still blocked.
+
+Deployment:
+
+- Vercel deployment: `dpl_9N2T8gu1ZRF5NVtPVG3xarHdnj2T`
+- Production URL: `https://cueguide-web.vercel.app`
+- Commit: `2fb63b84`
+
+Commands:
+
+- `vercel --prod --yes`
+- Direct production TTS curl to `/api/elevenlabs/tts`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Instrumented production browser check for blocked voice behavior
+
+Observed:
+
+- Deploy succeeded and aliased to `https://cueguide-web.vercel.app`.
+- Direct production TTS still returns `401 application/json`, confirming the current Vercel `ELEVENLABS_API_KEY` is invalid.
+- Fallback-tolerant production smoke passed.
+- Smoke medication: `Smoke Omega 1778915964924`.
+- Production mobile overflow check passed.
+- Production local onboarding flow passed.
+- Instrumented production check saw ElevenLabs `401 application/json`, `speechSynthesis.speak()` call count `0`, and disabled `Mark accepted`.
+- Strict production smoke failed because ElevenLabs did not return `audio/mpeg`; this remains the correct release blocker.
+
+Known caveats:
+
+- This deploy improves honesty and patient/caregiver UX around voice failure. It does not solve the missing valid ElevenLabs key.
 
 Linked: [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]], [[production-voice]], [[todo#P0 - Demo-Critical]]

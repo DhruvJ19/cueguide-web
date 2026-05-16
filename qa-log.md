@@ -1174,3 +1174,46 @@ Known caveats:
 - Real production voice remains blocked until a fresh valid `ELEVENLABS_API_KEY` is saved in Vercel and strict smoke returns `200 audio/mpeg`.
 
 Linked: [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]], [[production-voice]], [[runbook#Production Voice]], [[todo#P0 - Demo-Critical]]
+
+## 2026-05-16 - Voice Acceptance UX Local Gate
+
+Status: local QA passed; production deploy pending.
+
+Change:
+
+- Settings voice readiness now requires a tiny `/api/elevenlabs/tts` `audio/mpeg` check, not only `/api/elevenlabs/voices`.
+- `Read aloud` returns a typed playback result.
+- Patient Focus Mode shows calm text when audio is unavailable: `Let us use the words on screen for now.`
+- Settings disables `Mark accepted` until an actual ElevenLabs sample plays.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- In-app Browser QA at `http://127.0.0.1:3006`
+- Instrumented Playwright QA for blocked voice behavior
+
+Observed:
+
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security checks passed with 0 vulnerabilities, 346 verified registry signatures, and 48 verified attestations.
+- Dry-run clean install passed.
+- Local fallback-tolerant smoke passed.
+- Smoke medication: `Smoke Omega 1778905471847`.
+- Local mobile overflow check passed.
+- Local onboarding flow passed.
+- Instrumented blocked-voice check observed ElevenLabs JSON failures and `speechSynthesis.speak()` call count `0`.
+- Patient screen showed `Let us use the words on screen for now.`
+- Settings showed blocked voice state and disabled `Mark accepted`.
+
+Known caveats:
+
+- Local and production voice are still blocked until a fresh valid `ELEVENLABS_API_KEY` is saved and strict smoke returns `200 audio/mpeg`.
+
+Linked: [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]], [[production-voice]], [[todo#P0 - Demo-Critical]]

@@ -20,6 +20,8 @@ export interface VoiceStatus {
   message: string;
 }
 
+export type AudioPlaybackResult = 'elevenlabs' | 'browser' | 'blocked' | 'empty';
+
 const GENTLE_SETTINGS: VoiceSettings = {
   stability: 0.68,
   similarity_boost: 0.78,
@@ -46,6 +48,22 @@ async function fetchVoicePayload(): Promise<{ voices: Voice[]; selectedVoiceId: 
   };
 }
 
+async function assertTtsReady(): Promise<void> {
+  const res = await fetch('/api/elevenlabs/tts', {
+    method: 'POST',
+    headers: {
+      Accept: 'audio/mpeg',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text: 'Voice check.' }),
+  });
+  const contentType = (res.headers.get('content-type') || '').split(';')[0];
+  if (!res.ok || contentType !== 'audio/mpeg') {
+    throw new Error(`ElevenLabs TTS unavailable: ${res.status} ${contentType || 'unknown content type'}`);
+  }
+  await res.arrayBuffer();
+}
+
 export async function fetchVoices(): Promise<Voice[]> {
   if (cachedVoices) return cachedVoices;
   try {
@@ -61,6 +79,7 @@ export async function getElevenLabsStatus(): Promise<VoiceStatus> {
   if (cachedVoiceStatus) return cachedVoiceStatus;
   try {
     const data = await fetchVoicePayload();
+    await assertTtsReady();
     cachedVoices = data.voices;
     const selectedVoiceName = data.selectedVoice?.name || 'production voice';
     cachedVoiceStatus = {
@@ -83,7 +102,7 @@ export async function getElevenLabsStatus(): Promise<VoiceStatus> {
 
 export async function speakWithElevenLabs(
   text: string,
-  gentle: boolean = false,
+  gentle: boolean,
   onEnd?: () => void,
   voiceId?: string,
 ): Promise<boolean> {
@@ -129,7 +148,7 @@ export async function speakWithElevenLabs(
   }
 }
 
-export function speakWithBrowserTTS(text: string, gentle: boolean = false): void {
+export function speakWithBrowserTTS(text: string, gentle: boolean): void {
   if (!window.speechSynthesis) return;
 
   window.speechSynthesis.cancel();

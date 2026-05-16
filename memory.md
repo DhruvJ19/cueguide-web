@@ -2,7 +2,7 @@
 aliases: [memory, long-term-memory]
 tags: [project, memory, preferences, lessons]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 # CueGuide Memory
@@ -105,6 +105,7 @@ Recent verified checks:
 - Production ElevenLabs remains blocked by an invalid local/production key state: direct `/v1/user` with the local key returns `401`, and Chrome could not complete dashboard key rotation because the ElevenLabs page rendered blank. Rotate/re-set `ELEVENLABS_API_KEY` before strict production voice claims. See [[qa-log#2026-05-15 - POV Trust Audit And Data Realism Gate]].
 - POV trust production deploy `dpl_47yk2DiuRXwoh6RhAByhZ35Qvtcv` passed fallback-tolerant production smoke and mobile/onboarding checks, but strict production voice failed with ElevenLabs `401 application/json`. See [[qa-log#2026-05-15 - POV Trust Audit Production Deploy]].
 - When `VITE_USE_ELEVENLABS=true`, browser TTS fallback is now opt-in through `VITE_ALLOW_BROWSER_TTS_FALLBACK=true`. Keep it false for production so a broken ElevenLabs key cannot sound like the old robotic browser voice. See [[decisions#2026-05-16 - Broken ElevenLabs Must Not Masquerade As Browser Voice]].
+- Voice acceptance now requires an actual heard ElevenLabs sample. Settings should not allow `Mark accepted` from a mere config/voices check, and Patient Focus Mode should respond calmly when audio is unavailable. See [[decisions#2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample]].
 
 ## Obsidian Maintenance Rules
 

@@ -22,8 +22,8 @@ import { useMedicationStore } from '../store/medicationStore';
 import { useAlertStore } from '../store/alertStore';
 import { validateMedicationDraft } from '../services/careAlerts';
 import { buildMedicationRoutine, getMedicationScheduleTimes } from '../services/medicationRoutine';
-import { getElevenLabsStatus, type VoiceStatus } from '../services/elevenlabs';
-import { playAudio } from '../utils/audio';
+import { getElevenLabsStatus, type AudioPlaybackResult, type VoiceStatus } from '../services/elevenlabs';
+import { getCaregiverVoiceSampleMessage, playAudio } from '../utils/audio';
 import { config } from '../config/env';
 import { isSupabaseConfigured } from '../services/supabase';
 import { downloadLocalBackup } from '../services/localBackup';
@@ -40,6 +40,7 @@ import {
 import type { CaregiverTone } from '../components/caregiver/CaregiverPrimitives';
 import type { Medication, Routine, RoutineStatus, StepCompletion } from '../types';
 type VoiceReviewState = 'pending' | 'accepted';
+type VoiceSampleResult = AudioPlaybackResult | 'not_played';
 
 interface Props {
   onStartSimulation: (routine: Routine) => void;
@@ -159,6 +160,7 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
     selectedVoiceName: '',
     message: config.elevenlabs.enabled ? 'Checking ElevenLabs voice service.' : 'ElevenLabs is required for production voice.',
   });
+  const [voiceSampleResult, setVoiceSampleResult] = useState<VoiceSampleResult>('not_played');
 
   React.useEffect(() => {
     const handleNav = (event: Event) => {
@@ -281,12 +283,19 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
   const latestVisibleAlerts = [...alerts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
 
   const markVoiceAccepted = () => {
-    if (!readiness.voice) return;
+    if (!readiness.voice || voiceSampleResult !== 'elevenlabs') return;
     setVoiceReviewState('accepted');
   };
 
   const resetVoiceReview = () => {
     setVoiceReviewState('pending');
+    setVoiceSampleResult('not_played');
+  };
+
+  const playVoiceSample = async (prompt: string) => {
+    const result = await playAudio(prompt, 'female', true);
+    setVoiceSampleResult(result);
+    if (result !== 'elevenlabs') setVoiceReviewState('pending');
   };
 
   const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
@@ -450,11 +459,13 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         voiceReadinessValue={voiceReadinessValue}
         voiceReadinessDetail={voiceReadinessDetail}
         voiceReviewStatus={voiceReviewStatus}
+        canAcceptVoice={readiness.voice && voiceSampleResult === 'elevenlabs'}
+        voiceSampleMessage={getCaregiverVoiceSampleMessage(voiceSampleResult === 'not_played' ? 'empty' : voiceSampleResult)}
         voicePrompts={VOICE_REVIEW_PROMPTS}
         alertCount={alerts.length}
         aiEnabled={aiConfig.isEnabled}
-        onPlayPrimaryVoice={() => playAudio(VOICE_REVIEW_PROMPTS[0], 'female', true)}
-        onPlayVoicePrompt={(prompt) => playAudio(prompt, 'female', true)}
+        onPlayPrimaryVoice={() => void playVoiceSample(VOICE_REVIEW_PROMPTS[0])}
+        onPlayVoicePrompt={(prompt) => void playVoiceSample(prompt)}
         onMarkVoiceAccepted={markVoiceAccepted}
         onResetVoiceReview={resetVoiceReview}
         onToggleAI={(enabled) => setAiConfig({ isEnabled: enabled })}

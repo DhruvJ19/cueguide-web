@@ -624,6 +624,8 @@ export function SettingsView({
   voiceReadinessValue,
   voiceReadinessDetail,
   voiceReviewStatus,
+  canAcceptVoice,
+  voiceSampleMessage,
   voicePrompts,
   alertCount,
   aiEnabled,
@@ -639,6 +641,8 @@ export function SettingsView({
   voiceReadinessValue: string;
   voiceReadinessDetail: string;
   voiceReviewStatus: VoiceReadinessStatus;
+  canAcceptVoice: boolean;
+  voiceSampleMessage: string;
   voicePrompts: string[];
   alertCount: number;
   aiEnabled: boolean;
@@ -681,8 +685,9 @@ export function SettingsView({
                     </button>
                   ))}
                 </div>
+                <p className="cg-voice-sample-note">{voiceSampleMessage}</p>
                 <div className="cg-voice-review-actions">
-                  <button type="button" disabled={!readiness.voice} onClick={onMarkVoiceAccepted}>Mark accepted</button>
+                  <button type="button" disabled={!canAcceptVoice} onClick={onMarkVoiceAccepted}>Mark accepted</button>
                   <button type="button" onClick={onResetVoiceReview}>Reset</button>
                 </div>
               </div>

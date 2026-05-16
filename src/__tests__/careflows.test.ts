@@ -14,7 +14,7 @@ import {
   countCompletedSteps,
   getFocusCompletionStatus,
 } from '../services/focusSession';
-import { transformToGentle } from '../utils/audio';
+import { getCaregiverVoiceSampleMessage, getPatientAudioNotice, transformToGentle } from '../utils/audio';
 import type { Medication, PatientProfile, StepCompletion } from '../types';
 
 const patient: PatientProfile = {
@@ -200,6 +200,9 @@ assert.equal(safeCue.steps.length, 1);
 const gentleCue = transformToGentle('Take the blue pill with water!');
 assert.equal(gentleCue, 'Would you like to take the blue pill with a sip of water.');
 assert.doesNotMatch(gentleCue, /^Take\b|!/i);
+assert.equal(getPatientAudioNotice('blocked'), 'Let us use the words on screen for now.');
+assert.equal(getCaregiverVoiceSampleMessage('blocked'), 'Voice sample is blocked because ElevenLabs did not return audio. Rotate or re-set the server key.');
+assert.match(getCaregiverVoiceSampleMessage('elevenlabs'), /human, soft, and gentle/i);
 
 const backupStorage = new Map<string, string>([
   ['cueguide-patient', JSON.stringify({ state: { profile: patient } })],

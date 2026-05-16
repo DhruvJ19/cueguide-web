@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, HelpCircle, SkipForward, Volume2 } from 'lucide-react';
 import { generateCueData } from '../services/ai';
-import { playAudio } from '../utils/audio';
+import { getPatientAudioNotice, playAudio } from '../utils/audio';
 import { createCareAlertsFromStepEvents } from '../services/careAlerts';
 import {
   advanceFocusStep,
@@ -39,6 +39,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   const [stepStartedAt, setStepStartedAt] = useState(new Date().toISOString());
   const [stepEvents, setStepEvents] = useState<StepCompletion[]>([]);
   const [helpText, setHelpText] = useState<string | null>(null);
+  const [audioNotice, setAudioNotice] = useState<string | null>(null);
   const [startedAt] = useState(Date.now());
 
   const currentStep = routine.steps[currentStepIndex];
@@ -127,6 +128,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       nextStartedAt,
     });
     setHelpText(null);
+    setAudioNotice(null);
     setStepEvents(transition.events);
     setCurrentStepIndex(transition.currentStepIndex);
     setStepStartedAt(transition.stepStartedAt);
@@ -149,12 +151,15 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       routineName: routine.name,
     }));
     const text = currentCue?.help_text || currentStep.helpText || 'Take your time. Do the next small action when you are ready.';
+    setAudioNotice(null);
     setHelpText(text);
   }
 
-  function handleReadAloud() {
+  async function handleReadAloud() {
     const text = helpText || currentCue?.audio_text || currentCue?.text || currentStep.instruction;
-    playAudio(text, profile.preferences.voice);
+    setAudioNotice('Reading aloud now.');
+    const result = await playAudio(text, profile.preferences.voice, true);
+    setAudioNotice(getPatientAudioNotice(result));
   }
 
   function finishWithMood(mood: string) {
@@ -240,6 +245,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
         <p className="patient-kicker">Step {currentStepIndex + 1} of {routine.steps.length}</p>
         <h1>{currentCue?.text || currentStep.instruction}</h1>
         {patientStepGuidance && <p className={helpText ? 'patient-help' : 'patient-guidance'}>{patientStepGuidance}</p>}
+        {audioNotice && <p className="patient-audio-notice" aria-live="polite">{audioNotice}</p>}
         <div className="patient-actions">
           <button className="patient-done" onClick={handleDone}><Check size={30} /> Done</button>
           <button onClick={handleReadAloud}><Volume2 size={26} /> Read aloud</button>

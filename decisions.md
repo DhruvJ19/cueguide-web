@@ -2,7 +2,7 @@
 aliases: [decisions, decision-log]
 tags: [project, decisions, architecture, log]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 # CueGuide Decisions
@@ -369,3 +369,13 @@ Decision: When `VITE_USE_ELEVENLABS=true`, CueGuide should not automatically pla
 Reasoning: The old fallback hid a broken ElevenLabs key by playing the same robotic browser voice, making it look like ElevenLabs was configured but low quality. Som's voice standard requires real ElevenLabs audio; a failed provider check should be obvious instead of silently sounding like the old prototype.
 
 Linked: [[qa-log#2026-05-16 - ElevenLabs Fallback Masking Fix]], [[production-voice]], [[source-map#Som Feedback]]
+
+## 2026-05-16 - Voice Acceptance Requires A Heard ElevenLabs Sample
+
+#decision #voice #ux #som #qa
+
+Decision: Caregivers cannot mark the patient voice accepted until a voice sample actually plays through ElevenLabs. A blocked provider result should keep voice review pending, and Patient Focus Mode should show calm patient-safe text instead of a dead `Read aloud` interaction.
+
+Reasoning: A voices-list check is not enough for Som's standard. The app must prove the actual TTS path returns audio and the caregiver must hear it before accepting it as human, soft, and gentle. Patient-facing copy should never expose technical failure language.
+
+Linked: [[qa-log#2026-05-16 - Voice Acceptance UX Local Gate]], [[source-map#Som Feedback]], [[todo#P0 - Demo-Critical]]

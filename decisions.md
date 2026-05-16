@@ -430,4 +430,4 @@ Decision: Keep moving CueGuide away from repeated cards and poster-like patient 
 
 Reasoning: The user's screenshot critique showed that large boxed slabs, huge date copy, and repeated card styling made the app feel cheap and AI-generated. The product needs to feel like a calm care appliance for patients and a clinical operations surface for caregivers.
 
-Linked: [[qa-log#2026-05-16 - 10/10 UI Direction Local Gate]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+Linked: [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

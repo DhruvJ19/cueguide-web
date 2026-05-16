@@ -1472,9 +1472,15 @@ Known caveats:
 
 Linked: [[decisions#2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
 
-## 2026-05-16 - 10/10 UI Direction Local Gate
+## 2026-05-16 - 10/10 UI Direction Production Deploy
 
-Status: passed locally; ready for commit/deploy after final diff review.
+Status: passed; production deploy is live with strict ElevenLabs smoke.
+
+Deployment:
+
+- Commit: `63400bea`
+- Vercel deployment: `dpl_CpmA8pXcC84ZNAUJa39ZFgaNq1xn`
+- Production URL: `https://cueguide-web.vercel.app`
 
 Changes verified:
 
@@ -1491,6 +1497,8 @@ Commands:
 - `npm run security:all`
 - `npm ci --ignore-scripts --dry-run`
 - `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- `vercel --prod --yes`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
 - Browser QA for desktop Today, tablet Patient Focus Mode greeting/step, Medications, Reports, and Settings.
 
 Observed:
@@ -1499,8 +1507,11 @@ Observed:
 - Build passed in `2.27s`.
 - Security gate passed: lockfile, secret scan, npm audit, registry signatures, and attestations.
 - Strict local smoke passed with ElevenLabs `200 audio/mpeg`.
-- Smoke medication: `Smoke Omega 1778937347598`.
+- Local smoke medication: `Smoke Omega 1778937347598`.
+- Strict production smoke passed with ElevenLabs `200 audio/mpeg`.
+- Production smoke medication: `Smoke Omega 1778937563542`.
 - Mobile/local onboarding and no-overflow assertions passed.
+- Production mobile no-overflow and local onboarding assertions passed.
 - Browser QA showed no horizontal overflow on desktop, tablet patient, or smoke mobile checks.
 
 Known caveats:

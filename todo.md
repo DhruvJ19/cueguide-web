@@ -71,7 +71,7 @@ updated: 2026-05-16
 - [x] Stop broken ElevenLabs requests from falling back to the old browser voice in production mode.
 - [x] Ship a UI trust cleanup that reduces nested cards, improves type, clarifies Live Session navigation, softens caregiver timing language, and keeps strict ElevenLabs smoke passing. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - [x] Repair Patient Focus Mode visual quality: remove boxed poster-card greeting, shorten the headline, keep the patient name in support copy, and redeploy with strict ElevenLabs smoke. See [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
-- [x] Complete a 10/10-direction local UI trust gate: flatter caregiver command surfaces, shorter patient greeting, strict local ElevenLabs smoke, and updated smoke selectors. See [[qa-log#2026-05-16 - 10/10 UI Direction Local Gate]].
+- [x] Complete and deploy a 10/10-direction UI trust gate: flatter caregiver command surfaces, shorter patient greeting, strict local and production ElevenLabs smoke, and updated smoke selectors. See [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
 - [ ] Continue the next UI pass on signup/onboarding, reports density, medication edit ergonomics, and fresh-user navigation from caregiver/patient/buyer/devil's-advocate POVs.
 
 ## P3 - Mobile Path

@@ -113,7 +113,7 @@ Recent verified checks:
 - ElevenLabs key rotation must validate key access, configured voice id, model id, and tiny TTS audio before deploy. The funded-key pass caught a local `ELEVENLABS_MODEL_ID` typo (`eleve_flash_v2_5`) before production. See [[decisions#2026-05-16 - Validate Voice Key, Voice Id, And Model Before Deploy]].
 - `ELEVENLABS_LOCAL_ADDRESS` is optional and brittle with VPN/Wi-Fi changes. Server TTS should retry once without it before failing so local QA can still prove real ElevenLabs audio. See [[decisions#2026-05-16 - Local Voice Networking Must Fail Softly]].
 - UI trust work should keep moving away from nested cards: open page sections, row/table anatomy for caregiver operations, compact Settings readiness, and direct language like `Needs attention` instead of harsh failure labels. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
-- The next visual quality bar is "care command surface, not generated poster": caregiver UI should keep using rows/status strips/short labels, while Patient Focus Mode should avoid date-heavy giant copy and boxed slabs. See [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]] and [[qa-log#2026-05-16 - 10/10 UI Direction Local Gate]].
+- The next visual quality bar is "care command surface, not generated poster": caregiver UI should keep using rows/status strips/short labels, while Patient Focus Mode should avoid date-heavy giant copy and boxed slabs. See [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]] and [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

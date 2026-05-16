@@ -67,7 +67,7 @@ async function runSmoke(): Promise<void> {
     });
     await page.reload({ waitUntil: 'networkidle', timeout: 30_000 });
 
-    await page.getByRole('heading', { name: /Care overview/i }).waitFor({ state: 'visible' });
+    await page.getByRole('heading', { name: /Care (overview|dashboard)/i }).waitFor({ state: 'visible' });
     assert.equal(await page.locator('text=/Failed to compile|Unhandled Runtime Error|Vite Error/i').count(), 0);
 
     await clickNav(page, 'Medications');
@@ -135,7 +135,7 @@ async function runSmoke(): Promise<void> {
     await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 30_000 });
     await page.evaluate(() => localStorage.setItem('cueguide-active-tab', 'today'));
     await page.reload({ waitUntil: 'networkidle', timeout: 30_000 });
-    await page.getByRole('heading', { name: /Care overview/i }).waitFor({ state: 'visible' });
+    await page.getByRole('heading', { name: /Care (overview|dashboard)/i }).waitFor({ state: 'visible' });
     const hasMobileOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
     );
@@ -154,7 +154,7 @@ async function runSmoke(): Promise<void> {
     await page.getByPlaceholder('Lisinopril').fill('Smoke Starter Med');
     await page.getByPlaceholder('10 mg').fill('2 mg');
     await page.getByRole('button', { name: /Open dashboard/i }).click();
-    await page.getByRole('heading', { name: /Care overview/i }).waitFor({ state: 'visible', timeout: 15_000 });
+    await page.getByRole('heading', { name: /Care (overview|dashboard)/i }).waitFor({ state: 'visible', timeout: 15_000 });
     await page.getByRole('heading', { name: /Smoke Starter Med/i }).waitFor({ state: 'visible', timeout: 10_000 });
     const onboardingOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,

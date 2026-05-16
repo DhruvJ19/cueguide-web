@@ -23,6 +23,7 @@ updated: 2026-05-16
 - Current UI/UX Trust refactor splits caregiver screens into focused view modules and keeps production secondary routes in the same clinical shell.
 - Current multi-POV UI refinement favors row-based care operations surfaces over repeated cards, with Patient Focus Mode showing one dominant `Done` action plus visible support controls.
 - Current UI trust pass removes more nested section chrome, uses a system clinical font stack, and labels caregiver timing issues as `Needs attention` instead of harsh patient-facing failure language.
+- Current 10/10 direction continues flattening caregiver screens into command rows and shortens patient greeting copy so Focus Mode feels like a calm care appliance instead of a generated poster.
 
 ## Technical Stack
 

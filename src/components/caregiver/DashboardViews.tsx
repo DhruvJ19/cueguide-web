@@ -142,7 +142,7 @@ export function TodayView({
           </div>
         </section>
 
-        <Section title="Today’s medication plan">
+        <Section title="Medication plan">
           <div className="cg-schedule">
             {allRoutines.length === 0 && (
               <EmptyState
@@ -467,10 +467,18 @@ export function SessionView({
         </div>
       ) : (
         <div className="cg-live-panel">
-          <Activity size={28} />
-          <h2>No session logged today</h2>
-          <p>Start a scheduled routine to see help, skip, done, and timing events.</p>
-          <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
+          <div className="cg-live-empty">
+            <Activity size={28} />
+            <span>Ready for next patient session</span>
+            <h2>No session running</h2>
+            <p>Launch the next medication prompt, then review Help, Skip, Done, timing, and mood here.</p>
+            <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
+          </div>
+          <div className="cg-live-steps" aria-label="Session evidence that will appear after launch">
+            <span><CheckCircle2 size={16} /> Patient confirmations</span>
+            <span><Bell size={16} /> Help and skip alerts</span>
+            <span><ShieldCheck size={16} /> Confirmation limit notes</span>
+          </div>
         </div>
       )}
     </Section>
@@ -660,7 +668,7 @@ export function SettingsView({
           <div>
             <p className="cg-eyebrow">System checks</p>
             <h3>{voiceReviewReady && readiness.events ? 'Care loop ready' : 'Voice review needed'}</h3>
-            <p>{voiceReviewReady ? 'Voice accepted. Data, alerts, and privacy status are below.' : 'Approve only after the voice sounds human, soft, and gentle.'}</p>
+            <p>{voiceReviewReady ? 'Voice accepted. Data, alerts, and privacy status are below.' : 'Play a sample, then accept only if the voice is calm and natural.'}</p>
           </div>
           <button className="cg-primary" disabled={!readiness.voice} onClick={onPlayPrimaryVoice}>
             <Volume2 size={17} /> Play primary voice
@@ -676,7 +684,7 @@ export function SettingsView({
                 <Volume2 size={18} />
                 <div>
                   <strong>Google Maps voice standard</strong>
-                  <p>Human, soft, gentle, and question-shaped.</p>
+                  <p>Human, soft, gentle. Ask, do not command.</p>
                 </div>
                 <div className="cg-voice-prompts">
                   {voicePrompts.map((prompt, index) => (
@@ -701,14 +709,14 @@ export function SettingsView({
                 icon={<Database size={18} />}
                 label="Care data"
                 value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
-                detail={readiness.data ? 'Cloud env is present. Authenticated save/load proof still needs evidence.' : 'Local browser persistence is active. Cloud production proof is still pending.'}
+                detail={readiness.data ? 'Cloud env is present. Authenticated save/load proof is still pending.' : 'This browser is saving locally. Cloud proof is still pending.'}
                 status={readiness.data ? 'review' : 'fallback'}
               />
               <ReadinessItem
                 icon={<HardDrive size={18} />}
                 label="Local backup"
                 value="Export available"
-                detail="Download patient, medication, completion, alert, and voice-review data stored in this browser."
+                detail="Download patient, medication, session, alert, and voice-review data from this browser."
                 status={readiness.events ? 'ready' : 'review'}
               />
               <div className="cg-data-actions">
@@ -727,7 +735,7 @@ export function SettingsView({
                 icon={<BrainCircuit size={18} />}
                 label="AI cue generation"
                 value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
-                detail="Cue text stays short and warm. AI does not change schedules or create urgency autonomously."
+                detail="Short warm cues only. AI cannot change schedules or create urgency."
                 status={readiness.ai ? 'review' : 'fallback'}
               />
               <ReadinessItem

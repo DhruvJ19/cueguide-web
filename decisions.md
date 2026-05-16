@@ -421,3 +421,13 @@ Decision: If `ELEVENLABS_LOCAL_ADDRESS` is configured and the ElevenLabs TTS req
 Reasoning: The local voice path can break when VPN or Wi-Fi routing changes, even when the server key, voice id, model id, and production route are valid. Retrying without the local address keeps development and stakeholder testing from falling back to the old browser voice because of a brittle local network binding.
 
 Linked: [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]], [[context#Environment Notes]], [[production-voice]]
+
+## 2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy
+
+#decision #ux #design #patient-mode #qa
+
+Decision: Keep moving CueGuide away from repeated cards and poster-like patient screens. Caregiver screens should use command panels, rows, status strips, and concise labels. Patient Focus Mode should use open space, short greetings, and question-shaped prompts without date-heavy hero copy.
+
+Reasoning: The user's screenshot critique showed that large boxed slabs, huge date copy, and repeated card styling made the app feel cheap and AI-generated. The product needs to feel like a calm care appliance for patients and a clinical operations surface for caregivers.
+
+Linked: [[qa-log#2026-05-16 - 10/10 UI Direction Local Gate]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

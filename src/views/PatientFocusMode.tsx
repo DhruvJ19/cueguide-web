@@ -48,9 +48,13 @@ function lowerFirstCharacter(value: string): string {
   return value.charAt(0).toLowerCase() + value.slice(1);
 }
 
-function buildGreetingCopy(greeting: string | undefined, preferredName: string): PatientGreetingCopy {
+function getRoutineLabel(routineName: string): string {
+  return routineName.replace(/\s*\(\d+\)\s*$/, '').trim().toLowerCase() || 'medication guide';
+}
+
+function buildGreetingCopy(greeting: string | undefined, preferredName: string, routineName: string): PatientGreetingCopy {
   const fallbackTitle = 'Good morning.';
-  const fallbackDetail = `${preferredName}, we will go one step at a time.`;
+  const fallbackDetail = `${preferredName}, your ${getRoutineLabel(routineName)} is ready. We will go one step at a time.`;
   if (!greeting?.trim()) return { title: fallbackTitle, detail: fallbackDetail };
 
   const sentences = splitSentences(greeting.trim());
@@ -58,8 +62,10 @@ function buildGreetingCopy(greeting: string | undefined, preferredName: string):
 
   const rawTitle = sentences[0];
   const title = rawTitle.replace(new RegExp(`,\\s*${escapeRegExp(preferredName)}\\.?$`, 'i'), '.');
-  const detailText = sentences.slice(1).join(' ').trim() || fallbackDetail;
-  const detail = rawTitle === title ? detailText : `${preferredName}, ${lowerFirstCharacter(detailText)}`;
+  const detailText = sentences.slice(1).join(' ').trim();
+  const detail = detailText.includes('one step at a time')
+    ? `${preferredName}, ${lowerFirstCharacter(detailText)}`
+    : fallbackDetail;
   return { title, detail };
 }
 
@@ -80,7 +86,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   const currentCue = cueData?.steps[currentStepIndex];
   const completedCount = countCompletedSteps(stepEvents);
   const patientStepGuidance = helpText || (currentStep?.medicationId ? currentCue?.help_text || currentStep.helpText : null);
-  const greetingCopy = buildGreetingCopy(cueData?.greeting, profile?.preferredName || 'there');
+  const greetingCopy = buildGreetingCopy(cueData?.greeting, profile?.preferredName || 'there', routine.name);
 
   const promptContext = useMemo(() => {
     const today = new Date();
@@ -224,6 +230,10 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
           <p className="patient-kicker">{routine.name}</p>
           <h1>{greetingCopy.title}</h1>
           <p className="patient-subtitle">{greetingCopy.detail}</p>
+          <div className="patient-start-meta" aria-label="Session details">
+            <span>{routine.steps.length} step{routine.steps.length === 1 ? '' : 's'}</span>
+            <span>No rush</span>
+          </div>
           <button className="patient-primary" onClick={() => {
             const startedAt = new Date().toISOString();
             setFocusState('step');

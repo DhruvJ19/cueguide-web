@@ -267,16 +267,16 @@ export default function CaregiverDashboard({ onStartSimulation, theme, setTheme,
         ? 'ElevenLabs blocked'
         : 'ElevenLabs required';
   const voiceReadinessDetail = voiceReviewReady
-    ? `${voiceStatus.selectedVoiceName || 'Production voice'} passed the Google Maps standard: human, soft, gentle.`
+    ? `${voiceStatus.selectedVoiceName || 'Production voice'} passed the Google Maps standard.`
     : readiness.voice
-      ? `Voice library is reachable. Play a sample to confirm paid TTS audio and Google Maps-level tone.`
+      ? 'Play a sample before marking the voice accepted.'
       : voiceStatus.message;
-  const pageTitle = activeTab === 'today' ? 'Care overview' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
-  const headerContext = profile?.name ? `${profile.name} care plan` : 'Care plan';
+  const pageTitle = activeTab === 'today' ? 'Care dashboard' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
+  const headerContext = profile?.preferredName ? `${profile.preferredName}'s care plan` : profile?.name ? `${profile.name} care plan` : 'Care plan';
   const headerStatus = unreadAlerts.length > 0
     ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? ' needs' : 's need'} review`
     : nextRoutine
-      ? `${nextRoutine.name} at ${nextRoutine.scheduledTime}`
+      ? `Next: ${nextRoutine.name} at ${nextRoutine.scheduledTime}`
       : 'Care plan ready';
   const adherenceLabel = medicationCompletions.length < 2 ? 'Pending' : `${adherenceRate}%`;
   const latestSessionEvents = latestCompletion?.stepEvents || [];

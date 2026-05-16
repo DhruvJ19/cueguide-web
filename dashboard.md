@@ -91,6 +91,7 @@ updated: 2026-05-16
 - Latest strict ElevenLabs voice gate: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - Latest UI trust and voice reliability deploy: [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - Latest patient Focus Mode visual repair: [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
+- Latest 10/10-direction local gate: [[qa-log#2026-05-16 - 10/10 UI Direction Local Gate]].
 
 ## Context
 

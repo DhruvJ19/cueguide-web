@@ -1471,3 +1471,42 @@ Known caveats:
 - Supabase authenticated cloud persistence proof remains pending until test credentials are available.
 
 Linked: [[decisions#2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+
+## 2026-05-16 - 10/10 UI Direction Local Gate
+
+Status: passed locally; ready for commit/deploy after final diff review.
+
+Changes verified:
+
+- Caregiver Today now reads as a care command surface: `Care dashboard`, next medication, one primary patient-session action, compact status rows, and a flatter medication plan.
+- Patient Focus Mode greeting is no longer a boxed poster-card; it uses a calm open layout, shorter greeting, session meta, and question-shaped medication prompts.
+- Settings copy is shorter and voice readiness keeps Som's standard visible without hiding that human voice review is still pending.
+- Smoke selectors now accept the current `Care dashboard` heading while preserving coverage for the same care loop.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Browser QA for desktop Today, tablet Patient Focus Mode greeting/step, Medications, Reports, and Settings.
+
+Observed:
+
+- Type check passed after the smoke selector update.
+- Build passed in `2.27s`.
+- Security gate passed: lockfile, secret scan, npm audit, registry signatures, and attestations.
+- Strict local smoke passed with ElevenLabs `200 audio/mpeg`.
+- Smoke medication: `Smoke Omega 1778937347598`.
+- Mobile/local onboarding and no-overflow assertions passed.
+- Browser QA showed no horizontal overflow on desktop, tablet patient, or smoke mobile checks.
+
+Known caveats:
+
+- This is a meaningful UI trust improvement, not a 10/10 endpoint. The next pass should continue reducing wordiness, improving visual hierarchy, and testing signup/data flows from fresh-user POVs.
+- Human-ear voice acceptance is still user-owned.
+- Supabase authenticated cloud persistence proof remains pending until test credentials are available.
+
+Linked: [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

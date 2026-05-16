@@ -1478,8 +1478,8 @@ Status: passed; production deploy is live with strict ElevenLabs smoke.
 
 Deployment:
 
-- Commit: `15156a04`
-- Vercel deployment: `dpl_6USoA4BMJrndXuURPhXeZZPvtcN8`
+- Commit: `9f428f49`
+- Vercel deployment: `dpl_C5u769bwABR8TfU8TRwfAMF5iDyS`
 - Production URL: `https://cueguide-web.vercel.app`
 
 Changes verified:
@@ -1509,7 +1509,7 @@ Observed:
 - Strict local smoke passed with ElevenLabs `200 audio/mpeg`.
 - Local smoke medication: `Smoke Omega 1778937347598`.
 - Strict production smoke passed with ElevenLabs `200 audio/mpeg`.
-- Production smoke medication: `Smoke Omega 1778937795829`.
+- Production smoke medication: `Smoke Omega 1778937910295`.
 - Mobile/local onboarding and no-overflow assertions passed.
 - Production mobile no-overflow and local onboarding assertions passed.
 - Browser QA showed no horizontal overflow on desktop, tablet patient, or smoke mobile checks.

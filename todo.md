@@ -70,6 +70,7 @@ updated: 2026-05-16
 - [x] Rerun strict production voice smoke after funded ElevenLabs key is available. See [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - [x] Stop broken ElevenLabs requests from falling back to the old browser voice in production mode.
 - [x] Ship a UI trust cleanup that reduces nested cards, improves type, clarifies Live Session navigation, softens caregiver timing language, and keeps strict ElevenLabs smoke passing. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
+- [x] Repair Patient Focus Mode visual quality: remove boxed poster-card greeting, shorten the headline, keep the patient name in support copy, and redeploy with strict ElevenLabs smoke. See [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
 
 ## P3 - Mobile Path
 
@@ -111,3 +112,4 @@ updated: 2026-05-16
 - [x] Deployed voice acceptance UX hardening and verified production blocks browser speech plus voice acceptance when ElevenLabs returns `401`. See [[qa-log#2026-05-16 - Voice Acceptance UX Production Deploy]].
 - [x] Rotated the ElevenLabs production key and deployed quota-aware voice handling. Strict voice smoke now waits on ElevenLabs account credits, not code or env validity. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 - [x] Deployed UI trust and voice network fallback hardening: strict production smoke passed with ElevenLabs `200 audio/mpeg`, no mobile overflow, and cleaner Today/Settings screenshots. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
+- [x] Deployed Patient Focus visual repair: open full-screen greeting, shorter fallback greeting, strict ElevenLabs smoke, and tablet/mobile no-overflow QA. See [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].

@@ -29,6 +29,40 @@ interface Props {
 
 type FocusState = 'loading' | 'greeting' | 'step' | 'mood' | 'finished';
 
+interface PatientGreetingCopy {
+  title: string;
+  detail: string;
+}
+
+function splitSentences(value: string): string[] {
+  const matches = value.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+  if (!matches) return [];
+  return matches.map((sentence) => sentence.trim()).filter(Boolean);
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function lowerFirstCharacter(value: string): string {
+  return value.charAt(0).toLowerCase() + value.slice(1);
+}
+
+function buildGreetingCopy(greeting: string | undefined, preferredName: string): PatientGreetingCopy {
+  const fallbackTitle = 'Good morning.';
+  const fallbackDetail = `${preferredName}, we will go one step at a time.`;
+  if (!greeting?.trim()) return { title: fallbackTitle, detail: fallbackDetail };
+
+  const sentences = splitSentences(greeting.trim());
+  if (sentences.length === 0) return { title: fallbackTitle, detail: fallbackDetail };
+
+  const rawTitle = sentences[0];
+  const title = rawTitle.replace(new RegExp(`,\\s*${escapeRegExp(preferredName)}\\.?$`, 'i'), '.');
+  const detailText = sentences.slice(1).join(' ').trim() || fallbackDetail;
+  const detail = rawTitle === title ? detailText : `${preferredName}, ${lowerFirstCharacter(detailText)}`;
+  return { title, detail };
+}
+
 export default function PatientFocusMode({ routine, onComplete, onExit }: Props) {
   const { profile } = usePatientStore();
   const { aiConfig } = useSettingsStore();
@@ -46,6 +80,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   const currentCue = cueData?.steps[currentStepIndex];
   const completedCount = countCompletedSteps(stepEvents);
   const patientStepGuidance = helpText || (currentStep?.medicationId ? currentCue?.help_text || currentStep.helpText : null);
+  const greetingCopy = buildGreetingCopy(cueData?.greeting, profile?.preferredName || 'there');
 
   const promptContext = useMemo(() => {
     const today = new Date();
@@ -173,7 +208,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   if (focusState === 'loading') {
     return (
       <div className="patient-shell">
-        <div className="patient-panel">
+        <div className="patient-panel patient-loading-panel">
           <p className="patient-kicker">Preparing guide</p>
           <h1>One moment.</h1>
         </div>
@@ -183,11 +218,12 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
 
   if (focusState === 'greeting') {
     return (
-      <div className="patient-shell">
+      <div className="patient-shell patient-shell-greeting">
         <button className="patient-exit" onClick={onExit}><ArrowLeft size={22} /> Caregiver view</button>
-        <div className="patient-panel patient-centered">
+        <div className="patient-panel patient-greeting-panel">
           <p className="patient-kicker">{routine.name}</p>
-          <h1>{cueData?.greeting}</h1>
+          <h1>{greetingCopy.title}</h1>
+          <p className="patient-subtitle">{greetingCopy.detail}</p>
           <button className="patient-primary" onClick={() => {
             const startedAt = new Date().toISOString();
             setFocusState('step');
@@ -236,16 +272,18 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
   }
 
   return (
-    <div className="patient-shell">
+    <div className="patient-shell patient-shell-step">
       <button className="patient-exit" onClick={onExit}><ArrowLeft size={22} /> Caregiver view</button>
       <div className="patient-progress" aria-label={`Step ${currentStepIndex + 1} of ${routine.steps.length}`}>
         <span style={{ width: `${((currentStepIndex + 1) / routine.steps.length) * 100}%` }} />
       </div>
-      <div className="patient-panel">
-        <p className="patient-kicker">Step {currentStepIndex + 1} of {routine.steps.length}</p>
-        <h1>{currentCue?.text || currentStep.instruction}</h1>
-        {patientStepGuidance && <p className={helpText ? 'patient-help' : 'patient-guidance'}>{patientStepGuidance}</p>}
-        {audioNotice && <p className="patient-audio-notice" aria-live="polite">{audioNotice}</p>}
+      <div className="patient-panel patient-step-panel">
+        <div className="patient-copy">
+          <p className="patient-kicker">Step {currentStepIndex + 1} of {routine.steps.length}</p>
+          <h1>{currentCue?.text || currentStep.instruction}</h1>
+          {patientStepGuidance && <p className={helpText ? 'patient-help' : 'patient-guidance'}>{patientStepGuidance}</p>}
+          {audioNotice && <p className="patient-audio-notice" aria-live="polite">{audioNotice}</p>}
+        </div>
         <div className="patient-actions">
           <button className="patient-done" onClick={handleDone}><Check size={30} /> Done</button>
           <button onClick={handleReadAloud}><Volume2 size={26} /> Read aloud</button>

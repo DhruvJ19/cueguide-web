@@ -10,6 +10,18 @@ updated: 2026-05-16
 > [!note]
 > Append-only decision log. Each decision should link to [[plans]], [[context]], [[todo]], or [[memory]] where useful.
 
+## 2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room
+
+#decision #patient-ux #accessibility
+
+Decision: Patient Focus Mode should use an open full-screen layout with minimal text and one visible next action, not a centered poster card or dense clinical panel.
+
+Reasoning: The screenshot critique showed that even correct functionality can feel cheap when the patient view is boxed, over-large, and awkwardly worded. Dementia-first design needs calm space, clear hierarchy, short prompts, and no unnecessary date/orientation burden in the largest text.
+
+Implication: Keep caregiver screens operational and information-dense, but keep patient screens visually separate: calm background, short headline, softer support copy, large touch targets, and `Read aloud`, `Help`, `Skip`, and `Done` always available during steps.
+
+Linked: [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]], [[source-map#Som Feedback]], [[memory#Product Direction]]
+
 ## 2026-05-14 - Root Web App Is Production Demo
 
 #decision #architecture

@@ -97,7 +97,7 @@ Rules:
 
 Output format ONLY JSON, no markdown formatting blocks, no extra text:
 {
-  "greeting": "string (warm, conversational greeting, includes preferred name and date without sounding robotic)",
+  "greeting": "string (warm, conversational greeting with preferred name; keep orientation details brief and optional)",
   "steps": [
     {
       "stepId": "string if supplied",

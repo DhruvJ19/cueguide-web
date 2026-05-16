@@ -35,6 +35,7 @@ updated: 2026-05-16
 - Patient medication prompts must never include caregiver-only instructions. Instructions like "ask, do not command" belong in caregiver notes, not patient Focus Mode.
 - Patient medication prompts should keep the headline to one action. Location belongs in secondary patient guidance or Help text so dementia-first screens do not become giant multi-sentence blocks.
 - Patient Focus Mode should make `Done` the dominant visual action while keeping `Read aloud`, `Help`, and `Skip` visible as secondary support controls.
+- Patient Focus Mode should feel like a calm room, not a card or poster. Avoid centered boxed slabs, giant date greetings, and heavy display copy; use short headline plus softer support copy. See [[decisions#2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room]].
 - Caregiver screens should keep moving toward row-based operations surfaces. Repeated stat/card blocks are acceptable only when they improve scanning; otherwise use queues, rows, and concise care signals.
 - Daily caregiver use needs practical data controls. Local fallback mode should offer export/backup and never imply cloud database proof before authenticated Supabase save/load/RLS is verified.
 - The YouTube course reinforces the same operating path: real product loop first, web-first verification, then real-phone mobile port. See [[YouTube_Mobile_App_Course_BMMcmmnjrM8]].

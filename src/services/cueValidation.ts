@@ -45,7 +45,7 @@ export function buildFallbackCueData(
   fallbackSteps: AICueStep[],
 ): AICueData {
   return {
-    greeting: `Good morning, ${preferredName}. It is ${day}, ${date}. We will go one step at a time.`,
+    greeting: `Good morning, ${preferredName}. We will go one step at a time.`,
     steps: fallbackSteps,
     encouragement: `All set, ${preferredName}. Thank you for taking care of yourself.`,
     reviewed: true,

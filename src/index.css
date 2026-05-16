@@ -2180,29 +2180,38 @@ body:not(.light-mode) .cg-alert {
 
 .patient-shell {
   min-height: 100vh;
-  background: #f4f7f1;
-  color: #17201b;
+  background:
+    radial-gradient(circle at top left, rgba(217, 233, 222, 0.7), transparent 34rem),
+    linear-gradient(135deg, #fbfbf7 0%, #f1f6f0 100%);
+  color: #17221d;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 34px;
+  padding: clamp(24px, 5vw, 64px);
   position: relative;
+}
+
+.patient-shell.patient-shell-greeting {
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .patient-exit {
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: clamp(18px, 3vw, 30px);
+  left: clamp(18px, 3vw, 30px);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #ccd4ca;
-  background: #ffffff;
-  color: #34443a;
+  border: 1px solid rgba(31, 48, 39, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  color: #38483f;
   border-radius: 8px;
-  min-height: 44px;
-  padding: 0 14px;
-  font-weight: 800;
+  min-height: 46px;
+  padding: 0 15px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(29, 45, 36, 0.06);
 }
 
 .patient-progress {
@@ -2217,78 +2226,127 @@ body:not(.light-mode) .cg-alert {
 .patient-progress span {
   display: block;
   height: 100%;
-  background: #23745b;
+  background: #176b54;
   transition: width 0.25s ease;
 }
 
 .patient-panel {
-  width: min(100%, 980px);
-  background: #ffffff;
-  border: 1px solid #c7d4ca;
+  width: min(100%, 1040px);
   border-radius: 8px;
-  padding: clamp(28px, 6vw, 68px);
-  box-shadow: 0 18px 60px rgba(37, 54, 44, 0.12);
+  padding: clamp(24px, 6vw, 72px);
 }
 
 .patient-centered {
   text-align: center;
 }
 
+.patient-loading-panel,
+.patient-greeting-panel,
+.patient-step-panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.patient-greeting-panel {
+  min-height: auto;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 22px;
+  padding-top: clamp(136px, 18vh, 214px);
+  padding-left: clamp(18px, 7vw, 110px);
+  padding-right: clamp(18px, 7vw, 110px);
+}
+
+.patient-step-panel {
+  display: grid;
+  gap: clamp(22px, 4vw, 42px);
+  align-content: center;
+  min-height: min(78vh, 760px);
+}
+
+.patient-copy {
+  max-width: 920px;
+}
+
 .patient-panel h1 {
-  font-size: clamp(36px, 6vw, 68px);
-  line-height: 1.08;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6.4vw, 74px);
+  line-height: 1.03;
+  font-weight: 600;
   letter-spacing: 0;
-  margin: 12px 0 26px;
-  color: #122018;
-  max-width: 14ch;
+  margin: 0;
+  color: #102019;
+  max-width: 12ch;
 }
 
 .patient-panel:not(.patient-centered) h1 {
-  max-width: 16ch;
+  max-width: 18ch;
+}
+
+.patient-subtitle {
+  max-width: 680px;
+  color: #455b50;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.28;
+  margin: -6px 0 6px;
 }
 
 .patient-primary,
 .patient-done {
-  background: #23745b;
+  background: #176b54;
   color: white;
   border: 0;
 }
 
 .patient-primary {
-  min-width: 220px;
-  min-height: 74px;
+  min-width: min(100%, 300px);
+  min-height: 76px;
   border-radius: 8px;
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 25px;
+  font-weight: 700;
+  box-shadow: 0 16px 34px rgba(23, 107, 84, 0.18);
+}
+
+.patient-primary:focus-visible,
+.patient-actions button:focus-visible,
+.patient-moods button:focus-visible,
+.patient-exit:focus-visible {
+  outline: 4px solid rgba(23, 107, 84, 0.24);
+  outline-offset: 3px;
 }
 
 .patient-help {
-  font-size: clamp(22px, 3vw, 34px);
-  line-height: 1.25;
-  background: #eef4ea;
-  border: 1px solid #d7e3d2;
+  max-width: 820px;
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.3;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(31, 48, 39, 0.12);
   border-radius: 8px;
-  padding: 18px;
-  margin-bottom: 24px;
+  padding: 18px 20px;
+  margin: 22px 0 0;
+  color: #293c32;
 }
 
 .patient-guidance {
-  margin: -4px 0 24px;
-  max-width: 760px;
-  font-size: clamp(20px, 2.4vw, 30px);
+  margin: 22px 0 0;
+  max-width: 840px;
+  font-size: clamp(21px, 2.4vw, 30px);
   line-height: 1.35;
   color: #375447;
 }
 
 .patient-audio-notice {
-  margin: -8px 0 22px;
-  border: 1px solid #d7e3d2;
+  width: fit-content;
+  max-width: 840px;
+  margin: 22px 0 0;
+  border: 1px solid rgba(31, 48, 39, 0.12);
   border-radius: 8px;
-  background: #f7faf5;
+  background: rgba(255, 255, 255, 0.78);
   color: #2f4a3d;
   padding: 14px 16px;
-  font-size: clamp(19px, 2.2vw, 26px);
+  font-size: clamp(18px, 2.2vw, 24px);
   line-height: 1.25;
   font-weight: 700;
 }
@@ -2296,27 +2354,29 @@ body:not(.light-mode) .cg-alert {
 .patient-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+  max-width: 880px;
 }
 
 .patient-actions button,
 .patient-moods button {
-  min-height: 72px;
+  min-height: 74px;
   border-radius: 8px;
-  border: 1px solid #ccd4ca;
-  background: #ffffff;
+  border: 1px solid rgba(31, 48, 39, 0.16);
+  background: rgba(255, 255, 255, 0.86);
   color: #17201b;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-size: 20px;
-  font-weight: 800;
+  font-size: clamp(19px, 2.2vw, 23px);
+  font-weight: 700;
+  box-shadow: 0 10px 26px rgba(29, 45, 36, 0.05);
 }
 
 .patient-actions button:nth-child(2) {
-  background: #eef4ea;
-  border-color: #d7e3d2;
+  background: #eef6f1;
+  border-color: #cdded4;
 }
 
 .patient-actions button:nth-child(4) {
@@ -2325,23 +2385,30 @@ body:not(.light-mode) .cg-alert {
 
 .patient-actions .patient-done {
   grid-column: 1 / -1;
-  min-height: 88px;
-  font-size: 24px;
+  min-height: 92px;
+  font-size: clamp(24px, 3vw, 30px);
   color: white;
-  border-color: #23745b;
-  background: #23745b;
+  border-color: #176b54;
+  background: #176b54;
 }
 
 .patient-note {
-  margin-top: 18px;
-  color: #5e6c62;
-  font-size: 18px;
+  margin-top: -12px;
+  color: #52665b;
+  font-size: clamp(17px, 2vw, 20px);
 }
 
 .patient-moods {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+}
+
+.patient-kicker {
+  color: #52655b;
+  font-size: clamp(18px, 2.2vw, 24px);
+  text-transform: none;
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {
@@ -2549,12 +2616,55 @@ body:not(.light-mode) .cg-alert {
   }
 
   .patient-shell {
-    align-items: stretch;
-    padding: 88px 18px 24px;
+    align-items: center;
+    padding: 86px 18px 26px;
   }
 
   .patient-panel {
-    align-self: center;
+    width: 100%;
+    padding: 18px;
+  }
+
+  .patient-greeting-panel,
+  .patient-step-panel {
+    min-height: auto;
+    padding: 18px 4px;
+  }
+
+  .patient-shell.patient-shell-greeting {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .patient-shell.patient-shell-greeting .patient-greeting-panel {
+    padding-top: clamp(110px, 16vh, 176px);
+  }
+
+  .patient-greeting-panel {
+    gap: 18px;
+  }
+
+  .patient-panel h1 {
+    font-size: clamp(42px, 12vw, 56px);
+    max-width: 11ch;
+  }
+
+  .patient-panel:not(.patient-centered) h1 {
+    max-width: 13ch;
+  }
+
+  .patient-greeting-panel h1 {
+    max-width: min(760px, 100%);
+  }
+
+  .patient-subtitle,
+  .patient-guidance,
+  .patient-help {
+    font-size: 22px;
+  }
+
+  .patient-actions {
+    gap: 10px;
   }
 
   .legal-shell {
@@ -2573,5 +2683,24 @@ body:not(.light-mode) .cg-alert {
   .legal-button-row a,
   .legal-button-row button {
     width: 100%;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .patient-shell {
+    padding: 32px clamp(24px, 4vw, 44px);
+  }
+
+  .patient-shell.patient-shell-greeting .patient-greeting-panel {
+    padding-top: clamp(116px, 12vh, 150px);
+  }
+
+  .patient-greeting-panel h1 {
+    font-size: clamp(56px, 8vw, 72px);
+    max-width: min(760px, 100%);
+  }
+
+  .patient-primary {
+    min-width: min(100%, 320px);
   }
 }

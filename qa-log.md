@@ -1428,3 +1428,46 @@ Known caveats:
 - Supabase authenticated cloud persistence proof remains pending until test credentials are available.
 
 Linked: [[decisions#2026-05-16 - Local Voice Networking Must Fail Softly]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+
+## 2026-05-16 - Patient Focus Visual Repair Production Deploy
+
+Status: passed; production patient mode no longer uses the boxed poster-card treatment from the screenshot critique.
+
+Deployment:
+
+- Vercel deployment: `dpl_HiysoHKRXRz9GL7cZw1D8rAG6qM1`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Changes verified:
+
+- Patient greeting now uses an open full-screen dementia-first layout instead of a centered card slab.
+- Greeting copy is split into a short headline and softer support line: `Good morning.` and `Dad, we will go one step at a time.`
+- AI/fallback greeting rules no longer force a date into the largest text.
+- Medication step screen keeps one question-shaped action, separate location guidance, and visible `Done`, `Read aloud`, `Help`, and `Skip`.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- `vercel --prod --yes`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Production screenshot QA for tablet greeting, tablet step, and mobile step.
+
+Observed:
+
+- Strict local smoke passed with ElevenLabs `200 audio/mpeg`, local onboarding coverage, and no mobile overflow.
+- Strict production smoke passed with ElevenLabs `200 audio/mpeg`.
+- Production smoke medication: `Smoke Omega 1778934770846`.
+- Production tablet and mobile Patient Focus Mode reported no horizontal overflow.
+- Browser console only reported the expected Sentry-disabled warning.
+
+Known caveats:
+
+- Human-ear voice acceptance is still user-owned; the code proves ElevenLabs audio delivery, not subjective voice quality.
+- Supabase authenticated cloud persistence proof remains pending until test credentials are available.
+
+Linked: [[decisions#2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]

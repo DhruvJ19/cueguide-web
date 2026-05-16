@@ -90,6 +90,7 @@ updated: 2026-05-16
 - Latest ElevenLabs quota deploy: [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 - Latest strict ElevenLabs voice gate: [[qa-log#2026-05-16 - Funded ElevenLabs Key Strict Production Smoke]].
 - Latest UI trust and voice reliability deploy: [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
+- Latest patient Focus Mode visual repair: [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
 
 ## Context
 

@@ -1563,3 +1563,40 @@ Known caveats:
 - `cueguide-test.png` is unrelated local work and remains unstaged.
 
 Linked: [[decisions#2026-05-16 - First Use Must Prove Care Flow Before Metrics]], [[todo#P2 - Product Polish]], [[context#Commands]]
+
+## 2026-05-17 - First-Use And Reports Trust Production Deploy
+
+Status: passed; production deploy is live.
+
+Deployment:
+
+- Commit: `0852bfe5`
+- Vercel deployment: `dpl_2fWn3ZmFLaXoY7QPshL4zo7facpe`
+- Production URL: `https://cueguide-web.vercel.app`
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=https://cueguide-web.vercel.app CUEGUIDE_REQUIRE_ELEVENLABS=true npm run smoke:careflow`
+- Production rendered QA with Playwright.
+
+Observed:
+
+- Production build passed on Vercel.
+- Strict production smoke passed with ElevenLabs `200 audio/mpeg`.
+- Production smoke medication: `Smoke Omega 1778993776953`.
+- Production smoke reported mobile no-overflow and local onboarding coverage.
+- Rendered production QA covered signup desktop, onboarding medication step, medication edit desktop, Reports desktop, Settings desktop, signup mobile, dashboard mobile, and tablet Patient Focus Mode greeting.
+- Rendered production QA reported no horizontal overflow on every checked viewport.
+
+Known caveats:
+
+- Human-ear voice acceptance is still user-owned.
+- Supabase authenticated cloud persistence proof remains blocked until test credentials are available.
+- `cueguide-test.png` remains unrelated local work and was not staged.
+
+Linked: [[todo#P2 - Product Polish]], [[decisions#2026-05-16 - First Use Must Prove Care Flow Before Metrics]], [[dashboard#Release Evidence]]

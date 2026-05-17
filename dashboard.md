@@ -93,6 +93,7 @@ updated: 2026-05-16
 - Latest patient Focus Mode visual repair: [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
 - Latest 10/10-direction production deploy: [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
 - Latest first-use/report trust local gate: [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
+- Latest first-use/report production deploy: [[qa-log#2026-05-17 - First-Use And Reports Trust Production Deploy]].
 
 ## Context
 

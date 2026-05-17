@@ -116,6 +116,7 @@ Recent verified checks:
 - UI trust work should keep moving away from nested cards: open page sections, row/table anatomy for caregiver operations, compact Settings readiness, and direct language like `Needs attention` instead of harsh failure labels. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - The next visual quality bar is "care command surface, not generated poster": caregiver UI should keep using rows/status strips/short labels, while Patient Focus Mode should avoid date-heavy giant copy and boxed slabs. See [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]] and [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
 - First-Use and Reports Trust local gate passed on 2026-05-16 with signup/onboarding setup path, medication edit voice preview, report interpretation row, Settings cloud-proof row, full local gates, local smoke, and rendered no-overflow QA. Supabase proof remains blocked until `CUEGUIDE_SUPABASE_TEST_EMAIL` and `CUEGUIDE_SUPABASE_TEST_PASSWORD` are available. See [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
+- First-Use and Reports Trust production deploy `dpl_2fWn3ZmFLaXoY7QPshL4zo7facpe` passed strict smoke on 2026-05-17 with ElevenLabs `200 audio/mpeg`, mobile no-overflow, local onboarding coverage, and rendered production no-overflow QA. See [[qa-log#2026-05-17 - First-Use And Reports Trust Production Deploy]].
 
 ## Obsidian Maintenance Rules
 

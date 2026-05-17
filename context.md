@@ -15,6 +15,7 @@ updated: 2026-05-16
 - Workspace: `/Users/dj/Downloads/Official-CueGuide`
 - Branch: `codex/production-revamp`
 - Production URL: `https://cueguide-web.vercel.app`
+- Latest production deployment: `dpl_2fWn3ZmFLaXoY7QPshL4zo7facpe` from commit `0852bfe5`.
 - Draft PR: `https://github.com/DhruvJ19/cueguide-web/pull/1`
 - Known unrelated local dirty file: `cueguide-test.png`, intentionally not staged.
 - Current production-revamp working set also includes Obsidian notes, patient/caregiver UX trust polish, smoke QA, and Supabase RLS migration work.
@@ -80,6 +81,7 @@ updated: 2026-05-16
 Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3004` have served unrelated local apps during QA.
 
 Latest local UI trust gate: [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
+Latest production UI trust gate: [[qa-log#2026-05-17 - First-Use And Reports Trust Production Deploy]].
 
 ## Environment Notes
 

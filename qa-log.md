@@ -2,13 +2,60 @@
 aliases: [qa-log, verification-log, test-log]
 tags: [project, qa, verification, release]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide QA Log
 
 > [!note]
 > Dated verification evidence for [[dashboard|CueGuide]]. Append new runs after each meaningful app, env, or deploy change.
+
+## 2026-05-17 - Store Readiness And Mobile Boundary Local Gate
+
+Status: passed locally; cloud proof remains blocked by missing test caregiver credentials.
+
+Verified changes:
+
+- Root Patient Focus greeting now says `Medication guide` instead of exposing a long routine label, and the step footer is shortened to `No rush.`
+- Nested Expo voice now uses the server-selected ElevenLabs production voice instead of hard-coded older voice IDs.
+- Nested Expo AI fallback copy now asks instead of commands and avoids long date/weather narration.
+- Nested Expo local env was sanitized so ElevenLabs/OpenRouter/Gemini provider keys are not `EXPO_PUBLIC_*`.
+- Secret scanner now checks nested Expo local env files in addition to tracked files and root env.
+- Nested Expo app config moved to a light clinical default and removed unused camera/microphone permission copy.
+- [[store-readiness]] now tracks iOS/Android privacy, health-app, permission, voice/data, and real-device blockers.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `(cd CueGuide && npx tsc --noEmit --pretty false)`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+
+Smoke evidence:
+
+- Target URL: `http://127.0.0.1:3006`
+- Medication created and edited: `Smoke Omega 1778999912253`
+- ElevenLabs observed through local proxy: `200 audio/mpeg`
+- Mobile overflow: false
+- Local onboarding: true
+
+Rendered QA:
+
+- Desktop Today screenshot: `/tmp/cueguide-20260517-desktop-today.png`
+- Tablet patient greeting: `/tmp/cueguide-20260517-tablet-patient-greeting.png`
+- Tablet patient step: `/tmp/cueguide-20260517-tablet-patient-step.png`
+- Mobile signup after secondary-button fix: `/tmp/cueguide-20260517-mobile-signup-fixed2.png`
+- Console/page errors: none
+- Patient and signup horizontal overflow: false
+
+Production-readiness caveats:
+
+- `npm run proof:supabase` is blocked locally by missing `CUEGUIDE_SUPABASE_TEST_EMAIL`; cloud data cannot be called production-proven until that normal caregiver proof passes.
+- Sentry connector has access to the `robossist` organization, but no CueGuide project was found, so crash monitoring remains a release blocker.
+- Human-ear voice acceptance remains pending; API audio delivery is not the same as Som's Google Maps voice standard.
 
 ## 2026-05-14 - Production-Hardening Local Gate
 

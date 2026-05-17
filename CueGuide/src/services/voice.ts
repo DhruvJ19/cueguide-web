@@ -2,15 +2,6 @@ import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 
 const CUEGUIDE_API_BASE_URL = process.env.EXPO_PUBLIC_CUEGUIDE_API_BASE_URL?.trim() ?? '';
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
-const GENTLE_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
-
-const GENTLE_SETTINGS = {
-  stability: 0.55,
-  similarity_boost: 0.85,
-  style: 0.3,
-  use_speaker_boost: true,
-};
 
 function transformToGentle(text: string): string {
   return text
@@ -31,7 +22,7 @@ function getApiUrl(path: string): string {
   return `${CUEGUIDE_API_BASE_URL.replace(/\/$/, '')}${path}`;
 }
 
-export async function speakWithElevenLabs(text: string, gentle: boolean = true): Promise<void> {
+export async function speakWithElevenLabs(text: string, gentle: boolean): Promise<void> {
   const apiUrl = getApiUrl('/api/elevenlabs/tts');
   if (!apiUrl) {
     return speakWithNativeTTS(text, gentle);
@@ -46,11 +37,7 @@ export async function speakWithElevenLabs(text: string, gentle: boolean = true):
       },
       body: JSON.stringify({
         text: gentle ? transformToGentle(text) : text,
-        voiceId: gentle ? GENTLE_VOICE_ID : VOICE_ID,
-        voice_settings: gentle ? GENTLE_SETTINGS : {
-          stability: 0.4,
-          similarity_boost: 0.8,
-        },
+        gentle,
       }),
     });
 
@@ -80,7 +67,7 @@ export async function speakWithElevenLabs(text: string, gentle: boolean = true):
   }
 }
 
-export function speakWithNativeTTS(text: string, gentle: boolean = true): Promise<void> {
+export function speakWithNativeTTS(text: string, gentle: boolean): Promise<void> {
   return new Promise((resolve) => {
     Speech.stop();
     Speech.speak(gentle ? transformToGentle(text) : text, {

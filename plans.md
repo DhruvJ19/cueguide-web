@@ -2,7 +2,7 @@
 aliases: [plans, roadmap, master-plan]
 tags: [project, plan, roadmap, architecture]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-17
 ---
 
 # CueGuide Plans
@@ -94,7 +94,9 @@ Status: pending.
 
 Use [[CueGuide/BUILD_SUMMARY]] and the nested app as reference only. Port the proven web medication/session model into Expo after web QA is stable.
 
-Do not start app-store submission prep until the mobile app has the same core loop working on a real phone.
+Do not start app-store submission prep until the mobile app has the same core loop working on a real phone. Follow [[store-readiness]] before TestFlight, Google Play internal testing, or any public store claim.
+
+Mobile must keep AI and ElevenLabs behind server `/api/*` routes, avoid provider secrets in `EXPO_PUBLIC_*`, remove unused sensitive permissions, and disclose any health-data access precisely.
 
 ## Quality Gates
 
@@ -115,3 +117,4 @@ Before calling a branch demo-ready:
 - [[decisions]]
 - [[memory]]
 - [[meta-optimization]]
+- [[store-readiness]]

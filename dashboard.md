@@ -2,7 +2,7 @@
 aliases: [dashboard, home, moc]
 tags: [project, dashboard, moc, obsidian]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide Dashboard
@@ -23,6 +23,8 @@ updated: 2026-05-16
 - Latest daily-use production deploy passed strict smoke and rendered QA. See [[qa-log#2026-05-15 - Daily Use Refinement Production Deploy]].
 - Supabase proof gate exists but needs a normal test caregiver account before cloud readiness can be claimed. See [[qa-log#2026-05-15 - Supabase Proof Gate Added]].
 - Latest multi-POV UI trust refinement passed locally and is ready for production deploy/smoke. See [[qa-log#2026-05-15 - Multi-POV UI Trust Refinement Local Gate]].
+- Store readiness is now tracked separately from web stakeholder readiness. See [[store-readiness]] and [[decisions#2026-05-17 - Mobile Store Readiness Requires Web Parity First]].
+- Latest store/mobile-boundary local gate passed and documented the remaining Supabase/Sentry/human-voice blockers. See [[qa-log#2026-05-17 - Store Readiness And Mobile Boundary Local Gate]].
 
 ## Memory
 
@@ -62,6 +64,7 @@ updated: 2026-05-16
 - [[qa-log]] - dated verification evidence.
 - [[source-map]] - Som and YouTube guidance mapped to product decisions.
 - [[production-voice]] - ElevenLabs production voice requirement, selected voice, and tone rules.
+- [[store-readiness]] - iOS/Android readiness map for privacy, health-app declarations, permissions, real-device QA, and store submission blockers.
 - Latest local gate: [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - Latest production gate: [[qa-log#2026-05-14 - Stakeholder Alpha Production Deploy]].
 - Latest production voice gate: [[qa-log#2026-05-14 - Production Voice Hardening Deploy]].

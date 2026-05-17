@@ -2,13 +2,25 @@
 aliases: [decisions, decision-log]
 tags: [project, decisions, architecture, log]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide Decisions
 
 > [!note]
 > Append-only decision log. Each decision should link to [[plans]], [[context]], [[todo]], or [[memory]] where useful.
+
+## 2026-05-17 - Mobile Store Readiness Requires Web Parity First
+
+#decision #mobile #app-store #security
+
+Decision: Treat the nested [[CueGuide/BUILD_SUMMARY|Expo app]] as a port target until it matches the root web medication/session loop, uses server-only voice/AI provider boundaries, and passes real-device store-readiness QA.
+
+Reasoning: The mobile app still carried older production claims and stale public-provider-secret patterns in local env. Apple and Google health-app requirements also make permission minimization, privacy disclosures, and accurate health claims non-negotiable before TestFlight or Google Play internal testing.
+
+Implication: Do not submit native builds or claim store readiness until [[store-readiness]] is complete. Keep web as the production surface, port the proven CueGuide loop into Expo, remove unused sensitive permissions, and verify voice, data, privacy, and crash monitoring on real devices.
+
+Linked: [[store-readiness]], [[runbook#Store Readiness]], [[source-map#Store And Compliance Signals]], [[todo#P3 - Mobile Port Prep]]
 
 ## 2026-05-16 - Patient Focus Mode Should Feel Like A Calm Room
 

@@ -379,6 +379,14 @@ body {
 
 .auth-local {
   margin-top: -4px;
+  background: #ffffff;
+  color: #166a5a;
+  border-color: #bfd1de;
+}
+
+.auth-local:hover {
+  background: #f2faf7;
+  border-color: #8fc4b8;
 }
 
 .auth-switch,
@@ -2620,6 +2628,17 @@ body:not(.light-mode) .cg-alert {
   font-size: clamp(18px, 2.2vw, 24px);
   text-transform: none;
   font-weight: 700;
+}
+
+body:not(.light-mode) .auth-shell .auth-local {
+  background: #ffffff;
+  color: #166a5a;
+  border-color: #bfd1de;
+}
+
+body:not(.light-mode) .auth-shell .auth-local:hover {
+  background: #f2faf7;
+  border-color: #8fc4b8;
 }
 
 @media (max-width: 900px) {

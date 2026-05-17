@@ -16,7 +16,16 @@ const secretPatterns = [
 ];
 
 const ignoredFiles = new Set(['package-lock.json']);
-const localEnvFiles = ['.env', '.env.local', '.env.production', '.env.production.local'];
+const localEnvFiles = [
+  '.env',
+  '.env.local',
+  '.env.production',
+  '.env.production.local',
+  'CueGuide/.env',
+  'CueGuide/.env.local',
+  'CueGuide/.env.development',
+  'CueGuide/.env.production',
+];
 const browserPublicEnvPrefix = /^(VITE|EXPO_PUBLIC)_/;
 const browserSecretNamePattern = /(API_)?KEY|SECRET|TOKEN|AUTH|ACCOUNT_SID|PRIVATE/i;
 const allowedBrowserEnvNames = new Set([

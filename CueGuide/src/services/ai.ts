@@ -24,6 +24,11 @@ function getApiUrl(path: string): string {
   return `${CUEGUIDE_API_BASE_URL.replace(/\/$/, '')}${path}`;
 }
 
+function toQuestionAction(instruction: string): string {
+  const trimmed = instruction.trim().replace(/[.!?]+$/, '');
+  return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
+}
+
 async function callOpenRouter(prompt: string, model = DEFAULT_MODEL): Promise<string> {
   const apiUrl = getApiUrl('/api/ai/cue');
   if (!apiUrl) throw new Error('CueGuide AI proxy is not configured');
@@ -51,8 +56,7 @@ export async function generateCueData(contextData: AIPromptContext, aiConfig: AI
 }> {
   if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
-      const prompt = `You are CueGuide, a compassionate AI assistant helping people with early-stage
-dementia complete daily routines. You generate step-by-step prompts.
+      const prompt = `You are CueGuide, a compassionate AI assistant helping people with dementia complete medication and daily routines. Generate short, calm, question-shaped prompts.
 
 Patient Name: ${contextData.patientName}
 Preferred Name: ${contextData.preferredName}
@@ -68,14 +72,14 @@ Notes: ${contextData.context.notes}
 
 Output format ONLY JSON, no markdown formatting blocks, no extra text:
 {
-  "greeting": "string (warm, conversational greeting, includes preferred name, date, and weather/upcoming without sounding robotic)",
+  "greeting": "string (warm, brief greeting, no long date/weather narration)",
   "steps": [
     {
-      "text": "short instruction",
-      "audio_text": "read aloud version, encouraging"
+      "text": "one short patient-facing prompt that asks instead of commands",
+      "audio_text": "same tone, human, soft, gentle, never scolding"
     }
   ],
-  "encouragement": "warm finish statement, very conversational, use the preferred name, encourage them"
+  "encouragement": "brief warm finish statement, no celebration or medical certainty"
 }`;
 
       const text = await callOpenRouter(prompt);
@@ -88,12 +92,12 @@ Output format ONLY JSON, no markdown formatting blocks, no extra text:
   }
 
   return {
-    greeting: `Good morning, ${contextData.preferredName}. It's a nice ${contextData.context.day}, ${contextData.context.date}. The weather is ${contextData.context.weather.toLowerCase()} today.`,
+    greeting: `Good morning, ${contextData.preferredName}. We will go one step at a time.`,
     steps: contextData.steps.map(step => ({
-      text: step.instruction,
-      audio_text: `${step.instruction}, ${contextData.preferredName}.`
+      text: `Would you like to ${toQuestionAction(step.instruction)}?`,
+      audio_text: `${contextData.preferredName}, would you like to ${toQuestionAction(step.instruction)}?`
     })),
-    encouragement: `All done with your ${contextData.routineName}. You're doing absolutely great, ${contextData.preferredName}. I'm here when you need me.`
+    encouragement: `Thank you, ${contextData.preferredName}. I am here when you need me.`
   };
 }
 
@@ -105,7 +109,7 @@ export async function generateRoutineSteps(
 ): Promise<{ instruction: string; icon: string }[] | null> {
   if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
-      const prompt = `Generate exactly ${stepCount} simple, clear steps for a routine for someone with early dementia.
+      const prompt = `Generate exactly ${stepCount} simple, clear steps for a routine for someone with dementia.
 Routine Name: ${routineName}
 Category: ${category}
 
@@ -162,12 +166,12 @@ Only return the routine name, nothing else.`;
 }
 
 export async function generateHelpExplanation(
-  stepInstruction: string, 
+  stepInstruction: string,
   aiConfig: AIGenerationStatus
 ): Promise<string> {
   if (aiConfig.isEnabled && CUEGUIDE_API_BASE_URL) {
     try {
-      const prompt = `Please provide a calm, simple 1-2 sentence expanded explanation for this step for someone with early dementia: "${stepInstruction}"`;
+      const prompt = `Provide a calm, simple 1-2 sentence help note for this step. Ask, do not command. Step: "${stepInstruction}"`;
       const text = await callOpenRouter(prompt, 'openai/gpt-4o-mini');
       return text || "Take your time. We're here to help.";
     } catch (e) {

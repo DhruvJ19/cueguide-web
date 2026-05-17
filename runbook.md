@@ -2,7 +2,7 @@
 aliases: [runbook, release-runbook, demo-runbook]
 tags: [project, operations, qa, demo]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-17
 ---
 
 # CueGuide Runbook
@@ -50,6 +50,17 @@ npm run smoke:careflow
 ```
 
 This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `audio/mpeg`.
+
+## Store Readiness
+
+Use [[store-readiness]] before any native release claim.
+
+- Web acceptance comes first: medication loop, ElevenLabs voice, Supabase proof, security checks, and browser QA.
+- Native app work starts only after the Expo port matches the root web medication/session model.
+- Mobile must call `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` and server `/api/*` routes for AI and voice.
+- Never add `EXPO_PUBLIC_ELEVENLABS_API_KEY`, `EXPO_PUBLIC_OPENROUTER_API_KEY`, or similar provider secret names.
+- Remove unused health, camera, microphone, and notification permissions before TestFlight or Google Play internal testing.
+- Complete App Store privacy details, Google Play Data safety, and Google Play health app declaration before public submission.
 
 ## First-Run QA
 

@@ -2,7 +2,7 @@
 aliases: [todo, tasks, backlog]
 tags: [project, todo, priorities, backlog]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide Todo
@@ -22,6 +22,7 @@ updated: 2026-05-16
 - [ ] Verify production voice quality with human ears against Som's exact email standard: Google Maps-like, human, soft, gentle, and non-commanding.
 - [x] Confirm production Vercel Supabase env names exist. See [[qa-log#2026-05-14 - Stakeholder Alpha Local Gate]].
 - [ ] Verify live Supabase migrations/RLS with an authenticated Supabase session before claiming cloud data production readiness.
+- [ ] Add CueGuide Sentry project/environment and wire release monitoring before public GTM.
 - [x] Add repeatable `npm run proof:supabase` gate for authenticated cloud save/load/RLS proof.
 - [x] Add read-only Supabase MCP project config so cloud schema verification is ready once user OAuth/auth is complete.
 - [ ] Review Som demo flow against [[SOM_DEMO_BRIEF_May6]] and prepare a short talk track.
@@ -50,6 +51,7 @@ updated: 2026-05-16
 - [x] Add [[runbook]] for demo/test/deploy steps after browser QA passes.
 - [x] Add [[qa-log]] for dated verification evidence.
 - [x] Add [[source-map]] linking Som feedback and YouTube guidance to product decisions.
+- [x] Add [[store-readiness]] for iOS/Android privacy, health-app, permission, and real-device release blockers.
 - [ ] Improve core note frontmatter with `status`, `owner`, and `next_review` after the current production pass is stable.
 - [x] Expand Reports from placeholder summary into useful caregiver/clinician review.
 - [x] Make medication editing first-class, not just add/toggle.
@@ -78,6 +80,10 @@ updated: 2026-05-16
 ## P3 - Mobile Path
 
 - [ ] Map root web data model into nested [[CueGuide/BUILD_SUMMARY|Expo app]].
+- [x] Sanitize nested Expo local env so provider secrets are not `EXPO_PUBLIC_*` and add nested env coverage to the secret scanner.
+- [x] Stop nested Expo voice calls from overriding the server-selected ElevenLabs production voice.
+- [ ] Remove or gate the nested Expo health tab until HealthKit/Health Connect consent, privacy disclosures, and real-device QA are complete.
+- [ ] Add a native app-store release checklist for screenshots, privacy labels, account deletion, TestFlight/internal track, signing, and crash monitoring.
 - [ ] Test on real phone after web loop is stable.
 - [ ] Delay EAS/App Store work until mobile core loop matches web.
 

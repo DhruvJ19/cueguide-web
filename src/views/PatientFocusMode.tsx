@@ -84,9 +84,9 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
 
   const currentStep = routine.steps[currentStepIndex];
   const currentCue = cueData?.steps[currentStepIndex];
-  const completedCount = countCompletedSteps(stepEvents);
   const patientStepGuidance = helpText || (currentStep?.medicationId ? currentCue?.help_text || currentStep.helpText : null);
   const greetingCopy = buildGreetingCopy(cueData?.greeting, profile?.preferredName || 'there', routine.name);
+  const patientRoutineLabel = routine.category === 'medication' ? 'Medication guide' : routine.name;
 
   const promptContext = useMemo(() => {
     const today = new Date();
@@ -227,7 +227,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
       <div className="patient-shell patient-shell-greeting">
         <button className="patient-exit" onClick={onExit}><ArrowLeft size={22} /> Caregiver view</button>
         <div className="patient-panel patient-greeting-panel">
-          <p className="patient-kicker">{routine.name}</p>
+          <p className="patient-kicker">{patientRoutineLabel}</p>
           <h1>{greetingCopy.title}</h1>
           <p className="patient-subtitle">{greetingCopy.detail}</p>
           <div className="patient-start-meta" aria-label="Session details">
@@ -300,7 +300,7 @@ export default function PatientFocusMode({ routine, onComplete, onExit }: Props)
           <button onClick={handleHelp}><HelpCircle size={26} /> Help</button>
           <button onClick={handleSkip}><SkipForward size={26} /> Skip</button>
         </div>
-        <p className="patient-note">{completedCount} completed so far. There is no rush.</p>
+        <p className="patient-note">No rush.</p>
       </div>
     </div>
   );

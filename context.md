@@ -2,7 +2,7 @@
 aliases: [context, project-context, live-snapshot]
 tags: [project, context, architecture, stack]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide Context
@@ -26,6 +26,7 @@ updated: 2026-05-16
 - Current UI trust pass removes more nested section chrome, uses a system clinical font stack, and labels caregiver timing issues as `Needs attention` instead of harsh patient-facing failure language.
 - Current 10/10 direction continues flattening caregiver screens into command rows and shortens patient greeting copy so Focus Mode feels like a calm care appliance instead of a generated poster.
 - Current first-use trust pass makes signup/onboarding, medication editing, Reports, and Settings more explicit about the care loop and cloud-proof caveat.
+- Current store-readiness pass keeps web as source of truth, marks the nested Expo app as a port target, and blocks public-provider-secret env names in nested mobile local env.
 
 ## Technical Stack
 
@@ -60,6 +61,7 @@ updated: 2026-05-16
 | `supabase/migrations/20260514022823_production_rls_completion_medication_policies.sql` | Pending RLS/realtime hardening migration created for production policy coverage. |
 | `scripts/smoke-careflow.ts` | Browser smoke flow for medication setup, Focus Mode, alerts/session summary, voice, and mobile overflow. |
 | `scripts/prove-supabase-cloud.ts` | Authenticated Supabase proof for caregiver-owned patient, medication, completion, and alert save/load through RLS. |
+| `store-readiness.md` | iOS/Android readiness map for privacy, health-app declarations, permissions, voice/data proof, and real-device QA. |
 | `src/components/CommandPalette.tsx` | Keyboard navigation for real care destinations only; no fake analytics/device/compliance routes. |
 | `.mcp.json` | Read-only Supabase MCP project config; user OAuth/auth is still required before tools are available. |
 | `src/data.ts` | Deterministic local seed data for default patient, medications, routines, and sample history. Sample completions must use generated medication routine IDs. |
@@ -80,7 +82,7 @@ updated: 2026-05-16
 
 Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3004` have served unrelated local apps during QA.
 
-Latest local UI trust gate: [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
+Latest local gate: [[qa-log#2026-05-17 - Store Readiness And Mobile Boundary Local Gate]].
 Latest production UI trust gate: [[qa-log#2026-05-17 - First-Use And Reports Trust Production Deploy]].
 
 ## Environment Notes
@@ -98,12 +100,14 @@ Latest production UI trust gate: [[qa-log#2026-05-17 - First-Use And Reports Tru
 - Supabase browser env values are public anon config, but placeholder or malformed values must trigger local fallback.
 - Supabase MCP is configured read-only for project `kueqtpekkqapclczvahc`; Codex still needs user-completed OAuth/auth before live schema tools appear.
 - Do not add `VITE_` or `EXPO_PUBLIC_` provider secrets. Public prefixes ship to the client bundle.
+- The secret scanner checks nested Expo local env files because ignored local mobile env can still teach the wrong pattern.
+- Sentry access currently finds the `robossist` org but no CueGuide project; create/wire a CueGuide Sentry project before public GTM.
 
 ## Nested Expo App
 
 The nested [[CueGuide/BUILD_SUMMARY|Expo app]] has useful medication/health ideas but is not the current production demo. See [[plans#4. Mobile Port]].
 
-Before any mobile port, keep the nested app on `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` and route voice/AI through the root web app server APIs. Do not reintroduce public provider secrets. See [[meta-optimization#Codebase And Architecture]].
+Before any mobile port, keep the nested app on `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` and route voice/AI through the root web app server APIs. Do not reintroduce public provider secrets. See [[store-readiness]] and [[meta-optimization#Codebase And Architecture]].
 
 ## Important Source Docs
 

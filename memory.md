@@ -2,7 +2,7 @@
 aliases: [memory, long-term-memory]
 tags: [project, memory, preferences, lessons]
 created: 2026-05-14
-updated: 2026-05-16
+updated: 2026-05-17
 ---
 
 # CueGuide Memory
@@ -50,6 +50,8 @@ updated: 2026-05-16
 - ElevenLabs must stay server-side through `/api/elevenlabs/*`; never expose provider secrets as `VITE_*`.
 - The nested Expo app still contains historical public-provider-secret patterns. Do not port or ship mobile voice/AI until those calls use a server boundary like the root web app.
 - The nested Expo app has now been moved to a backend-proxy pattern through `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL`; do not reintroduce public ElevenLabs/OpenRouter keys during the mobile port.
+- The nested Expo local env has been sanitized so ElevenLabs/OpenRouter/Gemini provider keys are no longer `EXPO_PUBLIC_*`. The security scanner now checks nested Expo local env files too.
+- Mobile store readiness requires web parity first, then real-device QA, privacy labels, health declarations, permission minimization, and crash monitoring. See [[store-readiness]].
 - Hidden newlines in Vercel env vars caused `VITE_USE_ELEVENLABS` to evaluate as disabled in the frontend. Trim env values before using them. See [[decisions#2026-05-14 - Trim Environment Values Before Feature Gates]].
 - Hidden newlines in `ELEVENLABS_API_KEY` caused invalid header errors. Server handlers must trim provider keys.
 - Vercel provider env values can contain quotes and literal `\n` escapes, not only whitespace. Server routes and Vite dev middleware must normalize those before calling ElevenLabs.

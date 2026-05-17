@@ -2,7 +2,7 @@
 aliases: [source-map, evidence-map, product-sources]
 tags: [project, research, som, youtube, product]
 created: 2026-05-14
-updated: 2026-05-15
+updated: 2026-05-17
 ---
 
 # CueGuide Source Map
@@ -51,6 +51,15 @@ updated: 2026-05-15
 | [Supabase changelog, April 2026](https://supabase.com/changelog?next=Y3Vyc29yOnYyOpK0MjAyNC0wNy0xMlQwNTo0MDozOFrOAGmtQA%3D%3D&restPage=2): new projects may not expose public schema tables to Data API/GraphQL by default. | Cloud proof must check grants, RLS, and live authenticated save/load; migration files alone are not enough. | Settings data status, runbook cloud-data stop condition. |
 | [Amazon Alexa Together update](https://www.aboutamazon.com/news/devices/alexa-together-launches-to-help-customers-remotely-care-for-loved-ones): service is no longer available as of May 21, 2025. | Voice-enabled remote caregiving is validated but unstable as a platform dependency; CueGuide should own its caregiver workflow and voice boundary. | ElevenLabs server proxy, fallback policy, future mobile path. |
 
+## Store And Compliance Signals
+
+| Source | Product Translation | Current App Surface |
+| --- | --- | --- |
+| [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) healthcare/privacy rules | Healthcare apps require extra privacy discipline, accurate developer identity, explicit consent, and no misuse of HealthKit or medical data. | [[store-readiness]], [[runbook#Store Readiness]], privacy route, Supabase proof gate. |
+| [Apple App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/) | App Store submissions require accurate disclosure of data collected by CueGuide and third-party partners. | [[store-readiness]], future App Store privacy labels. |
+| [Google Play Health Apps guidance](https://support.google.com/googleplay/android-developer/answer/13996367) | Health apps need a Play Console health declaration, prominent disclosures, and removal of unused sensitive permissions. | [[store-readiness]], nested Expo `app.json` permission cleanup. |
+| [Google Play health content policy preview](https://support.google.com/googleplay/android-developer/answer/16555673) | Health/medical functionality must avoid misleading claims and must disclose risks, purpose, users, and disclaimers. | [[store-readiness]], patient confirmation-limit language. |
+
 ## Product Implications From Research
 
 - #product CueGuide cannot win as "another medication reminder." It needs to be the calm patient guidance layer plus caregiver interpretation layer.
@@ -59,6 +68,7 @@ updated: 2026-05-15
 - #data Daily caregiver use needs practical data controls: export local fallback data, verify cloud save/load, and make database mode visible.
 - #gtm Public GTM should wait for live data proof, onboarding/auth lifecycle, monitoring, compliance review, and real caregiver beta evidence.
 - #trust Sample data must never make the app look like it is fabricating live care events. Use deterministic history for trend surfaces and reserve unread alerts for real patient actions.
+- #mobile Native store work must not copy the older Expo app wholesale. Port the proven web loop, keep provider secrets server-side, remove unused sensitive permissions, and document health/privacy claims before submission.
 
 ## Current Decisions Backed By Sources
 
@@ -71,5 +81,6 @@ updated: 2026-05-15
 - [[decisions#2026-05-14 - Meta-Optimization Review Completed]]
 - [[decisions#2026-05-15 - Patient Done Is Confirmation Not Proof]]
 - [[decisions#2026-05-15 - Public Provider Secret Names Are Blocked]]
+- [[decisions#2026-05-17 - Mobile Store Readiness Requires Web Parity First]]
 
-Linked: [[dashboard]], [[plans]], [[memory]], [[todo]], [[runbook]], [[qa-log]]
+Linked: [[dashboard]], [[plans]], [[memory]], [[todo]], [[runbook]], [[qa-log]], [[store-readiness]]

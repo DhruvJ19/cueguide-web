@@ -72,7 +72,8 @@ updated: 2026-05-16
 - [x] Ship a UI trust cleanup that reduces nested cards, improves type, clarifies Live Session navigation, softens caregiver timing language, and keeps strict ElevenLabs smoke passing. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - [x] Repair Patient Focus Mode visual quality: remove boxed poster-card greeting, shorten the headline, keep the patient name in support copy, and redeploy with strict ElevenLabs smoke. See [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
 - [x] Complete and deploy a 10/10-direction UI trust gate: flatter caregiver command surfaces, shorter patient greeting, strict local and production ElevenLabs smoke, and updated smoke selectors. See [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
-- [ ] Continue the next UI pass on signup/onboarding, reports density, medication edit ergonomics, and fresh-user navigation from caregiver/patient/buyer/devil's-advocate POVs.
+- [x] Continue the next UI pass on signup/onboarding, reports density, medication edit ergonomics, and fresh-user navigation from caregiver/patient/buyer/devil's-advocate POVs. See [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
+- [ ] Next UI pass: reduce remaining auth/setup wordiness, make first-run route transitions feel faster, and tighten patient step typography after human voice acceptance.
 
 ## P3 - Mobile Path
 
@@ -115,3 +116,4 @@ updated: 2026-05-16
 - [x] Rotated the ElevenLabs production key and deployed quota-aware voice handling. Strict voice smoke now waits on ElevenLabs account credits, not code or env validity. See [[qa-log#2026-05-16 - ElevenLabs Quota Handling Production Deploy]].
 - [x] Deployed UI trust and voice network fallback hardening: strict production smoke passed with ElevenLabs `200 audio/mpeg`, no mobile overflow, and cleaner Today/Settings screenshots. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - [x] Deployed Patient Focus visual repair: open full-screen greeting, shorter fallback greeting, strict ElevenLabs smoke, and tablet/mobile no-overflow QA. See [[qa-log#2026-05-16 - Patient Focus Visual Repair Production Deploy]].
+- [x] Completed First-Use and Reports Trust local gate: clearer signup/onboarding setup path, medication edit voice preview, report interpretation row, Settings cloud-proof row, full local gates, local smoke, and rendered no-overflow QA. See [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].

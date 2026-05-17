@@ -43,6 +43,7 @@ updated: 2026-05-16
 - `Done` is patient confirmation only, not proof the pill was swallowed. Keep this explicit in caregiver Session/Reports and never imply verified administration without hardware, caregiver observation, or another confirmation source.
 - First-run local setup is a real supported path, even when Supabase browser env exists. Caregivers must always be able to choose local setup while cloud auth/proof is pending.
 - Medication session names should expose the actual medicine when one scheduled medication drives the routine, for example `Morning Lisinopril` instead of generic `Morning Medication`.
+- First-use trust standard: signup/onboarding must show the caregiver -> patient -> first medication path, medication editing must preview the patient-facing prompt, and Reports must explain what to review before showing raw metrics.
 
 ## Technical Lessons
 
@@ -114,6 +115,7 @@ Recent verified checks:
 - `ELEVENLABS_LOCAL_ADDRESS` is optional and brittle with VPN/Wi-Fi changes. Server TTS should retry once without it before failing so local QA can still prove real ElevenLabs audio. See [[decisions#2026-05-16 - Local Voice Networking Must Fail Softly]].
 - UI trust work should keep moving away from nested cards: open page sections, row/table anatomy for caregiver operations, compact Settings readiness, and direct language like `Needs attention` instead of harsh failure labels. See [[qa-log#2026-05-16 - UI Trust And Voice Network Fallback Production Deploy]].
 - The next visual quality bar is "care command surface, not generated poster": caregiver UI should keep using rows/status strips/short labels, while Patient Focus Mode should avoid date-heavy giant copy and boxed slabs. See [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]] and [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]].
+- First-Use and Reports Trust local gate passed on 2026-05-16 with signup/onboarding setup path, medication edit voice preview, report interpretation row, Settings cloud-proof row, full local gates, local smoke, and rendered no-overflow QA. Supabase proof remains blocked until `CUEGUIDE_SUPABASE_TEST_EMAIL` and `CUEGUIDE_SUPABASE_TEST_PASSWORD` are available. See [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
 
 ## Obsidian Maintenance Rules
 

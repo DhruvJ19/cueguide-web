@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import AuthLayout from '../components/AuthLayout';
@@ -160,6 +160,7 @@ export default function OnboardingPage() {
               onChange={(event) => setCaregiverName(event.target.value)}
               placeholder="Sarah Chen"
             />
+            <small className="auth-field-note">This name appears in caregiver records and alert review screens.</small>
           </label>
           <button type="button" disabled={!canContinueCaregiver} className="cg-primary auth-submit" onClick={() => setStep(1)}>
             Continue <ArrowRight size={18} />
@@ -177,6 +178,7 @@ export default function OnboardingPage() {
               onChange={(event) => setPatientName(event.target.value)}
               placeholder="Robert Chen"
             />
+            <small className="auth-field-note">Used for caregiver records. The patient sees the display name below.</small>
           </label>
           <label>
             <span>Patient display name</span>
@@ -186,6 +188,7 @@ export default function OnboardingPage() {
               onChange={(event) => setPreferredName(event.target.value)}
               placeholder="Dad"
             />
+            <small className="auth-field-note">Keep it familiar and short for patient prompts.</small>
           </label>
           <div className="auth-segmented" aria-label="Dementia stage">
             {(['early', 'moderate', 'late'] as Stage[]).map((option) => (
@@ -202,6 +205,7 @@ export default function OnboardingPage() {
               placeholder="Medication location, preferred cup, comfort names, useful routines..."
               rows={4}
             />
+            <small className="auth-field-note">Only add what helps the voice stay specific and calm.</small>
           </label>
           <div className="auth-actions">
             <button type="button" className="cg-secondary" onClick={() => setStep(0)}>Back</button>
@@ -214,6 +218,20 @@ export default function OnboardingPage() {
 
       {step === 2 && (
         <div className="auth-form">
+          <div className="auth-setup-map auth-setup-map-review" aria-label="First medication readiness">
+            <span>
+              <CheckCircle2 size={15} />
+              {patientName.trim() || 'Patient'}
+            </span>
+            <span>
+              <CheckCircle2 size={15} />
+              {preferredName.trim() || patientName.trim() || 'Display name'}
+            </span>
+            <span>
+              <CheckCircle2 size={15} />
+              One calm prompt
+            </span>
+          </div>
           <label>
             <span>First medication</span>
             <input

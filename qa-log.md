@@ -1521,3 +1521,45 @@ Known caveats:
 - Supabase authenticated cloud persistence proof remains pending until test credentials are available.
 
 Linked: [[decisions#2026-05-16 - Visual Trust Requires Fewer Boxes And Shorter Patient Copy]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+
+## 2026-05-16 - First-Use And Reports Trust Local Gate
+
+Status: passed locally with cloud-proof caveat.
+
+Changes verified:
+
+- Signup now shows a clearer three-step care setup path: caregiver, patient, first medication.
+- Onboarding now gives shorter helper text for caregiver name, patient display name, context, and first medication readiness.
+- Medication add/edit now shows edit mode, dose/time context, and a patient voice preview before the form fields.
+- Reports now lead with caregiver interpretation: care signals, adherence evidence, comfort pattern, and next action.
+- Settings now keeps Supabase claims honest with a separate `Cloud proof` readiness row.
+
+Commands:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+- `npm run security:all`
+- `npm ci --ignore-scripts --dry-run`
+- `CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow`
+- `npm run proof:supabase`
+
+Observed:
+
+- Careflow tests passed.
+- Type check passed.
+- Production build passed.
+- Security gate passed: lockfile, secret scan, npm audit, registry signatures, and attestations.
+- Dry-run install passed.
+- Local smoke passed with ElevenLabs `200 audio/mpeg`, local onboarding coverage, and no mobile overflow.
+- Rendered QA covered desktop signup, onboarding medication step, medication edit, reports, settings, mobile signup, mobile dashboard, mobile settings, and tablet Patient Focus Mode greeting.
+- Rendered QA reported no horizontal overflow on every checked viewport.
+- Browser plugin click control stalled during local interaction, so direct Playwright was used for the full rendered pass.
+
+Known caveats:
+
+- `npm run proof:supabase` is blocked by missing `CUEGUIDE_SUPABASE_TEST_EMAIL`; authenticated cloud save/load/RLS proof remains pending.
+- Human-ear ElevenLabs voice acceptance remains user-owned.
+- `cueguide-test.png` is unrelated local work and remains unstaged.
+
+Linked: [[decisions#2026-05-16 - First Use Must Prove Care Flow Before Metrics]], [[todo#P2 - Product Polish]], [[context#Commands]]

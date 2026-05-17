@@ -24,6 +24,7 @@ updated: 2026-05-16
 - Current multi-POV UI refinement favors row-based care operations surfaces over repeated cards, with Patient Focus Mode showing one dominant `Done` action plus visible support controls.
 - Current UI trust pass removes more nested section chrome, uses a system clinical font stack, and labels caregiver timing issues as `Needs attention` instead of harsh patient-facing failure language.
 - Current 10/10 direction continues flattening caregiver screens into command rows and shortens patient greeting copy so Focus Mode feels like a calm care appliance instead of a generated poster.
+- Current first-use trust pass makes signup/onboarding, medication editing, Reports, and Settings more explicit about the care loop and cloud-proof caveat.
 
 ## Technical Stack
 
@@ -77,6 +78,8 @@ updated: 2026-05-16
 | `npm run proof:supabase` | Authenticated Supabase save/load/RLS proof. Requires test caregiver email/password env. |
 
 Local dev uses `http://127.0.0.1:3006` with `--strictPort` because `3000` and `3004` have served unrelated local apps during QA.
+
+Latest local UI trust gate: [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]].
 
 ## Environment Notes
 

@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/AuthLayout';
 import { isSupabaseConfigured, supabase } from '../services/supabase';
 import { useAuthStore } from '../store/authStore';
+
+const setupSteps = [
+  'Caregiver',
+  'Patient',
+  'First medication',
+];
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -77,8 +83,8 @@ export default function SignupPage() {
   return (
     <AuthLayout
       eyebrow="Caregiver account"
-      title="Create your account"
-      subtitle="Start with the caregiver, patient, and first medication schedule."
+      title="Set up care access"
+      subtitle="Create the caregiver account first. The next screen adds the patient and first medication."
     >
       {error && <div className="auth-alert">{error}</div>}
 
@@ -86,6 +92,15 @@ export default function SignupPage() {
         <div className={`auth-mode-banner ${isSupabaseConfigured ? 'cloud' : 'local'}`}>
           <strong>{isSupabaseConfigured ? 'Cloud account path available' : 'Local setup active'}</strong>
           <span>{isSupabaseConfigured ? 'Use email for cloud sign-in, or continue locally for this device.' : 'Data stays in this browser until Supabase is connected.'}</span>
+        </div>
+
+        <div className="auth-setup-map" aria-label="CueGuide setup path">
+          {setupSteps.map((label) => (
+            <span key={label}>
+              <CheckCircle2 size={15} />
+              {label}
+            </span>
+          ))}
         </div>
 
         <label>

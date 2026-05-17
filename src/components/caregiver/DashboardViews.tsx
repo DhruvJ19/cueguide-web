@@ -54,6 +54,14 @@ export interface DashboardFormatters {
   getRefillInfo: (medication: Medication) => RefillInfo;
 }
 
+function buildMedicationPromptPreview(medication: MedicationDraft): string {
+  const shape = medication.pillShape.trim() || 'small round';
+  const color = medication.pillColor.trim() || 'blue';
+  const location = (medication.location || '').trim();
+  const locationPhrase = location ? ` It is in ${location}.` : '';
+  return `Would you like to take the ${shape} ${color} pill with a sip of water?${locationPhrase}`;
+}
+
 export function TodayView({
   nextRoutineIsPastDue,
   nextRoutine,
@@ -249,6 +257,10 @@ export function MedicationsView({
   onSaveMedication: () => void;
   formatters: Pick<DashboardFormatters, 'getNextDoseLabel' | 'getRefillInfo'>;
 }) {
+  const formTitle = editingMedicationId ? 'Edit medication' : 'Add medication';
+  const primaryTime = draftMedication.times[0] || '--:--';
+  const promptPreview = buildMedicationPromptPreview(draftMedication);
+
   return (
     <div className="cg-main-stack">
       <Section
@@ -317,8 +329,19 @@ export function MedicationsView({
       </Section>
 
       {isAddingMedication && (
-        <Section title={editingMedicationId ? 'Edit Medication' : 'Add Medication'} eyebrow="Patient-safe cue inputs">
+        <Section title={formTitle} eyebrow="Patient-safe cue inputs">
           <div className="cg-form">
+            <div className="cg-edit-banner">
+              <div>
+                <p className="cg-eyebrow">{editingMedicationId ? 'Editing current medication' : 'New medication'}</p>
+                <h3>{draftMedication.name.trim() || 'Medication details'}</h3>
+                <span>{draftMedication.dosage.trim() || 'Dose needed'} · {primaryTime}</span>
+              </div>
+              <div className="cg-med-preview">
+                <span>Patient voice preview</span>
+                <p>{promptPreview}</p>
+              </div>
+            </div>
             <div className="cg-form-block">
               <strong>Medication profile</strong>
               <div className="cg-form-row">
@@ -517,6 +540,17 @@ export function ReportsView({
   formatters: Pick<DashboardFormatters, 'formatStatus'>;
 }) {
   const completedMedicationCount = medicationCompletions.filter((completion) => completion.status === 'completed').length;
+  const reviewPriority = unreadAlertCount + helpEvents.length + skippedEvents.length + refillAttentionCount;
+  const reviewHeading = reviewPriority > 0
+    ? `${reviewPriority} care signal${reviewPriority === 1 ? '' : 's'} to review`
+    : medicationCompletions.length < 2
+      ? 'Baseline still building'
+      : 'Care pattern looks steady';
+  const reviewBody = reviewPriority > 0
+    ? 'Start with Help, Skip, unread alert, and refill signals before reading adherence as a trend.'
+    : medicationCompletions.length < 2
+      ? 'Run a few more medication sessions before drawing conclusions.'
+      : 'No urgent care signals are visible in recent medication sessions.';
   const careSignals = [
     {
       label: 'Medication adherence',
@@ -551,16 +585,26 @@ export function ReportsView({
           <div className="cg-report-lead">
             <div>
               <p className="cg-eyebrow">Current signal</p>
-              <h3>{medicationCompletions.length < 2 ? 'Trend evidence is still building' : `${adherenceRate}% session completion`}</h3>
-              <p>
-                {medicationCompletions.length < 2
-                  ? 'Run more medication sessions before treating this as a trend.'
-                  : `${completedMedicationCount} of ${medicationCompletions.length} recent medication sessions were completed.`}
-              </p>
+              <h3>{reviewHeading}</h3>
+              <p>{reviewBody}</p>
             </div>
             <div className="cg-report-meter" aria-label="Medication adherence meter">
               <span style={{ width: `${medicationCompletions.length < 2 ? 18 : adherenceRate}%` }} />
             </div>
+          </div>
+          <div className="cg-report-interpretation" aria-label="Caregiver interpretation">
+            <span>
+              <strong>Adherence</strong>
+              {medicationCompletions.length < 2 ? 'Needs more sessions' : `${completedMedicationCount}/${medicationCompletions.length} medication sessions confirmed`}
+            </span>
+            <span>
+              <strong>Comfort</strong>
+              {helpEvents.length + skippedEvents.length === 0 ? 'No help or skip pattern yet' : `${helpEvents.length} help, ${skippedEvents.length} skip`}
+            </span>
+            <span>
+              <strong>Action</strong>
+              {reviewPriority > 0 ? 'Review alerts and refill timing' : 'Keep today’s schedule current'}
+            </span>
           </div>
           <div className="cg-report-signal-list">
             {careSignals.map((signal) => (
@@ -711,6 +755,13 @@ export function SettingsView({
                 value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
                 detail={readiness.data ? 'Cloud env is present. Authenticated save/load proof is still pending.' : 'This browser is saving locally. Cloud proof is still pending.'}
                 status={readiness.data ? 'review' : 'fallback'}
+              />
+              <ReadinessItem
+                icon={<ShieldCheck size={18} />}
+                label="Cloud proof"
+                value="Proof gate required"
+                detail="Run the cloud proof gate before claiming patient, medication, completion, and alert data are production-persistent."
+                status="review"
               />
               <ReadinessItem
                 icon={<HardDrive size={18} />}

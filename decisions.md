@@ -431,3 +431,13 @@ Decision: Keep moving CueGuide away from repeated cards and poster-like patient 
 Reasoning: The user's screenshot critique showed that large boxed slabs, huge date copy, and repeated card styling made the app feel cheap and AI-generated. The product needs to feel like a calm care appliance for patients and a clinical operations surface for caregivers.
 
 Linked: [[qa-log#2026-05-16 - 10/10 UI Direction Production Deploy]], [[source-map#Som Feedback]], [[todo#P2 - Product Polish]]
+
+## 2026-05-16 - First Use Must Prove Care Flow Before Metrics
+
+#decision #ux #onboarding #reports #supabase
+
+Decision: First-use surfaces should prove the care loop before asking caregivers to trust reports or cloud readiness. Signup and onboarding should show the path from caregiver to patient to first medication, medication editing should preview the patient-facing voice prompt, Reports should lead with interpretation, and Settings should separate configured Supabase env from authenticated cloud proof.
+
+Reasoning: A polished caregiver product cannot rely on dense forms, raw metrics, or vague readiness labels. The user critique and Som voice standard both point to one clear loop: schedule a real medication, ask gently, record patient action, and show caregiver review signals honestly.
+
+Linked: [[qa-log#2026-05-16 - First-Use And Reports Trust Local Gate]], [[todo#P2 - Product Polish]], [[context#Commands]]

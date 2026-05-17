@@ -1,115 +1,108 @@
 import React, { useState } from 'react';
-import { supabase, db } from '../services/supabase';
-import { HeartPulse, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../components/AuthLayout';
+import { isSupabaseConfigured, supabase } from '../services/supabase';
+import { useAuthStore } from '../store/authStore';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { setRole } = useAuthStore();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
+  const enterLocalMode = () => {
+    setRole('caregiver');
+    localStorage.setItem('cueguide-active-tab', 'today');
+    navigate('/dashboard');
+  };
+
+  const handleMagicLink = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) return;
+
+    if (!isSupabaseConfigured) {
+      setError('Cloud sign-in is not configured in this environment. Continue with local data or add Supabase credentials.');
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
+    const { error: signInError } = await supabase.auth.signInWithOtp({
+      email: normalizedEmail,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`
-      }
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
       setLoading(false);
-    } else {
-      setSent(true);
-      setLoading(false);
+      return;
     }
+
+    setSent(true);
+    setLoading(false);
   };
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-        <div className="glass-panel p-10 max-w-md w-full border border-indigo-500/20 text-center">
-          <div className="w-16 h-16 bg-indigo-500/20 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <HeartPulse size={32} />
-          </div>
-          <h1 className="text-2xl font-semibold text-content mb-3">Check your email</h1>
-          <p className="text-content-muted mb-2">
-            We sent a magic link to <span className="text-content font-medium">{email}</span>
-          </p>
-          <p className="text-content-faint text-sm mb-8">
-            Click the link in the email to sign in. It expires in 1 hour.
-          </p>
-          <button
-            onClick={() => { setSent(false); setEmail(''); }}
-            className="text-indigo-500 text-sm font-medium hover:underline"
-          >
+      <AuthLayout
+        eyebrow="Secure caregiver sign-in"
+        title="Check your email"
+        subtitle={`We sent a private sign-in link to ${email}.`}
+      >
+        <div className="auth-success">
+          <p>Open the email on this device. The link will bring you back to CueGuide and load the caregiver workspace.</p>
+          <button type="button" className="cg-secondary" onClick={() => { setSent(false); setEmail(''); }}>
             Use a different email
           </button>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-6">
-      <div className="glass-panel p-10 max-w-md w-full border border-indigo-500/20">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <HeartPulse size={20} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>
+    <AuthLayout
+      eyebrow="Caregiver sign-in"
+      title="Welcome back"
+      subtitle="Open the caregiver workspace for medication schedules, sessions, and alerts."
+    >
+      {error && <div className="auth-alert">{error}</div>}
+
+      <form onSubmit={handleMagicLink} className="auth-form">
+        <div className={`auth-mode-banner ${isSupabaseConfigured ? 'cloud' : 'local'}`}>
+          <strong>{isSupabaseConfigured ? 'Cloud sign-in path available' : 'Local data mode active'}</strong>
+          <span>{isSupabaseConfigured ? 'Use email for cloud data, or open local data on this device.' : 'Use this device while cloud production proof is pending.'}</span>
         </div>
 
-        <h2 className="text-xl font-semibold text-content mb-2">Welcome back</h2>
-        <p className="text-content-muted mb-8 text-sm">Sign in to check on your loved one</p>
+        <label>
+          <span>Email address</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="caregiver@example.com"
+            required
+          />
+        </label>
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl mb-6">
-            {error}
-          </div>
-        )}
+        <button type="submit" disabled={loading} className="cg-primary auth-submit">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <>Send secure link <ArrowRight size={18} /></>}
+        </button>
+      </form>
 
-        <form onSubmit={handleMagicLink} className="space-y-4">
-          <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-content-faint mb-2 block">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="sarah@example.com"
-              required
-              className="w-full px-4 py-3 bg-panel border border-line rounded-xl text-content placeholder:text-content-faint focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-          </div>
+      <button type="button" className="cg-secondary auth-local" onClick={enterLocalMode}>
+        Continue with local data
+      </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-500 transition-colors disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>Send magic link <ArrowRight size={18} /></>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-content-muted text-sm">
-            New to CueGuide?{' '}
-            <Link to="/signup" className="text-indigo-500 font-medium hover:underline">Create account</Link>
-          </p>
-        </div>
-      </div>
-    </div>
+      <p className="auth-switch">
+        New to CueGuide? <Link to="/signup">Create caregiver account</Link>
+      </p>
+    </AuthLayout>
   );
 }

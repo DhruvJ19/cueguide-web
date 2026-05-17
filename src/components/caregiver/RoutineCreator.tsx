@@ -479,7 +479,7 @@ export default function RoutineCreator({ onSave, onClose }: Props) {
                          )}
 
                          <button 
-                           onClick={() => step.instruction && playAudio(step.instruction)} 
+                           onClick={() => step.instruction && void playAudio(step.instruction, 'female', true)} 
                            className="p-2.5 text-content-faint hover:text-emerald-400 rounded-lg hover:bg-emerald-500/10 transition-colors"
                            title="Listen to Instruction"
                            disabled={!step.instruction}

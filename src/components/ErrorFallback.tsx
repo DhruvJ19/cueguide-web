@@ -8,32 +8,32 @@ interface ErrorFallbackProps {
 
 export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-8">
-      <div className="glass-panel p-8 max-w-md w-full border border-red-500/30">
-        <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-xl flex items-center justify-center mb-6">
-          <AlertTriangle size={24} />
+    <main className="legal-shell">
+      <section className="legal-card legal-card-narrow" aria-labelledby="error-title">
+        <div className="legal-brand">
+          <div><AlertTriangle size={20} /></div>
+          <span>CueGuide</span>
         </div>
-        <h2 className="text-xl font-bold text-content mb-2">Something went wrong</h2>
-        <p className="text-content-muted mb-6 text-sm font-mono bg-panel-hover p-3 rounded-lg border border-line">
-          {error.message || 'An unexpected error occurred'}
-        </p>
-        <div className="flex gap-3">
+        <p className="cg-eyebrow">Care workspace</p>
+        <h1 id="error-title">Something went wrong</h1>
+        <p className="legal-lead">{error.message || 'An unexpected error occurred'}</p>
+        <div className="legal-button-row">
           <button
             onClick={resetErrorBoundary}
-            className="flex-1 flex items-center justify-center gap-2 bg-indigo-500 text-white py-3 rounded-xl font-bold hover:bg-indigo-600 transition-colors"
+            className="cg-primary"
           >
             <RefreshCw size={16} />
             Try again
           </button>
           <Link
             to="/"
-            className="flex-1 flex items-center justify-center gap-2 bg-panel border border-line text-content py-3 rounded-xl font-bold hover:bg-panel-hover transition-colors"
+            className="cg-secondary"
           >
             <Home size={16} />
             Go Home
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

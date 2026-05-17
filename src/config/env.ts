@@ -1,19 +1,26 @@
+const viteEnv: Partial<ImportMetaEnv> = import.meta.env || {};
+
+function readEnvValue(value: string | undefined): string {
+  const trimmed = value?.trim() || '';
+  const unquoted = (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  )
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return unquoted.replace(/\\n/g, '').replace(/\r?\n/g, '').trim();
+}
+
 export const config = {
   supabase: {
-    url: import.meta.env.VITE_SUPABASE_URL || 'https://mock-supabase-url.supabase.co',
-    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key',
-  },
-  openrouter: {
-    apiKey: import.meta.env.VITE_OPENROUTER_API_KEY || '',
-  },
-  gemini: {
-    apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+    url: readEnvValue(viteEnv.VITE_SUPABASE_URL) || 'https://mock-supabase-url.supabase.co',
+    anonKey: readEnvValue(viteEnv.VITE_SUPABASE_ANON_KEY) || 'mock-anon-key',
   },
   elevenlabs: {
-    apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY || '',
+    enabled: readEnvValue(viteEnv.VITE_USE_ELEVENLABS) === 'true',
+    allowBrowserFallback: readEnvValue(viteEnv.VITE_ALLOW_BROWSER_TTS_FALLBACK) === 'true',
   },
   vapid: {
-    publicKey: import.meta.env.VITE_VAPID_PUBLIC_KEY || '',
-    privateKey: import.meta.env.VITE_VAPID_PRIVATE_KEY || '',
+    publicKey: readEnvValue(viteEnv.VITE_VAPID_PUBLIC_KEY),
   }
 };

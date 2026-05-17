@@ -14,58 +14,74 @@ const LoginPage = lazy(() => import('./pages/Login'));
 const SignupPage = lazy(() => import('./pages/Signup'));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallback'));
 const OnboardingPage = lazy(() => import('./pages/Onboarding'));
-const SettingsPage = lazy(() => import('./pages/Settings'));
 const PrivacyPage = lazy(() => import('./pages/Privacy'));
 const TermsPage = lazy(() => import('./pages/Terms'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 import { HeartPulse, AlertTriangle } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
+import { format } from 'date-fns';
 
 import { usePatientStore } from './store/patientStore';
 import { useRoutineStore } from './store/routineStore';
 import { useCompletionStore } from './store/completionStore';
 import { useAuthStore } from './store/authStore';
+import { useMedicationStore } from './store/medicationStore';
+import { useAlertStore } from './store/alertStore';
 
 import { useSettingsStore } from './store/settingsStore';
+import type { AICueStep, Routine, StepCompletion } from './types';
+import { createRoutineCompletionAlert } from './services/careAlerts';
+import { v4 as uuidv4 } from 'uuid';
 
 import CommandPalette from './components/CommandPalette';
-import { ManagementPanel } from './components/ManagementPanel';
-import { SyncStatus } from './components/SyncStatus';
-import { supabase, db } from './services/supabase';
+import { supabase, db, isSupabaseConfigured } from './services/supabase';
+
+const THEME_SCHEMA_VERSION = 'hybrid-care-os-v1';
+type CaregiverInitialTab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
 
 function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-8 text-content">
-      <div className="glass-panel p-8 max-w-md w-full border border-red-500/30">
-        <div className="w-12 h-12 bg-red-500/20 text-red-500 rounded-xl flex items-center justify-center mb-6">
-           <AlertTriangle size={24} />
+    <main className="legal-shell">
+      <section className="legal-card legal-card-narrow" aria-labelledby="app-error-title">
+        <div className="legal-brand">
+          <div><AlertTriangle size={20} /></div>
+          <span>CueGuide</span>
         </div>
-        <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
-        <p className="text-content-muted mb-6 text-sm">{error.message}</p>
-        <button id="error-fallback-retry-btn" onClick={resetErrorBoundary} className="w-full py-3 bg-content text-bg font-bold rounded-xl hover:opacity-80 transition-opacity">
+        <p className="cg-eyebrow">Care workspace</p>
+        <h1 id="app-error-title">Something went wrong</h1>
+        <p className="legal-lead">{error.message}</p>
+        <button id="error-fallback-retry-btn" onClick={resetErrorBoundary} className="cg-primary">
           Try again
         </button>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
-function AppShell() {
+function AppShell({ initialTab }: { initialTab?: CaregiverInitialTab }) {
   const { role, setRole, isAuthenticated } = useAuthStore();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const storedVersion = localStorage.getItem('cueguide-theme-version');
+    if (storedVersion !== THEME_SCHEMA_VERSION) {
+      localStorage.setItem('cueguide-theme-version', THEME_SCHEMA_VERSION);
+      localStorage.setItem('cueguide-theme', 'light');
+      return 'light';
+    }
     const stored = localStorage.getItem('cueguide-theme');
-    return (stored === 'light' || stored === 'dark') ? stored : 'dark';
+    return (stored === 'light' || stored === 'dark') ? stored : 'light';
   });
   const [isCommandOpen, setIsCommandOpen] = useState(false);
 
   const { profile, updatePreferences } = usePatientStore();
   const { routines, adjustments } = useRoutineStore();
-  const { completions, addCompletion } = useCompletionStore();
+  const { completions, addCompletion, setCompletions } = useCompletionStore();
+  const { setMedications } = useMedicationStore();
+  const { addAlerts, setAlerts } = useAlertStore();
   const { aiConfig } = useSettingsStore();
 
   const [globalAlert, setGlobalAlert] = useState<string | null>(null);
-  const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
+  const [activeRoutine, setActiveRoutine] = useState<Routine | null>(null);
 
   useEffect(() => {
     localStorage.setItem('cueguide-theme', theme);
@@ -75,6 +91,26 @@ function AppShell() {
       document.body.classList.remove('light-mode');
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !profile?.id) return;
+    let isMounted = true;
+    async function loadProductionData() {
+      const [savedMedications, savedCompletions, savedAlerts] = await Promise.all([
+        db.medications.getForPatient(profile.id),
+        db.completions.getForPatient(profile.id),
+        db.alerts.getForPatient(profile.id),
+      ]);
+      if (!isMounted) return;
+      if (savedMedications.length > 0) setMedications(savedMedications);
+      if (savedCompletions.length > 0) setCompletions(savedCompletions);
+      if (savedAlerts.length > 0) setAlerts(savedAlerts);
+    }
+    loadProductionData();
+    return () => {
+      isMounted = false;
+    };
+  }, [profile?.id, setAlerts, setCompletions, setMedications]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -87,25 +123,49 @@ function AppShell() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleStartRoutine = (id: string) => {
-    setActiveRoutineId(id);
+  const handleStartRoutine = (routine: Routine) => {
+    setActiveRoutine(routine);
     setRole('patient');
   };
 
-  const handleFinishRoutine = (routineId: string, status: 'completed' | 'partial' | 'missed', minutes: number, stepsCompleted: number, mood?: string) => {
-    addCompletion({
-      id: Math.random().toString(36).substr(2, 9),
+  const handleFinishRoutine = (
+    routine: Routine,
+    status: 'completed' | 'partial' | 'missed',
+    minutes: number,
+    stepsCompleted: number,
+    mood?: string,
+    stepEvents?: StepCompletion[],
+    aiPromptsUsed?: AICueStep[]
+  ) => {
+    const completion = {
+      id: uuidv4(),
       patientId: profile?.id || '',
-      routineId,
-      date: new Date().toISOString().split('T')[0],
+      routineId: routine.id,
+      date: format(new Date(), 'yyyy-MM-dd'),
       status,
       minutes,
       stepsCompleted,
-      stepsTotal: routines.find(r => r.id === routineId)?.steps.length || 0,
+      stepsTotal: routine.steps.length,
+      stepEvents,
+      aiPromptsUsed,
       mood,
       createdAt: new Date().toISOString(),
-    });
-    setActiveRoutineId(null);
+    };
+    addCompletion(completion);
+    addAlerts([
+      createRoutineCompletionAlert({
+        patientId: completion.patientId,
+        routineId: completion.routineId,
+        patientName: profile?.preferredName || profile?.name || 'The patient',
+        routineName: routine.name,
+        status,
+        stepsCompleted,
+        stepsTotal: routine.steps.length,
+        minutes,
+      }),
+    ]);
+    localStorage.setItem('cueguide-active-tab', 'session');
+    setActiveRoutine(null);
     setRole('caregiver');
   };
 
@@ -115,7 +175,7 @@ function AppShell() {
   };
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => setActiveRoutineId(null)}>
+    <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => setActiveRoutine(null)}>
       <div className={`min-h-screen h-screen relative flex flex-col selection:bg-indigo-500/30 overflow-hidden ${theme === 'light' ? 'light-mode' : ''}`}>
         <div className="mesh-bg"></div>
         <Toaster theme={theme} position="top-right" />
@@ -139,13 +199,10 @@ function AppShell() {
               >
                 <CaregiverDashboard
                    onStartSimulation={handleStartRoutine}
-                   globalAlert={globalAlert}
-                   clearAlert={() => setGlobalAlert(null)}
                    theme={theme}
                    setTheme={setTheme}
-                   role={role}
-                   setRole={setRole}
                    setIsCommandOpen={setIsCommandOpen}
+                   initialTab={initialTab}
                 />
               </motion.div>
             ) : (
@@ -158,10 +215,11 @@ function AppShell() {
                 className="flex-1 h-full flex flex-col overflow-hidden"
               >
                 <PatientFocusMode
-                   routine={routines.find(r => r.id === activeRoutineId) || routines[0]}
-                   onComplete={(status, min, steps, mood) => handleFinishRoutine(activeRoutineId || routines[0].id, status, min, steps, mood)}
+                   routine={activeRoutine || routines[0]}
+                   onComplete={(status, min, steps, mood, stepEvents, aiPromptsUsed) =>
+                    handleFinishRoutine(activeRoutine || routines[0], status, min, steps, mood, stepEvents, aiPromptsUsed)
+                   }
                    onExit={() => setRole('caregiver')}
-                   onAlert={(msg) => setGlobalAlert(msg || null)}
                 />
               </motion.div>
             )}
@@ -177,6 +235,7 @@ export default function App() {
   const { profile } = usePatientStore();
 
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const existing = await db.caregivers.getByUserId(session.user.id);
@@ -190,6 +249,7 @@ export default function App() {
   }, [setRole]);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -207,15 +267,13 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<AppShell initialTab="settings" />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/dashboard" element={<AppShell />} />
         <Route path="/" element={<AppShell />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <SyncStatus />
-      <ManagementPanel />
       </Suspense>
     </BrowserRouter>
   );

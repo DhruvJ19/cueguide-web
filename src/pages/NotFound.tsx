@@ -3,33 +3,32 @@ import { Home, ArrowLeft } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-8">
-      <div className="glass-panel p-12 max-w-lg w-full text-center">
-        <div className="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <span className="text-4xl">🔍</span>
+    <main className="legal-shell">
+      <section className="legal-card legal-card-narrow" aria-labelledby="not-found-title">
+        <div className="legal-brand">
+          <div><Home size={20} /></div>
+          <span>CueGuide</span>
         </div>
-        <h1 className="text-4xl font-bold text-content mb-3">404</h1>
-        <p className="text-xl text-content-muted mb-2">Page not found</p>
-        <p className="text-content-faint text-sm mb-8">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="flex gap-3 justify-center">
+        <p className="cg-eyebrow">404</p>
+        <h1 id="not-found-title">Page not found</h1>
+        <p className="legal-lead">The page does not exist or has moved.</p>
+        <div className="legal-button-row">
           <Link
             to="/"
-            className="flex items-center gap-2 bg-indigo-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-600 transition-colors"
+            className="cg-primary"
           >
             <Home size={18} />
             Go Home
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 bg-panel border border-line text-content px-6 py-3 rounded-xl font-semibold hover:bg-panel-hover transition-colors"
+            className="cg-secondary"
           >
             <ArrowLeft size={18} />
             Go Back
           </button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

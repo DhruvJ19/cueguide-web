@@ -1,0 +1,822 @@
+import React from 'react';
+import {
+  Activity,
+  AlertTriangle,
+  Bell,
+  BrainCircuit,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardList,
+  Database,
+  Download,
+  Edit3,
+  HeartPulse,
+  HardDrive,
+  Pill,
+  Plus,
+  Save,
+  ShieldCheck,
+  Volume2,
+} from 'lucide-react';
+import { EmptyState, ReadinessItem, Section, StatCard, type CaregiverTone } from './CaregiverPrimitives';
+import type { CareAlert, Completion, Medication, PatientProfile, Routine, RoutineStatus, StepCompletion } from '../../types';
+
+export type Tab = 'today' | 'medications' | 'routines' | 'session' | 'reports' | 'settings';
+export type MedicationDraft = Omit<Medication, 'id' | 'createdAt' | 'updatedAt'>;
+export type VoiceReadinessStatus = 'ready' | 'review' | 'blocked';
+
+interface RefillInfo {
+  label: string;
+  tone: CaregiverTone;
+}
+
+interface ReadinessState {
+  voice: boolean;
+  ai: boolean;
+  data: boolean;
+  events: boolean;
+}
+
+function getCareContextFacts(context: string | undefined): string[] {
+  if (!context) return [];
+  return context
+    .split('.')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
+export interface DashboardFormatters {
+  formatStatus: (status: RoutineStatus | string) => string;
+  formatEventStatus: (status: StepCompletion['status']) => string;
+  formatAlertSeverity: (severity: string) => string;
+  getNextDoseLabel: (medication: Medication, currentTime: string) => string;
+  getRefillInfo: (medication: Medication) => RefillInfo;
+}
+
+function buildMedicationPromptPreview(medication: MedicationDraft): string {
+  const shape = medication.pillShape.trim() || 'small round';
+  const color = medication.pillColor.trim() || 'blue';
+  const location = (medication.location || '').trim();
+  const locationPhrase = location ? ` It is in ${location}.` : '';
+  return `Would you like to take the ${shape} ${color} pill with a sip of water?${locationPhrase}`;
+}
+
+export function TodayView({
+  nextRoutineIsPastDue,
+  nextRoutine,
+  nextMedicationRoutine,
+  activeMedicationCount,
+  activeDoseCount,
+  unreadAlertCount,
+  needsReviewCount,
+  completedTodayCount,
+  refillAttentionCount,
+  allRoutines,
+  sortedRoutines,
+  todaysCompletions,
+  currentTime,
+  alerts,
+  overdueRoutines,
+  latestVisibleAlerts,
+  profile,
+  onStartSimulation,
+  onNavigate,
+  onAcknowledgeAlert,
+  formatters,
+}: {
+  nextRoutineIsPastDue: boolean;
+  nextRoutine?: Routine;
+  nextMedicationRoutine?: Routine;
+  activeMedicationCount: number;
+  activeDoseCount: number;
+  unreadAlertCount: number;
+  needsReviewCount: number;
+  completedTodayCount: number;
+  refillAttentionCount: number;
+  allRoutines: Routine[];
+  sortedRoutines: Routine[];
+  todaysCompletions: Completion[];
+  currentTime: string;
+  alerts: CareAlert[];
+  overdueRoutines: Routine[];
+  latestVisibleAlerts: CareAlert[];
+  profile: PatientProfile | null;
+  onStartSimulation: (routine: Routine) => void;
+  onNavigate: (tab: Tab) => void;
+  onAcknowledgeAlert: (alertId: string) => void;
+  formatters: Pick<DashboardFormatters, 'formatStatus' | 'formatAlertSeverity'>;
+}) {
+  const careContextFacts = getCareContextFacts(profile?.context);
+
+  return (
+    <div className="cg-day-layout">
+      <div className="cg-main-stack">
+        <section className="cg-command-panel" aria-label="Medication guidance overview">
+          <div className="cg-next-primary">
+            <p className="cg-eyebrow">{nextRoutineIsPastDue ? 'Needs attention' : 'Next medication'}</p>
+            <h2>{nextRoutine?.name || 'No medication scheduled'}</h2>
+            <div className="cg-meta-grid">
+              <span><strong>{nextRoutine?.scheduledTime || '--:--'}</strong> Time</span>
+              <span><strong>{nextRoutine?.steps.length || 0}</strong> Steps</span>
+              <span><strong>{activeMedicationCount}</strong> Active meds</span>
+            </div>
+            <button className="cg-primary cg-start-button" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>
+              <Pill size={18} /> Start patient session
+            </button>
+          </div>
+          <div className="cg-command-queue" aria-label="Care status summary">
+            <button type="button" className="cg-brief-row" onClick={() => onNavigate('medications')}>
+              <Pill size={18} />
+              <span>
+                <strong>{activeDoseCount} doses today</strong>
+                <small>Review schedule and pill cues</small>
+              </span>
+              <ChevronRight size={16} />
+            </button>
+            <button type="button" className="cg-brief-row" onClick={() => onNavigate('session')}>
+              <Bell size={18} />
+              <span>
+                <strong>{unreadAlertCount > 0 ? `${unreadAlertCount} alert${unreadAlertCount === 1 ? '' : 's'}` : 'No open alerts'}</strong>
+                <small>{needsReviewCount > 0 ? `${needsReviewCount} session${needsReviewCount === 1 ? '' : 's'} need review` : 'No patient action needed'}</small>
+              </span>
+              <ChevronRight size={16} />
+            </button>
+            <div className="cg-care-strip" aria-label="Care metrics">
+              <span><strong>{completedTodayCount}</strong> confirmed</span>
+              <span><strong>{unreadAlertCount + needsReviewCount}</strong> review</span>
+              <span><strong>{refillAttentionCount}</strong> refill</span>
+            </div>
+          </div>
+        </section>
+
+        <Section title="Medication plan">
+          <div className="cg-schedule">
+            {allRoutines.length === 0 && (
+              <EmptyState
+                title="No care sessions scheduled yet"
+                body="Add a medication time to create the first patient-ready session."
+                action={<button className="cg-secondary" onClick={() => onNavigate('medications')}>Add medication</button>}
+              />
+            )}
+            {sortedRoutines.map((routine) => {
+              const completion = todaysCompletions.find((item) => item.routineId === routine.id);
+              const routineStatus = completion?.status || (routine.scheduledTime < currentTime ? 'past_due' : 'upcoming');
+              return (
+                <div key={routine.id} className="cg-schedule-row">
+                  <div className="cg-time">{routine.scheduledTime}</div>
+                  <div className="cg-schedule-body">
+                    <strong>{routine.name}</strong>
+                    <span>{routine.category === 'medication' ? 'Medication' : 'Routine'} · {routine.steps.length} steps</span>
+                  </div>
+                  <span className={`cg-status ${routineStatus}`}>{formatters.formatStatus(routineStatus)}</span>
+                  <button className="cg-secondary" onClick={() => onStartSimulation(routine)}>Start</button>
+                </div>
+              );
+            })}
+          </div>
+        </Section>
+      </div>
+
+      <aside className="cg-side-stack">
+        <Section title="Caregiver attention">
+          <div className="cg-alert-list">
+            {alerts.length === 0 && (
+              <EmptyState title="No alerts" body="Help, skip, and long-pause events will appear here." />
+            )}
+            {overdueRoutines.length > 0 && (
+              <div className="cg-system-alert">
+                <AlertTriangle size={16} />
+                <span>
+                  <strong>{overdueRoutines.length} session{overdueRoutines.length === 1 ? '' : 's'} need caregiver review</strong>
+                  <small>Check timing and context. Patient prompts remain calm.</small>
+                </span>
+              </div>
+            )}
+            {latestVisibleAlerts.map((alert) => (
+              <button key={alert.id} className={`cg-alert ${alert.status}`} onClick={() => onAcknowledgeAlert(alert.id)}>
+                <Bell size={16} />
+                <span>
+                  <strong>{alert.title}</strong>
+                  <small>{alert.message}</small>
+                  <em>{formatters.formatAlertSeverity(alert.severity)} · {alert.status === 'unread' ? 'Tap to acknowledge' : 'Acknowledged'}</em>
+                </span>
+              </button>
+            ))}
+          </div>
+        </Section>
+        <Section title="Patient context">
+          <div className="cg-profile cg-profile-compact">
+            <div className="cg-avatar"><HeartPulse size={30} /></div>
+            <div>
+              <strong>{profile?.name}</strong>
+              <span>Stage: {profile?.stage}</span>
+            </div>
+            <div className="cg-patient-facts" aria-label="Patient care cues">
+              <span><strong>Preferred name</strong>{profile?.preferredName || 'Not set'}</span>
+              <span><strong>Caregiver</strong>{profile?.primaryCaregiverName || 'Not set'}</span>
+              {careContextFacts.map((fact) => (
+                <span key={fact}>{fact}</span>
+              ))}
+            </div>
+          </div>
+        </Section>
+      </aside>
+    </div>
+  );
+}
+
+export function MedicationsView({
+  medications,
+  currentTime,
+  isAddingMedication,
+  editingMedicationId,
+  draftMedication,
+  formErrors,
+  lastSaveError,
+  onStartAddMedication,
+  onEditMedication,
+  onToggleMedication,
+  onMedicationChange,
+  onResetMedicationForm,
+  onSaveMedication,
+  formatters,
+}: {
+  medications: Medication[];
+  currentTime: string;
+  isAddingMedication: boolean;
+  editingMedicationId: string | null;
+  draftMedication: MedicationDraft;
+  formErrors: Record<string, string>;
+  lastSaveError: string | null;
+  onStartAddMedication: () => void;
+  onEditMedication: (medication: Medication) => void;
+  onToggleMedication: (medicationId: string) => void;
+  onMedicationChange: (field: keyof MedicationDraft, value: string | string[] | boolean) => void;
+  onResetMedicationForm: () => void;
+  onSaveMedication: () => void;
+  formatters: Pick<DashboardFormatters, 'getNextDoseLabel' | 'getRefillInfo'>;
+}) {
+  const formTitle = editingMedicationId ? 'Edit medication' : 'Add medication';
+  const primaryTime = draftMedication.times[0] || '--:--';
+  const promptPreview = buildMedicationPromptPreview(draftMedication);
+
+  return (
+    <div className="cg-main-stack">
+      <Section
+        title="Medications"
+        action={
+          <button className="cg-primary" onClick={onStartAddMedication}>
+            <Plus size={16} /> Add medication
+          </button>
+        }
+      >
+        <div className="cg-med-list">
+          {medications.length > 0 && (
+            <div className="cg-med-table-head" aria-hidden="true">
+              <span>Medication</span>
+              <span>Purpose</span>
+              <span>Schedule</span>
+              <span>Refill</span>
+              <span>Actions</span>
+            </div>
+          )}
+          {medications.length === 0 && (
+            <EmptyState
+              title="No medications entered"
+              body="Add a medication with pill appearance, schedule, and instructions."
+              action={<button className="cg-secondary" onClick={onStartAddMedication}>Add medication</button>}
+            />
+          )}
+          {medications.map((medication) => {
+            const refill = formatters.getRefillInfo(medication);
+            return (
+              <article key={medication.id} className={`cg-med-row ${!medication.isActive ? 'inactive' : ''}`}>
+                <div className="cg-med-name">
+                  <div className={`cg-pill ${medication.pillColor}`} />
+                  <div>
+                    <h3>{medication.name}</h3>
+                    <p>{medication.dosage} · {medication.pillShape} {medication.pillColor}</p>
+                    {medication.location && <small>{medication.location}</small>}
+                  </div>
+                </div>
+                <div className="cg-med-purpose">
+                  <strong>{medication.purpose}</strong>
+                  {medication.instructions && <small>{medication.instructions}</small>}
+                </div>
+                <div className="cg-med-schedule">
+                  <strong>{formatters.getNextDoseLabel(medication, currentTime)}</strong>
+                  <div className="cg-chip-row" aria-label={`${medication.name} times`}>
+                    {medication.times.map((time) => <span key={time}>{time}</span>)}
+                  </div>
+                </div>
+                <div className="cg-refill-cell">
+                  <span className={`cg-refill ${refill.tone}`}>{refill.label}</span>
+                </div>
+                <div className="cg-row-actions">
+                  <button className="cg-toggle" onClick={() => onToggleMedication(medication.id)}>
+                    {medication.isActive ? 'On' : 'Off'}
+                  </button>
+                  <button className="cg-secondary" onClick={() => onEditMedication(medication)}>
+                    <Edit3 size={15} /> Edit
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        {lastSaveError && <p className="cg-warning-note">{lastSaveError}</p>}
+      </Section>
+
+      {isAddingMedication && (
+        <Section title={formTitle} eyebrow="Patient-safe cue inputs">
+          <div className="cg-form">
+            <div className="cg-edit-banner">
+              <div>
+                <p className="cg-eyebrow">{editingMedicationId ? 'Editing current medication' : 'New medication'}</p>
+                <h3>{draftMedication.name.trim() || 'Medication details'}</h3>
+                <span>{draftMedication.dosage.trim() || 'Dose needed'} · {primaryTime}</span>
+              </div>
+              <div className="cg-med-preview">
+                <span>Patient voice preview</span>
+                <p>{promptPreview}</p>
+              </div>
+            </div>
+            <div className="cg-form-block">
+              <strong>Medication profile</strong>
+              <div className="cg-form-row">
+                <label>
+                  <span>Medication name</span>
+                  <input value={draftMedication.name} onChange={(event) => onMedicationChange('name', event.target.value)} placeholder="Medication name" />
+                  {formErrors.name && <small className="cg-field-error">{formErrors.name}</small>}
+                </label>
+                <label>
+                  <span>Dosage</span>
+                  <input value={draftMedication.dosage} onChange={(event) => onMedicationChange('dosage', event.target.value)} placeholder="Dosage, e.g. 10 mg" />
+                  {formErrors.dosage && <small className="cg-field-error">{formErrors.dosage}</small>}
+                </label>
+              </div>
+              <label>
+                <span>Purpose for caregiver review</span>
+                <input value={draftMedication.purpose} onChange={(event) => onMedicationChange('purpose', event.target.value)} placeholder="Plain-language purpose" />
+                {formErrors.purpose && <small className="cg-field-error">{formErrors.purpose}</small>}
+              </label>
+            </div>
+
+            <div className="cg-form-block">
+              <strong>Patient recognition cues</strong>
+              <div className="cg-form-row">
+                <label>
+                  <span>Pill color</span>
+                  <input value={draftMedication.pillColor} onChange={(event) => onMedicationChange('pillColor', event.target.value)} placeholder="Pill color" />
+                </label>
+                <label>
+                  <span>Pill shape</span>
+                  <input value={draftMedication.pillShape} onChange={(event) => onMedicationChange('pillShape', event.target.value)} placeholder="Pill shape" />
+                </label>
+              </div>
+              <label>
+                <span>Patient location cue</span>
+                <input value={draftMedication.location} onChange={(event) => onMedicationChange('location', event.target.value)} placeholder="Where the patient finds it" />
+              </label>
+            </div>
+
+            <div className="cg-form-block">
+              <strong>Schedule and caregiver notes</strong>
+              <label>
+                <span>Schedule times</span>
+                <input value={draftMedication.times.join(', ')} onChange={(event) => onMedicationChange('times', event.target.value.split(',').map((item) => item.trim()).filter(Boolean))} placeholder="Times, comma separated" />
+                {formErrors.times && <small className="cg-field-error">{formErrors.times}</small>}
+              </label>
+              <label>
+                <span>Refill date</span>
+                <input type="date" value={draftMedication.refillDate || ''} onChange={(event) => onMedicationChange('refillDate', event.target.value)} />
+              </label>
+              <label>
+                <span>Caregiver instructions</span>
+                <textarea value={draftMedication.instructions} onChange={(event) => onMedicationChange('instructions', event.target.value)} placeholder="Caregiver notes or instructions" />
+              </label>
+            </div>
+            <div className="cg-form-actions">
+              <button className="cg-secondary" onClick={onResetMedicationForm}>Cancel</button>
+              <button className="cg-primary" onClick={onSaveMedication}>
+                <Save size={16} /> {editingMedicationId ? 'Update medication' : 'Save medication'}
+              </button>
+            </div>
+          </div>
+        </Section>
+      )}
+    </div>
+  );
+}
+
+export function RoutinesView({
+  allRoutines,
+  onStartSimulation,
+}: {
+  allRoutines: Routine[];
+  onStartSimulation: (routine: Routine) => void;
+}) {
+  return (
+    <Section title="Routine Library">
+      <div className="cg-routine-grid">
+        {allRoutines.map((routine) => (
+          <article key={routine.id} className="cg-routine-card">
+            <span>{routine.category}</span>
+            <h3>{routine.name}</h3>
+            <p>{routine.scheduledTime} · {routine.steps.length} steps · {routine.recurrence.join(', ')}</p>
+            <button className="cg-secondary" onClick={() => onStartSimulation(routine)}>Launch patient mode</button>
+          </article>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+export function SessionView({
+  latestCompletion,
+  latestRoutine,
+  latestSessionEvents,
+  nextMedicationRoutine,
+  profile,
+  sessionStatusNote,
+  onStartSimulation,
+  formatters,
+}: {
+  latestCompletion?: Completion;
+  latestRoutine?: Routine;
+  latestSessionEvents: StepCompletion[];
+  nextMedicationRoutine?: Routine;
+  profile: PatientProfile | null;
+  sessionStatusNote: string;
+  onStartSimulation: (routine: Routine) => void;
+  formatters: Pick<DashboardFormatters, 'formatStatus' | 'formatEventStatus'>;
+}) {
+  return (
+    <Section title="Patient Session">
+      {latestCompletion ? (
+        <div className="cg-session-layout">
+          <div className="cg-session-summary">
+            <div>
+              <p className="cg-eyebrow">Latest session</p>
+              <h2>{latestRoutine?.name || 'Medication session'}</h2>
+              <p>{sessionStatusNote}</p>
+              <div className="cg-safety-note">
+                <ShieldCheck size={18} />
+                <span>
+                  <strong>Confirmation limit</strong>
+                  <small>{profile?.preferredName || 'The patient'} pressing Done means the prompt was confirmed in CueGuide. It is not proof the pill was swallowed.</small>
+                </span>
+              </div>
+            </div>
+            <div className="cg-session-metrics">
+              <StatCard label="Status" value={formatters.formatStatus(latestCompletion.status)} note="caregiver only" tone={latestCompletion.status === 'completed' ? 'ready' : 'attention'} />
+              <StatCard label="Steps" value={`${latestCompletion.stepsCompleted}/${latestCompletion.stepsTotal}`} note={`${latestCompletion.minutes} min`} tone="muted" />
+              <StatCard label="Help" value={`${latestSessionEvents.filter((event) => event.status === 'help_requested').length}`} note="patient-tapped help events" tone={latestSessionEvents.some((event) => event.status === 'help_requested') ? 'attention' : 'ready'} />
+              <StatCard label="Skipped" value={`${latestSessionEvents.filter((event) => event.status === 'skipped').length}`} note="steps for caregiver review" tone={latestSessionEvents.some((event) => event.status === 'skipped') ? 'attention' : 'ready'} />
+            </div>
+            <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
+          </div>
+          <div className="cg-timeline" aria-label="Latest patient action timeline">
+            {latestSessionEvents.length === 0 && <p>No detailed step events were logged for this session.</p>}
+            {latestSessionEvents.slice(-8).map((event) => (
+              <div key={`${event.stepId}-${event.status}-${event.completedAt || event.startedAt}`} className={`cg-timeline-item ${event.status}`}>
+                <span>{formatters.formatEventStatus(event.status)}</span>
+                <strong>{Math.max(1, event.elapsedSeconds)}s</strong>
+                <small>{event.completedAt || event.startedAt}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="cg-live-panel">
+          <div className="cg-live-empty">
+            <Activity size={28} />
+            <span>Ready for next patient session</span>
+            <h2>No session running</h2>
+            <p>Launch the next medication prompt, then review Help, Skip, Done, timing, and mood here.</p>
+            <button className="cg-primary" disabled={!nextMedicationRoutine} onClick={() => nextMedicationRoutine && onStartSimulation(nextMedicationRoutine)}>Start next session</button>
+          </div>
+          <div className="cg-live-steps" aria-label="Session evidence that will appear after launch">
+            <span><CheckCircle2 size={16} /> Patient confirmations</span>
+            <span><Bell size={16} /> Help and skip alerts</span>
+            <span><ShieldCheck size={16} /> Confirmation limit notes</span>
+          </div>
+        </div>
+      )}
+    </Section>
+  );
+}
+
+export function ReportsView({
+  medicationCompletions,
+  adherenceRate,
+  adherenceLabel,
+  helpEvents,
+  skippedEvents,
+  topMood,
+  activeMedicationCount,
+  medTimeCount,
+  refillAttentionCount,
+  unreadAlertCount,
+  alertCount,
+  recentCompletions,
+  allRoutines,
+  formatters,
+}: {
+  medicationCompletions: Completion[];
+  adherenceRate: number;
+  adherenceLabel: string;
+  helpEvents: StepCompletion[];
+  skippedEvents: StepCompletion[];
+  topMood: string;
+  activeMedicationCount: number;
+  medTimeCount: number;
+  refillAttentionCount: number;
+  unreadAlertCount: number;
+  alertCount: number;
+  recentCompletions: Completion[];
+  allRoutines: Routine[];
+  formatters: Pick<DashboardFormatters, 'formatStatus'>;
+}) {
+  const completedMedicationCount = medicationCompletions.filter((completion) => completion.status === 'completed').length;
+  const reviewPriority = unreadAlertCount + helpEvents.length + skippedEvents.length + refillAttentionCount;
+  const reviewHeading = reviewPriority > 0
+    ? `${reviewPriority} care signal${reviewPriority === 1 ? '' : 's'} to review`
+    : medicationCompletions.length < 2
+      ? 'Baseline still building'
+      : 'Care pattern looks steady';
+  const reviewBody = reviewPriority > 0
+    ? 'Start with Help, Skip, unread alert, and refill signals before reading adherence as a trend.'
+    : medicationCompletions.length < 2
+      ? 'Run a few more medication sessions before drawing conclusions.'
+      : 'No urgent care signals are visible in recent medication sessions.';
+  const careSignals = [
+    {
+      label: 'Medication adherence',
+      value: adherenceLabel,
+      detail: medicationCompletions.length < 2 ? 'Needs more sessions' : `${completedMedicationCount} of ${medicationCompletions.length} recent sessions`,
+      icon: <CheckCircle2 size={20} />,
+    },
+    {
+      label: 'Help requests',
+      value: `${helpEvents.length}`,
+      detail: 'patient tapped Help',
+      icon: <Bell size={20} />,
+    },
+    {
+      label: 'Skipped steps',
+      value: `${skippedEvents.length}`,
+      detail: 'caregiver review',
+      icon: <ClipboardList size={20} />,
+    },
+    {
+      label: 'Common mood',
+      value: topMood,
+      detail: 'session mood',
+      icon: <HeartPulse size={20} />,
+    },
+  ];
+
+  return (
+    <div className="cg-content-grid cg-reports-layout">
+      <div className="cg-main-stack">
+        <Section title="Care Review">
+          <div className="cg-report-lead">
+            <div>
+              <p className="cg-eyebrow">Current signal</p>
+              <h3>{reviewHeading}</h3>
+              <p>{reviewBody}</p>
+            </div>
+            <div className="cg-report-meter" aria-label="Medication adherence meter">
+              <span style={{ width: `${medicationCompletions.length < 2 ? 18 : adherenceRate}%` }} />
+            </div>
+          </div>
+          <div className="cg-report-interpretation" aria-label="Caregiver interpretation">
+            <span>
+              <strong>Adherence</strong>
+              {medicationCompletions.length < 2 ? 'Needs more sessions' : `${completedMedicationCount}/${medicationCompletions.length} medication sessions confirmed`}
+            </span>
+            <span>
+              <strong>Comfort</strong>
+              {helpEvents.length + skippedEvents.length === 0 ? 'No help or skip pattern yet' : `${helpEvents.length} help, ${skippedEvents.length} skip`}
+            </span>
+            <span>
+              <strong>Action</strong>
+              {reviewPriority > 0 ? 'Review alerts and refill timing' : 'Keep today’s schedule current'}
+            </span>
+          </div>
+          <div className="cg-report-signal-list">
+            {careSignals.map((signal) => (
+              <div key={signal.label} className="cg-report-signal">
+                {signal.icon}
+                <span>{signal.label}</span>
+                <strong>{signal.value}</strong>
+                <small>{signal.detail}</small>
+              </div>
+            ))}
+          </div>
+          <div className="cg-safety-note cg-report-safety-note">
+            <ShieldCheck size={18} />
+            <span>
+              <strong>Confirmation limit</strong>
+              <small>Done is patient confirmation only. Treat missed, Help, and Skip events as caregiver review signals, not medical proof.</small>
+            </span>
+          </div>
+          <div className="cg-insight-list">
+            <div>
+              <strong>Medication review</strong>
+              <p>{activeMedicationCount} active medications across {medTimeCount} scheduled time{medTimeCount === 1 ? '' : 's'}; {refillAttentionCount} refill item{refillAttentionCount === 1 ? '' : 's'} need attention.</p>
+            </div>
+            <div>
+              <strong>Caregiver attention</strong>
+              <p>{unreadAlertCount} unread alert{unreadAlertCount === 1 ? '' : 's'} and {alertCount} total alert{alertCount === 1 ? '' : 's'} available for review.</p>
+            </div>
+            <div>
+              <strong>Patient comfort signal</strong>
+              <p>{helpEvents.length + skippedEvents.length === 0 ? 'No help or skip patterns are visible in recent sessions.' : `${helpEvents.length} help request${helpEvents.length === 1 ? '' : 's'} and ${skippedEvents.length} skipped step${skippedEvents.length === 1 ? '' : 's'} should be reviewed.`}</p>
+            </div>
+          </div>
+        </Section>
+        <Section title="Recent Session Log">
+          <div className="cg-session-log">
+            {recentCompletions.length === 0 && <EmptyState title="No sessions yet" body="Run a medication session to begin building trend evidence." />}
+            {recentCompletions.slice(0, 6).map((completion) => {
+              const routine = allRoutines.find((item) => item.id === completion.routineId);
+              return (
+                <div key={completion.id} className="cg-log-row">
+                  <div>
+                    <strong>{routine?.name || 'Care session'}</strong>
+                    <span>{completion.date} · {completion.stepsCompleted} of {completion.stepsTotal} steps</span>
+                  </div>
+                  <span className={`cg-status ${completion.status}`}>{formatters.formatStatus(completion.status)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Section>
+      </div>
+      <aside className="cg-side-stack">
+        <Section title="Review Next">
+          <div className="cg-checklist">
+            <span><Pill size={16} /> Confirm the next scheduled dose</span>
+            <span><Bell size={16} /> Review any Help or Skip events</span>
+            <span><HeartPulse size={16} /> Watch mood after medication prompts</span>
+            <span><ClipboardList size={16} /> Update caregiver notes only if a pattern repeats</span>
+          </div>
+        </Section>
+      </aside>
+    </div>
+  );
+}
+
+export function SettingsView({
+  voiceReviewReady,
+  readiness,
+  voiceReadinessValue,
+  voiceReadinessDetail,
+  voiceReviewStatus,
+  canAcceptVoice,
+  voiceSampleMessage,
+  voicePrompts,
+  alertCount,
+  aiEnabled,
+  onPlayPrimaryVoice,
+  onPlayVoicePrompt,
+  onMarkVoiceAccepted,
+  onResetVoiceReview,
+  onToggleAI,
+  onExportLocalData,
+}: {
+  voiceReviewReady: boolean;
+  readiness: ReadinessState;
+  voiceReadinessValue: string;
+  voiceReadinessDetail: string;
+  voiceReviewStatus: VoiceReadinessStatus;
+  canAcceptVoice: boolean;
+  voiceSampleMessage: string;
+  voicePrompts: string[];
+  alertCount: number;
+  aiEnabled: boolean;
+  onPlayPrimaryVoice: () => void;
+  onPlayVoicePrompt: (prompt: string) => void;
+  onMarkVoiceAccepted: () => void;
+  onResetVoiceReview: () => void;
+  onToggleAI: (enabled: boolean) => void;
+  onExportLocalData: () => void;
+}) {
+  return (
+    <div className="cg-main-stack">
+      <Section title="System readiness">
+        <div className="cg-settings-summary">
+          <div>
+            <p className="cg-eyebrow">System checks</p>
+            <h3>{voiceReviewReady && readiness.events ? 'Care loop ready' : 'Voice review needed'}</h3>
+            <p>{voiceReviewReady ? 'Voice accepted. Data, alerts, and privacy status are below.' : 'Play a sample, then accept only if the voice is calm and natural.'}</p>
+          </div>
+          <button className="cg-primary" disabled={!readiness.voice} onClick={onPlayPrimaryVoice}>
+            <Volume2 size={17} /> Play primary voice
+          </button>
+        </div>
+
+        <div className="cg-settings-board">
+          <div className="cg-settings-group">
+            <h3>Voice</h3>
+            <div className="cg-settings-list">
+              <ReadinessItem icon={<Volume2 size={18} />} label="Patient voice" value={voiceReadinessValue} detail={voiceReadinessDetail} status={voiceReviewStatus} />
+              <div className={`cg-voice-status ${voiceReviewStatus}`}>
+                <Volume2 size={18} />
+                <div>
+                  <strong>Google Maps voice standard</strong>
+                  <p>Human, soft, gentle. Ask, do not command.</p>
+                </div>
+                <div className="cg-voice-prompts">
+                  {voicePrompts.map((prompt, index) => (
+                    <button key={prompt} type="button" disabled={!readiness.voice} onClick={() => onPlayVoicePrompt(prompt)}>
+                      Sample {index + 1}
+                    </button>
+                  ))}
+                </div>
+                <p className="cg-voice-sample-note">{voiceSampleMessage}</p>
+                <div className="cg-voice-review-actions">
+                  <button type="button" disabled={!canAcceptVoice} onClick={onMarkVoiceAccepted}>Mark accepted</button>
+                  <button type="button" onClick={onResetVoiceReview}>Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="cg-settings-group">
+            <h3>Data</h3>
+            <div className="cg-settings-list">
+              <ReadinessItem
+                icon={<Database size={18} />}
+                label="Care data"
+                value={readiness.data ? 'Supabase configured' : 'Local fallback active'}
+                detail={readiness.data ? 'Cloud env is present. Authenticated save/load proof is still pending.' : 'This browser is saving locally. Cloud proof is still pending.'}
+                status={readiness.data ? 'review' : 'fallback'}
+              />
+              <ReadinessItem
+                icon={<ShieldCheck size={18} />}
+                label="Cloud proof"
+                value="Proof gate required"
+                detail="Run the cloud proof gate before claiming patient, medication, completion, and alert data are production-persistent."
+                status="review"
+              />
+              <ReadinessItem
+                icon={<HardDrive size={18} />}
+                label="Local backup"
+                value="Export available"
+                detail="Download patient, medication, session, alert, and voice-review data from this browser."
+                status={readiness.events ? 'ready' : 'review'}
+              />
+              <div className="cg-data-actions">
+                <button type="button" onClick={onExportLocalData}>
+                  <Download size={16} /> Export local backup
+                </button>
+                <small>Use before device changes or stakeholder testing in local fallback mode.</small>
+              </div>
+            </div>
+          </div>
+
+          <div className="cg-settings-group">
+            <h3>AI and alerts</h3>
+            <div className="cg-settings-list">
+              <ReadinessItem
+                icon={<BrainCircuit size={18} />}
+                label="AI cue generation"
+                value={readiness.ai ? 'Reviewable generation on' : 'Reviewed fallback prompts'}
+                detail="Short warm cues only. AI cannot change schedules or create urgency."
+                status={readiness.ai ? 'review' : 'fallback'}
+              />
+              <ReadinessItem
+                icon={<Bell size={18} />}
+                label="Care monitoring"
+                value={alertCount > 0 ? `${alertCount} alerts available` : 'Alert model ready'}
+                detail="Help, skip, stuck, and completion summaries."
+                status={alertCount > 0 ? 'ready' : 'review'}
+              />
+            </div>
+            <label className="cg-ai-toggle">
+              <span>Live AI cue generation</span>
+              <input type="checkbox" checked={aiEnabled} onChange={(event) => onToggleAI(event.target.checked)} />
+            </label>
+          </div>
+
+          <div className="cg-settings-group">
+            <h3>Privacy</h3>
+            <div className="cg-settings-list">
+              <ReadinessItem
+                icon={<ShieldCheck size={18} />}
+                label="Provider secrets"
+                value="Server-only boundary"
+                detail="ElevenLabs and AI keys stay behind /api routes."
+                status="ready"
+              />
+            </div>
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}

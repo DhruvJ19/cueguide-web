@@ -1,611 +1,516 @@
-import React, { useState } from 'react';
-import { Routine, Completion, ScheduleAdjustment } from '../types';
-import WeeklyCharts from '../components/caregiver/WeeklyCharts';
-import RoutineCreator from '../components/caregiver/RoutineCreator';
-import DeviceManager from '../components/caregiver/DeviceManager';
-import AnonymizationPipeline from '../components/caregiver/AnonymizationPipeline';
-import ReportsEngine from '../components/caregiver/ReportsEngine';
-import GlowCard from '../components/GlowCard';
-import SettingsPage from '../pages/Settings';
-import { Plus, CheckCircle2, Circle, Clock, MoreVertical, Play, Zap, ZapOff, Sparkles, AlertCircle, LayoutDashboard, ListTodo, Activity, Settings, User, Shield, Radio, FileText, HeartPulse, Sun, Moon } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
-import { AIGenerationStatus } from '../services/ai';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useMemo, useState } from 'react';
+import {
+  ClipboardList,
+  FileText,
+  HeartPulse,
+  LayoutDashboard,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Pill,
+  Radio,
+  Search,
+  Settings,
+  Sun,
+} from 'lucide-react';
+import { format } from 'date-fns';
 import { usePatientStore } from '../store/patientStore';
 import { useRoutineStore } from '../store/routineStore';
 import { useCompletionStore } from '../store/completionStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { toast } from 'sonner';
-
-const RoutineCard = ({ routine, completion, onStart, getMoodIcon, compact = false }: any) => {
-  const statusColor = 
-    completion?.status === 'completed' ? 'border-emerald-500/30 bg-emerald-500/5' :
-    completion?.status === 'in_progress' ? 'border-indigo-500/30 bg-indigo-500/5' :
-    completion?.status === 'missed' ? 'border-red-500/30 bg-red-500/5' :
-    completion?.status === 'partial' ? 'border-amber-500/30 bg-amber-500/5' : 'border-line glass-card';
-  
-  const textColor = 
-    completion?.status === 'completed' ? 'text-emerald-500' :
-    completion?.status === 'in_progress' ? 'text-indigo-500' :
-    completion?.status === 'missed' ? 'text-red-500' :
-    completion?.status === 'partial' ? 'text-amber-500' : 'text-content-muted';
-
-  return (
-    <div className={`p-5 ${!compact && 'md:p-6'} flex flex-col justify-between h-full rounded-xl ${statusColor} border hover:shadow-md transition-all duration-300 group`}>
-      <div className="flex justify-between items-start mb-6">
-        <div>
-            <div className={`inline-block px-2.5 py-0.5 rounded-md bg-panel-hover border border-line text-[10px] font-bold text-content-muted mb-2 capitalize`}>
-              {routine.category || 'General'}
-            </div>
-            <h3 className={`font-semibold ${compact ? 'text-lg' : 'text-xl'} text-content tracking-tight leading-tight mb-2 group-hover:text-indigo-500 transition-colors`}>{routine.name}</h3>
-            <div className={`flex items-center ${compact ? 'text-[10px]' : 'text-xs'} font-medium text-content-muted bg-panel-hover border-line border inline-flex px-2 py-0.5 rounded-md`}>
-              <Clock size={14} className="mr-2 opacity-70" />
-              {routine.scheduledTime}
-            </div>
-        </div>
-        <button id={`routine-more-btn-${routine.id}`} aria-label="Routine Options" className="text-content-muted hover:text-content transition-colors bg-panel hover:bg-panel-hover rounded-xl p-2 border border-line">
-          <MoreVertical size={18} />
-        </button>
-      </div>
-      
-      <div className="flex-grow mt-4">
-        <div className="flex justify-between items-center mb-3">
-          <p className="text-[10px] uppercase font-black text-content-faint tracking-widest">{routine.steps.length} Steps</p>
-          {completion && <span className="text-[10px] uppercase font-bold text-content-muted">{completion.stepsCompleted} / {routine.steps.length} completed</span>}
-        </div>
-        <div className="flex gap-2 w-full h-2 bg-panel-hover border border-line rounded-sm overflow-hidden p-0.5">
-          {routine.steps.map((s: any, i: number) => (
-              <div key={s.id} className={`h-full flex-1 rounded-sm transition-all duration-500 ${completion && (completion.stepsCompleted > i || completion.status === 'completed') ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-line-strong'}`}></div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-8 flex items-center justify-between pt-6 border-t border-line">
-        <div className={`flex items-center text-xs font-bold tracking-widest uppercase ${textColor}`}>
-            {completion ? (
-              <div className="flex items-center gap-1.5 bg-panel px-2.5 py-1 border border-line rounded-md">
-                {completion.status === 'completed' && <CheckCircle2 size={14} />}
-                {completion.status.replace('_', ' ')}
-              </div>
-            ) : (
-              <span className="flex items-center gap-2"><Circle size={10} className="fill-content-faint" /> Ready</span>
-            )}
-        </div>
-        
-        {!completion && (
-          <motion.button 
-            id={`routine-play-btn-${routine.id}`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            onClick={() => onStart(routine.id)}
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-indigo-500 text-white px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/25"
-          >
-              <Play size={14} className="fill-current" /> Play
-          </motion.button>
-        )}
-        {completion?.mood && (
-            <div className="flex items-center gap-2 bg-panel border border-line px-3 py-1.5 rounded-lg">
-              <span className="text-content-faint text-xs font-medium">Mood:</span>
-              <span className="text-sm font-bold text-content flex items-center gap-1.5">{getMoodIcon(completion.mood)} {completion.mood}</span>
-            </div>
-        )}
-      </div>
-    </div>
-  );
-};
+import { useMedicationStore } from '../store/medicationStore';
+import { useAlertStore } from '../store/alertStore';
+import { validateMedicationDraft } from '../services/careAlerts';
+import { buildMedicationRoutine, getMedicationScheduleTimes } from '../services/medicationRoutine';
+import { getElevenLabsStatus, type AudioPlaybackResult, type VoiceStatus } from '../services/elevenlabs';
+import { getCaregiverVoiceSampleMessage, playAudio } from '../utils/audio';
+import { config } from '../config/env';
+import { isSupabaseConfigured } from '../services/supabase';
+import { downloadLocalBackup } from '../services/localBackup';
+import {
+  MedicationsView,
+  ReportsView,
+  RoutinesView,
+  SessionView,
+  SettingsView,
+  TodayView,
+  type MedicationDraft,
+  type Tab,
+} from '../components/caregiver/DashboardViews';
+import type { CaregiverTone } from '../components/caregiver/CaregiverPrimitives';
+import type { Medication, Routine, RoutineStatus, StepCompletion } from '../types';
+type VoiceReviewState = 'pending' | 'accepted';
+type VoiceSampleResult = AudioPlaybackResult | 'not_played';
 
 interface Props {
-  onStartSimulation: (id: string) => void;
-  globalAlert?: string | null;
-  clearAlert?: () => void;
+  onStartSimulation: (routine: Routine) => void;
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
-  role: 'caregiver' | 'patient';
-  setRole: (role: 'caregiver' | 'patient') => void;
   setIsCommandOpen: (open: boolean) => void;
+  initialTab?: Tab;
 }
 
-export default function CaregiverDashboard({ 
-  onStartSimulation, globalAlert, clearAlert,
-  theme, setTheme, role, setRole, setIsCommandOpen
-}: Props) {
-  const { routines, addRoutine, adjustments, approveAdjustment, rejectAdjustment } = useRoutineStore();
-  const { completions } = useCompletionStore();
-  const { profile: patientProfile } = usePatientStore();
-  const { aiConfig, setAiConfig } = useSettingsStore();
+const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode }> = [
+  { id: 'today', label: 'Today', icon: <LayoutDashboard size={18} /> },
+  { id: 'medications', label: 'Medications', icon: <Pill size={18} /> },
+  { id: 'routines', label: 'Routines', icon: <ClipboardList size={18} /> },
+  { id: 'session', label: 'Live Session', icon: <Radio size={18} /> },
+  { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
+  { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
+];
 
-  const [isCreating, setIsCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'routines' | 'analytics' | 'devices' | 'compliance' | 'reports' | 'settings'>('overview');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const emptyMedication: Omit<Medication, 'id' | 'createdAt' | 'updatedAt'> = {
+  patientId: 'patient-1',
+  name: '',
+  purpose: '',
+  dosage: '',
+  pillColor: 'blue',
+  pillShape: 'small round',
+  times: ['08:00'],
+  instructions: '',
+  location: 'the yellow pill box on the kitchen counter',
+  refillDate: '',
+  isActive: true,
+};
+
+const VOICE_REVIEW_STORAGE_KEY = 'cueguide-voice-review-state';
+const VOICE_REVIEW_PROMPTS = [
+  'Would you like to take the small blue pill with a sip of water?',
+  'The pill is in the yellow box on the counter.',
+  'Take your time. I can wait with you.',
+];
+
+function formatStatus(status: RoutineStatus | string): string {
+  const labels: Record<string, string> = {
+    upcoming: 'Upcoming',
+    in_progress: 'In progress',
+    completed: 'Complete',
+    partial: 'Needs review',
+    missed: 'Missed',
+    past_due: 'Needs attention',
+  };
+  return labels[status] || status.replace('_', ' ');
+}
+
+function formatEventStatus(status: StepCompletion['status']): string {
+  const labels: Record<StepCompletion['status'], string> = {
+    started: 'Started',
+    completed: 'Confirmed',
+    skipped: 'Skipped',
+    help_requested: 'Help requested',
+    stuck: 'Stuck too long',
+  };
+  return labels[status];
+}
+
+function formatAlertSeverity(severity: string): string {
+  return severity.charAt(0).toUpperCase() + severity.slice(1).toLowerCase();
+}
+
+function getNextDoseLabel(medication: Medication, currentTime: string): string {
+  const sortedTimes = [...medication.times].sort((a, b) => a.localeCompare(b));
+  const nextToday = sortedTimes.find((time) => time >= currentTime);
+  if (nextToday) return `Next ${nextToday}`;
+  return sortedTimes[0] ? `Tomorrow ${sortedTimes[0]}` : 'No time set';
+}
+
+function getRefillInfo(medication: Medication): { label: string; tone: CaregiverTone } {
+  if (!medication.refillDate) return { label: 'No refill date', tone: 'muted' };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const refill = new Date(`${medication.refillDate}T00:00:00`);
+  if (Number.isNaN(refill.getTime())) return { label: 'Check refill date', tone: 'attention' };
+  const daysUntilRefill = Math.ceil((refill.getTime() - today.getTime()) / 86_400_000);
+  if (daysUntilRefill < 0) return { label: `Overdue ${Math.abs(daysUntilRefill)}d`, tone: 'urgent' };
+  if (daysUntilRefill === 0) return { label: 'Due today', tone: 'urgent' };
+  if (daysUntilRefill <= 7) return { label: `Refill in ${daysUntilRefill}d`, tone: 'attention' };
+  return { label: `Refill ${format(refill, 'MMM d')}`, tone: 'ready' };
+}
+
+function getSessionMessage(completionStatus: RoutineStatus | undefined): string {
+  if (completionStatus === 'completed') return 'Patient confirmed the session. Review events and mood below.';
+  if (completionStatus === 'partial') return 'Some steps need caregiver review. Patient-facing language stays calm.';
+  if (completionStatus === 'missed') return 'Session did not complete. Use caregiver review language only.';
+  return 'Start a medication session to see patient actions and caregiver alerts here.';
+}
+
+export default function CaregiverDashboard({ onStartSimulation, theme, setTheme, setIsCommandOpen, initialTab }: Props) {
+  const { profile } = usePatientStore();
+  const { routines } = useRoutineStore();
+  const { completions } = useCompletionStore();
+  const { aiConfig, setAiConfig } = useSettingsStore();
+  const { medications, addMedication, updateMedication, toggleMedication, lastSaveError } = useMedicationStore();
+  const { alerts, acknowledgeAlert } = useAlertStore();
+  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (initialTab) return initialTab;
+    const stored = localStorage.getItem('cueguide-active-tab') as Tab | null;
+    return stored && tabs.some((item) => item.id === stored) ? stored : 'today';
+  });
+  const [isAddingMedication, setIsAddingMedication] = useState(false);
+  const [editingMedicationId, setEditingMedicationId] = useState<string | null>(null);
+  const [draftMedication, setDraftMedication] = useState(emptyMedication);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [voiceReviewState, setVoiceReviewState] = useState<VoiceReviewState>(() => {
+    return localStorage.getItem(VOICE_REVIEW_STORAGE_KEY) === 'accepted' ? 'accepted' : 'pending';
+  });
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>({
+    ok: false,
+    selectedVoiceId: '',
+    selectedVoiceName: '',
+    message: config.elevenlabs.enabled ? 'Checking ElevenLabs voice service.' : 'ElevenLabs is required for production voice.',
+  });
+  const [voiceSampleResult, setVoiceSampleResult] = useState<VoiceSampleResult>('not_played');
 
   React.useEffect(() => {
-    const handleNav = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail) {
-        setActiveTab(customEvent.detail as any);
-      }
+    const handleNav = (event: Event) => {
+      const tab = (event as CustomEvent).detail as Tab;
+      if (tabs.some((item) => item.id === tab)) setActiveTab(tab);
     };
     window.addEventListener('nav-tab', handleNav);
     return () => window.removeEventListener('nav-tab', handleNav);
   }, []);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todaysCompletions = completions.filter(c => c.date === todayStr);
+  React.useEffect(() => {
+    localStorage.setItem('cueguide-active-tab', activeTab);
+  }, [activeTab]);
 
-  const handleApproveAdjustment = (routineId: string, newTime: string) => {
-    approveAdjustment(routineId, newTime);
-    toast.success('Schedule adjustment approved');
-  };
+  React.useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
 
-  const handleRejectAdjustment = (routineId: string) => {
-    rejectAdjustment(routineId);
-    toast.success('Schedule adjustment dismissed');
-  };
+  React.useEffect(() => {
+    localStorage.setItem(VOICE_REVIEW_STORAGE_KEY, voiceReviewState);
+  }, [voiceReviewState]);
 
-  const getMoodIcon = (mood?: string) => {
-    switch(mood) {
-      case 'Great': return '😄';
-      case 'Good': return '🙂';
-      case 'Okay': return '😐';
-      case 'Confused': return '😕';
-      case 'Tired': return '😔';
-      default: return '';
+  React.useEffect(() => {
+    let cancelled = false;
+    if (!config.elevenlabs.enabled) {
+      setVoiceStatus({
+        ok: false,
+        selectedVoiceId: '',
+        selectedVoiceName: '',
+        message: 'Enable VITE_USE_ELEVENLABS=true for production voice.',
+      });
+      return;
     }
+
+    getElevenLabsStatus().then((status) => {
+      if (!cancelled) setVoiceStatus(status);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const currentTime = format(new Date(), 'HH:mm');
+  const todaysCompletions = completions.filter((completion) => completion.date === today);
+  const activeMedications = medications.filter((medication) => medication.isActive);
+  const medTimes = getMedicationScheduleTimes(medications);
+  const medicationRoutines = useMemo(
+    () =>
+      profile
+        ? medTimes.map((time) => buildMedicationRoutine({ patient: profile, medications, scheduledTime: time }))
+        : [],
+    [profile, medications, medTimes]
+  );
+  const allRoutines = [...medicationRoutines, ...routines.filter((routine) => routine.category !== 'medication')];
+  const unreadAlerts = alerts.filter((alert) => alert.status === 'unread');
+  const completedToday = todaysCompletions.filter((completion) => completion.status === 'completed');
+  const needsReviewToday = todaysCompletions.filter((completion) => completion.status === 'partial' || completion.status === 'missed');
+  const latestCompletion = [...todaysCompletions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  const latestRoutine = latestCompletion ? allRoutines.find((routine) => routine.id === latestCompletion.routineId) : undefined;
+  const recentCompletions = [...completions].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 30);
+  const medicationCompletions = recentCompletions.filter((completion) =>
+    allRoutines.find((routine) => routine.id === completion.routineId)?.category === 'medication'
+  );
+  const sortedRoutines = [...allRoutines].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
+  const nextRoutine = sortedRoutines.find((routine) => !todaysCompletions.some((item) => item.routineId === routine.id)) || sortedRoutines[0];
+  const nextMedicationRoutine = medicationRoutines.find((routine) => !todaysCompletions.some((item) => item.routineId === routine.id)) || medicationRoutines[0];
+  const nextRoutineCompletion = nextRoutine ? todaysCompletions.find((item) => item.routineId === nextRoutine.id) : undefined;
+  const nextRoutineIsPastDue = Boolean(nextRoutine && !nextRoutineCompletion && nextRoutine.scheduledTime < currentTime);
+  const overdueRoutines = sortedRoutines.filter((routine) => {
+    const completion = todaysCompletions.find((item) => item.routineId === routine.id);
+    return !completion && routine.scheduledTime < currentTime;
+  });
+  const helpEvents = recentCompletions.flatMap((completion) => completion.stepEvents || []).filter((event) => event.status === 'help_requested');
+  const skippedEvents = recentCompletions.flatMap((completion) => completion.stepEvents || []).filter((event) => event.status === 'skipped');
+  const adherenceRate = medicationCompletions.length === 0
+    ? 0
+    : Math.round((medicationCompletions.filter((completion) => completion.status === 'completed').length / medicationCompletions.length) * 100);
+  const moodCounts = recentCompletions.reduce<Record<string, number>>((counts, completion) => {
+    if (!completion.mood) return counts;
+    return { ...counts, [completion.mood]: (counts[completion.mood] || 0) + 1 };
+  }, {});
+  const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'No mood data';
+  const readiness = {
+    voice: config.elevenlabs.enabled && voiceStatus.ok,
+    ai: aiConfig.isEnabled,
+    data: isSupabaseConfigured,
+    events: todaysCompletions.some((completion) => (completion.stepEvents?.length || 0) > 0),
+  };
+  const activeDoseCount = activeMedications.reduce((sum, med) => sum + med.times.length, 0);
+  const refillAttentionCount = activeMedications.filter((medication) => {
+    const refill = getRefillInfo(medication);
+    return refill.tone === 'attention' || refill.tone === 'urgent';
+  }).length;
+  const sessionStatusNote = getSessionMessage(latestCompletion?.status);
+  const voiceReviewReady = readiness.voice && voiceReviewState === 'accepted';
+  const voiceReviewStatus: 'ready' | 'review' | 'blocked' = voiceReviewReady ? 'ready' : readiness.voice ? 'review' : 'blocked';
+  const voiceReadinessValue = voiceReviewReady
+    ? 'Voice accepted'
+    : readiness.voice
+      ? 'Human voice review pending'
+      : config.elevenlabs.enabled
+        ? 'ElevenLabs blocked'
+        : 'ElevenLabs required';
+  const voiceReadinessDetail = voiceReviewReady
+    ? `${voiceStatus.selectedVoiceName || 'Production voice'} passed the Google Maps standard.`
+    : readiness.voice
+      ? 'Play a sample before marking the voice accepted.'
+      : voiceStatus.message;
+  const pageTitle = activeTab === 'today' ? 'Care dashboard' : tabs.find((tab) => tab.id === activeTab)?.label || 'Today';
+  const headerContext = profile?.preferredName ? `${profile.preferredName}'s care plan` : profile?.name ? `${profile.name} care plan` : 'Care plan';
+  const headerStatus = unreadAlerts.length > 0
+    ? `${unreadAlerts.length} alert${unreadAlerts.length === 1 ? ' needs' : 's need'} review`
+    : nextRoutine
+      ? `Next: ${nextRoutine.name} at ${nextRoutine.scheduledTime}`
+      : 'Care plan ready';
+  const adherenceLabel = medicationCompletions.length < 2 ? 'Pending' : `${adherenceRate}%`;
+  const latestSessionEvents = latestCompletion?.stepEvents || [];
+  const latestVisibleAlerts = [...alerts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
+
+  const markVoiceAccepted = () => {
+    if (!readiness.voice || voiceSampleResult !== 'elevenlabs') return;
+    setVoiceReviewState('accepted');
+  };
+
+  const resetVoiceReview = () => {
+    setVoiceReviewState('pending');
+    setVoiceSampleResult('not_played');
+  };
+
+  const playVoiceSample = async (prompt: string) => {
+    const result = await playAudio(prompt, 'female', true);
+    setVoiceSampleResult(result);
+    if (result !== 'elevenlabs') setVoiceReviewState('pending');
+  };
+
+  const handleMedicationChange = (field: keyof typeof draftMedication, value: string | string[] | boolean) => {
+    setDraftMedication((current) => ({ ...current, [field]: value }));
+    setFormErrors((current) => ({ ...current, [field]: '' }));
+  };
+
+  const handleExportLocalData = () => {
+    downloadLocalBackup(window.localStorage, new Date().toISOString());
+  };
+
+  const resetMedicationForm = () => {
+    setDraftMedication(emptyMedication);
+    setFormErrors({});
+    setEditingMedicationId(null);
+    setIsAddingMedication(false);
+  };
+
+  const startAddMedication = () => {
+    setDraftMedication(emptyMedication);
+    setFormErrors({});
+    setEditingMedicationId(null);
+    setIsAddingMedication(true);
+  };
+
+  const startEditMedication = (medication: Medication) => {
+    const { id, createdAt, updatedAt, ...draft } = medication;
+    setDraftMedication(draft);
+    setFormErrors({});
+    setEditingMedicationId(id);
+    setIsAddingMedication(true);
+  };
+
+  const handleSaveMedication = () => {
+    const now = new Date().toISOString();
+    const validation = validateMedicationDraft({
+      ...draftMedication,
+      id: editingMedicationId || 'draft-medication',
+      patientId: profile?.id || 'patient-1',
+      createdAt: now,
+      updatedAt: now,
+    });
+    if (!validation.isValid) {
+      setFormErrors(validation.errors);
+      return;
+    }
+    const { id, createdAt, updatedAt, ...medication } = validation.normalized;
+    if (editingMedicationId) {
+      updateMedication(editingMedicationId, {
+        ...medication,
+        patientId: profile?.id || 'patient-1',
+      });
+    } else {
+      addMedication({ ...medication, patientId: profile?.id || 'patient-1' });
+    }
+    resetMedicationForm();
+  };
+
+  const dashboardFormatters = {
+    formatStatus,
+    formatEventStatus,
+    formatAlertSeverity,
+    getNextDoseLabel,
+    getRefillInfo,
+  };
+
+  const renderActiveTab = () => {
+    if (activeTab === 'today') {
+      return (
+        <TodayView
+          nextRoutineIsPastDue={nextRoutineIsPastDue}
+          nextRoutine={nextRoutine}
+          nextMedicationRoutine={nextMedicationRoutine}
+          activeMedicationCount={activeMedications.length}
+          activeDoseCount={activeDoseCount}
+          unreadAlertCount={unreadAlerts.length}
+          needsReviewCount={needsReviewToday.length}
+          completedTodayCount={completedToday.length}
+          refillAttentionCount={refillAttentionCount}
+          allRoutines={allRoutines}
+          sortedRoutines={sortedRoutines}
+          todaysCompletions={todaysCompletions}
+          currentTime={currentTime}
+          alerts={alerts}
+          overdueRoutines={overdueRoutines}
+          latestVisibleAlerts={latestVisibleAlerts}
+          profile={profile}
+          onStartSimulation={onStartSimulation}
+          onNavigate={setActiveTab}
+          onAcknowledgeAlert={acknowledgeAlert}
+          formatters={dashboardFormatters}
+        />
+      );
+    }
+
+    if (activeTab === 'medications') {
+      return (
+        <MedicationsView
+          medications={medications}
+          currentTime={currentTime}
+          isAddingMedication={isAddingMedication}
+          editingMedicationId={editingMedicationId}
+          draftMedication={draftMedication}
+          formErrors={formErrors}
+          lastSaveError={lastSaveError}
+          onStartAddMedication={startAddMedication}
+          onEditMedication={startEditMedication}
+          onToggleMedication={toggleMedication}
+          onMedicationChange={handleMedicationChange}
+          onResetMedicationForm={resetMedicationForm}
+          onSaveMedication={handleSaveMedication}
+          formatters={dashboardFormatters}
+        />
+      );
+    }
+
+    if (activeTab === 'routines') {
+      return <RoutinesView allRoutines={allRoutines} onStartSimulation={onStartSimulation} />;
+    }
+
+    if (activeTab === 'session') {
+      return (
+        <SessionView
+          latestCompletion={latestCompletion}
+          latestRoutine={latestRoutine}
+          latestSessionEvents={latestSessionEvents}
+          nextMedicationRoutine={nextMedicationRoutine}
+          profile={profile}
+          sessionStatusNote={sessionStatusNote}
+          onStartSimulation={onStartSimulation}
+          formatters={dashboardFormatters}
+        />
+      );
+    }
+
+    if (activeTab === 'reports') {
+      return (
+        <ReportsView
+          medicationCompletions={medicationCompletions}
+          adherenceRate={adherenceRate}
+          adherenceLabel={adherenceLabel}
+          helpEvents={helpEvents}
+          skippedEvents={skippedEvents}
+          topMood={topMood}
+          activeMedicationCount={activeMedications.length}
+          medTimeCount={medTimes.length}
+          refillAttentionCount={refillAttentionCount}
+          unreadAlertCount={unreadAlerts.length}
+          alertCount={alerts.length}
+          recentCompletions={recentCompletions}
+          allRoutines={allRoutines}
+          formatters={dashboardFormatters}
+        />
+      );
+    }
+
+    return (
+      <SettingsView
+        voiceReviewReady={voiceReviewReady}
+        readiness={readiness}
+        voiceReadinessValue={voiceReadinessValue}
+        voiceReadinessDetail={voiceReadinessDetail}
+        voiceReviewStatus={voiceReviewStatus}
+        canAcceptVoice={readiness.voice && voiceSampleResult === 'elevenlabs'}
+        voiceSampleMessage={getCaregiverVoiceSampleMessage(voiceSampleResult === 'not_played' ? 'empty' : voiceSampleResult)}
+        voicePrompts={VOICE_REVIEW_PROMPTS}
+        alertCount={alerts.length}
+        aiEnabled={aiConfig.isEnabled}
+        onPlayPrimaryVoice={() => void playVoiceSample(VOICE_REVIEW_PROMPTS[0])}
+        onPlayVoicePrompt={(prompt) => void playVoiceSample(prompt)}
+        onMarkVoiceAccepted={markVoiceAccepted}
+        onResetVoiceReview={resetVoiceReview}
+        onToggleAI={(enabled) => setAiConfig({ isEnabled: enabled })}
+        onExportLocalData={handleExportLocalData}
+      />
+    );
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-bg">
-      
-      {/* 1. Sidebar - Fixed Full Height */}
-      <aside className={`shrink-0 border-r border-line bg-panel flex flex-col z-30 transition-all duration-300 ${isSidebarOpen ? 'w-60' : 'w-16 overflow-hidden'}`}>
-        {/* Sidebar Logo Section */}
-        <div className={`h-14 flex items-center px-4 border-b border-line mb-4 ${isSidebarOpen ? '' : 'justify-center'}`}>
-           <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
-                <HeartPulse size={18} className="text-white" />
-              </div>
-              {isSidebarOpen && <h1 className="text-lg font-semibold tracking-tight text-content">CueGuide<span className="text-indigo-400 font-black">.</span></h1>}
-           </div>
+    <div className="cg-app">
+      <aside className={`cg-nav ${isNavCollapsed ? 'collapsed' : ''}`}>
+        <div className="cg-brand">
+          <div><HeartPulse size={20} /></div>
+          <span>CueGuide</span>
         </div>
-
-        {/* Sidebar Workspace Info */}
-        {isSidebarOpen && (
-          <div className="px-4 mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-content-faint mb-1">Workspace</p>
-            <h2 className="text-sm font-semibold text-content">Main Dashboard</h2>
-          </div>
-        )}
-
-        {/* Sidebar Navigation */}
-        <nav className="flex-1 flex flex-col gap-0.5 px-2 overflow-y-auto">
-          {[
-             { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
-             { id: 'routines', label: (
-               <div className="flex items-center w-full">
-                  <span>Routines</span>
-                  {isSidebarOpen && <span className="bg-panel-hover border border-line text-content-muted font-bold py-0.5 px-2 rounded text-[10px] ml-auto">{routines.length}</span>}
-               </div>
-             ), icon: <ListTodo size={18} /> },
-             { id: 'analytics', label: 'Analytics', icon: <Activity size={18} /> },
-             { id: 'devices', label: 'Sensors', icon: <Radio size={18} /> },
-             { id: 'compliance', label: 'PHI Privacy', icon: <Shield size={18} /> },
-             { id: 'reports', label: 'Reports', icon: <FileText size={18} /> },
-          ].map(tab => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all group ${
-                  isActive ? 'bg-indigo-600/10 text-indigo-500 border border-indigo-500/20' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'
-                } ${isSidebarOpen ? '' : 'justify-center px-0'}`}
-              >
-                <div className={`${isActive ? 'text-indigo-500' : 'text-content-faint group-hover:text-content-muted'} transition-colors shrink-0`}>{tab.icon}</div>
-                {isSidebarOpen && tab.label}
-              </button>
-            );
-          })}
+        <nav>
+          {tabs.map((tab) => (
+            <button key={tab.id} data-tab={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </nav>
-
-        {/* Sidebar Footer Section */}
-        <div className="p-3 border-t border-line mt-auto">
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${activeTab === 'settings' ? 'bg-panel-hover text-content border border-line' : 'text-content-muted hover:text-content hover:bg-panel-hover border border-transparent'} ${isSidebarOpen ? '' : 'justify-center px-0'}`}
-          >
-            <Settings size={18} className="shrink-0" />
-            {isSidebarOpen && <span>Settings</span>}
-          </button>
-          <button 
-             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-content-faint hover:text-content transition-all mt-1"
-          >
-             <div className={`transition-transform duration-300 ${isSidebarOpen ? 'rotate-0' : 'rotate-180'} shrink-0`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-             </div>
-             {isSidebarOpen && <span>Collapse</span>}
-          </button>
-        </div>
+        <button className="cg-collapse" onClick={() => setIsNavCollapsed((current) => !current)} aria-label={isNavCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+          {isNavCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+          <span>{isNavCollapsed ? 'Expand' : 'Collapse'}</span>
+        </button>
       </aside>
 
-      {/* 2. Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg">
-        
-        {/* Integrated Header */}
-        <header className="h-14 px-6 flex items-center justify-between border-b border-line bg-panel z-20">
-           <div className="flex items-center gap-3 text-content">
-              <h2 className="text-base font-semibold tracking-tight capitalize">
-                 {activeTab}
-              </h2>
-              {aiConfig.isEnabled && (
-                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-500">
-                  <Zap size={10} className="fill-indigo-500" /> AI Active
-                </div>
-              )}
-           </div>
-           <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsCommandOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-line bg-panel-hover hover:bg-line text-content-faint text-xs transition-colors"
-              >
-                <span>Search…</span>
-                <kbd className="text-[10px] font-bold bg-panel border border-line px-1.5 py-0.5 rounded">⌘K</kbd>
-              </button>
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg transition-colors hover:bg-panel-hover text-content-muted"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <div className="flex items-center p-0.5 rounded-lg border border-line bg-panel-hover">
-                  <button 
-                    onClick={() => setRole('caregiver')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'caregiver' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Dashboard
-                  </button>
-                  <button 
-                    onClick={() => setRole('patient')} 
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-colors ${role === 'patient' ? 'bg-indigo-600 text-white shadow-sm' : 'text-content-muted hover:text-content'}`}
-                  >
-                    Patient
-                  </button>
-              </div>
-           </div>
+      <main className="cg-main">
+        <header className="cg-topbar">
+          <div>
+            <p>{headerContext}</p>
+            <h1>{pageTitle}</h1>
+            <span>{headerStatus}</span>
+          </div>
+          <div className="cg-top-actions">
+            <button className="cg-search" onClick={() => setIsCommandOpen(true)}><Search size={16} /> Search</button>
+            <button className="cg-icon-button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
         </header>
-
-        {/* Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto relative p-6">
-           {globalAlert && (
-             <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="bg-rose-500 text-white px-5 py-3 rounded-xl flex items-center gap-4 shadow-lg shadow-rose-500/20">
-                   <AlertCircle size={20} />
-                   <div className="flex-1">
-                     <p className="text-sm font-bold">{globalAlert}</p>
-                   </div>
-                   <button onClick={() => clearAlert?.()} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                   </button>
-                </div>
-             </div>
-           )}
-
-        <div className="p-5 md:p-6">
-        
-        {activeTab === 'overview' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-6">
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-               <GlowCard className="md:col-span-2 glass-card flex flex-col justify-center" glowColor="rgba(99, 102, 241, 0.08)">
-                 <div className="p-6">
-                   <h2 className="text-2xl md:text-3xl font-display font-light text-content tracking-tight leading-tight">
-                      Good morning, <span className="font-semibold text-content">{patientProfile?.primaryCaregiverName || 'Caregiver'}</span>
-                   </h2>
-                   <p className="text-content-muted mt-2 text-sm max-w-lg">
-                      {patientProfile?.name || 'The patient'} is currently tracking on schedule. All morning sensor readings look stable.
-                   </p>
-                   <div className="mt-5 flex gap-3">
-                      <motion.button id="overview-manage-routine-btn" onClick={() => setActiveTab('routines')} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={{ type: "spring", stiffness: 400, damping: 17 }} className="bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm">Manage Routine</motion.button>
-                   </div>
-                 </div>
-               </GlowCard>
-               
-               {/* Patient Mini-Profile */}
-               <GlowCard className="glass-card" glowColor="rgba(16, 185, 129, 0.06)">
-                 <div className="p-6 flex flex-col items-center justify-center text-center h-full">
-                   <div className="w-14 h-14 bg-panel-hover rounded-full border border-line flex items-center justify-center mb-3">
-                      <User size={32} className="text-content-faint" />
-                   </div>
-                   <h3 className="font-display font-semibold text-lg text-content">{patientProfile?.preferredName || 'Patient'}</h3>
-                   <p className="text-xs text-content-muted mt-1 uppercase tracking-widest font-bold">{patientProfile?.stage || 'Monitoring'}</p>
-                 </div>
-               </GlowCard>
-            </div>
-
-            {adjustments.length > 0 && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                   <h2 className="font-display text-2xl font-semibold text-content tracking-tight">Adaptive Suggestions</h2>
-                   <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest flex items-center gap-1">
-                     <Zap size={10} className="fill-amber-500" /> Insight
-                   </span>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {adjustments.map(adj => (
-                    <div key={adj.routineId} className="bg-panel border border-line p-6 flex flex-col justify-between rounded-2xl relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                      <div className="relative z-10 flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-lg text-content">{adj.routineName}</h3>
-                          <div className="flex items-center text-sm mt-3 mb-4 font-mono bg-panel-hover inline-flex px-3 py-1.5 rounded-lg border border-line">
-                            <Clock size={14} className="mr-2 text-content-muted" />
-                            <span className="text-content-muted line-through opacity-70">{adj.currentTime}</span> 
-                            <span className="mx-2 text-content-faint">→</span> 
-                            <span className="text-amber-600 dark:text-amber-500 font-bold">{adj.suggestedTime}</span>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button id={`approve-adj-${adj.routineId}-btn`} onClick={() => handleApproveAdjustment(adj.routineId, adj.suggestedTime)} className="px-4 bg-amber-500 text-white font-bold py-2 rounded-xl transition-colors text-sm shadow-md shadow-amber-500/20 hover:bg-amber-600">
-                            Approve
-                          </button>
-                          <button id={`dismiss-adj-${adj.routineId}-btn`} onClick={() => handleRejectAdjustment(adj.routineId)} className="px-4 bg-panel border border-line hover:bg-panel-hover text-content-muted font-bold py-2 rounded-xl transition-colors text-sm">
-                            Dismiss
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-sm text-content-muted leading-relaxed relative z-10 border-t border-line pt-4 mt-2">{adj.reason}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-line pb-3">
-                <h2 className="font-display text-lg font-semibold text-content tracking-tight">Today's Queue</h2>
-                <button onClick={() => setActiveTab('routines')} className="text-xs font-semibold text-content-muted hover:text-content transition-colors">View All</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 {routines.slice(0, 3).map(routine => {
-                   const completion = todaysCompletions.find(c => c.routineId === routine.id);
-                   return <RoutineCard key={routine.id} routine={routine} completion={completion} onStart={() => onStartSimulation(routine.id)} getMoodIcon={getMoodIcon} compact />;
-                 })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Routines Listing */}
-        {activeTab === 'routines' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-4 gap-3">
-              <div>
-                 <h2 className="font-display text-xl font-semibold text-content tracking-tight">All Routines</h2>
-                 <p className="text-content-muted text-xs mt-1">{routines.length} established routines</p>
-              </div>
-              <motion.button 
-                id="new-routine-btn"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                onClick={() => setIsCreating(true)}
-                className="flex items-center justify-center gap-2 bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 px-5 py-2.5 rounded-xl font-bold text-sm"
-              >
-                <Plus size={16} /> New Routine
-              </motion.button>
-            </div>
-
-            {aiConfig.isEnabled && (
-               <div className="bg-amber-50/50 dark:bg-panel mb-2 border border-amber-500/30 p-5 rounded-2xl flex items-start sm:items-center gap-4 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                     <AlertCircle size={20} className="text-amber-600 dark:text-amber-500" />
-                  </div>
-                  <div className="flex-1">
-                     <h4 className="text-content font-bold text-sm tracking-wide">Dehydration Risk</h4>
-                     <p className="text-content-muted text-sm mt-0.5">Based on heat index (84°F) and incomplete water intake in Morning Routine.</p>
-                  </div>
-               </div>
-            )}
-
-            <motion.div 
-               variants={{
-                 hidden: { opacity: 0 },
-                 visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-               }}
-               initial="hidden"
-               animate="visible"
-               className="flex flex-col gap-4"
-            >
-               {routines.length === 0 ? (
-                 <motion.div 
-                   variants={{
-                     hidden: { opacity: 0, y: 20 },
-                     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                   }}
-                   className="bg-panel border border-dashed border-line rounded-3xl p-12 flex flex-col items-center justify-center text-center"
-                 >
-                   <div className="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
-                     <ListTodo size={32} />
-                   </div>
-                   <h3 className="text-xl font-bold text-content mb-2">No routines established</h3>
-                   <p className="text-content-muted max-w-md mb-8">Start building a structured day for the patient by creating customized routines with step-by-step guidance.</p>
-                   <motion.button 
-                     whileHover={{ scale: 1.05 }}
-                     whileTap={{ scale: 0.95 }}
-                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                     onClick={() => setIsCreating(true)}
-                     className="bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center gap-2"
-                   >
-                     <Plus size={18} /> Create First Routine
-                   </motion.button>
-                 </motion.div>
-               ) : (
-                 routines.map(routine => {
-                   const completion = todaysCompletions.find(c => c.routineId === routine.id);
-                   return (
-                     <motion.div 
-                       key={routine.id}
-                       variants={{
-                         hidden: { opacity: 0, y: 20 },
-                         visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-                       }}
-                     >
-                       <GlowCard className="bg-panel border border-line rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-line-strong transition-colors" glowColor="rgba(255,255,255,0.05)">
-                         <div className="p-4 md:p-6 w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
-                           <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="bg-panel-hover border border-line px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest text-content-muted">{routine.category}</span>
-                                {completion && <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><CheckCircle2 size={12}/> Completed</span>}
-                              </div>
-                              <h3 className="text-xl font-bold text-content">{routine.name}</h3>
-                              <div className="flex gap-4 mt-2 text-sm text-content-muted">
-                                <span className="flex items-center gap-1"><Clock size={14}/> {routine.scheduledTime}</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1"><ListTodo size={14}/> {routine.steps.length} Steps</span>
-                              </div>
-                           </div>
-                           
-                           <div className="flex items-center gap-3 md:justify-end">
-                              <button id={`simulate-routine-${routine.id}-btn`} aria-label="Simulate Routine" onClick={() => onStartSimulation(routine.id)} className="bg-panel-hover border border-line hover:bg-line text-content px-4 py-2 rounded-lg text-sm font-bold transition-colors">
-                                Simulate
-                              </button>
-                              <button id={`routine-options-${routine.id}-btn`} aria-label="Routine Options" className="p-2 text-content-muted hover:text-content hover:bg-panel-hover rounded-lg transition-colors border border-transparent hover:border-line">
-                                <MoreVertical size={20} />
-                              </button>
-                           </div>
-                         </div>
-                       </GlowCard>
-                     </motion.div>
-                   );
-                 })
-               )}
-            </motion.div>
-          </div>
-        )}
-
-        {/* Analytics */}
-        {activeTab === 'analytics' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-12">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-line pb-6 gap-4">
-              <div>
-                <h2 className="font-display text-3xl font-light text-content tracking-tight">Analytics & Trends</h2>
-                <p className="text-content-muted mt-1">Deep insights over the past week</p>
-              </div>
-              <button 
-                onClick={() => {
-                   import('../services/pdfExport').then(m => {
-                      if (patientProfile) {
-                        m.exportWeeklyReport(patientProfile, completions, routines);
-                        toast.success('PDF Export started');
-                      }
-                   });
-                }}
-                className="flex items-center justify-center gap-2 bg-panel-hover border border-line text-content-muted hover:text-content px-5 py-2.5 rounded-xl font-bold transition-all text-sm"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Export PDF
-              </button>
-            </div>
-            
-            <WeeklyCharts completions={completions} />
-            
-            {aiConfig.isEnabled && (
-              <div className="bg-panel border border-line rounded-2xl p-6 md:p-8 relative overflow-hidden">
-                 <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                 <div className="flex items-center gap-3 mb-8">
-                   <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
-                      <Sparkles size={18} className="fill-indigo-500" />
-                   </div>
-                   <div>
-                     <h3 className="text-xl font-bold text-content tracking-tight">AI Cognitive Check-in</h3>
-                     <p className="text-xs text-content-faint mt-0.5 font-medium uppercase tracking-widest">Generative Insight</p>
-                   </div>
-                 </div>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Mood Correlation</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        {patientProfile?.name || 'The patient'} exhibits a <strong className="text-content font-bold">30% stronger completion rate</strong> when expressing "Great" or "Good" in the morning.
-                     </p>
-                   </div>
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Task Complexity</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        He is pausing for an average of <strong className="text-amber-500 font-bold">4.2 mins</strong> on "Prepare Coffee" steps. Consider breaking this down into smaller sub-steps.
-                     </p>
-                   </div>
-                   <div className="space-y-3">
-                     <h4 className="text-xs font-bold uppercase tracking-widest text-content-muted">Schedule Drift</h4>
-                     <p className="text-content-muted leading-relaxed text-sm">
-                        Evening routines are starting later than scheduled (avg 42 mins drift). Recommend shifting medication times to align with eating habits.
-                     </p>
-                   </div>
-                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Devices */}
-        {activeTab === 'devices' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-            <div className="border-b border-line pb-6">
-              <h2 className="font-display font-light text-3xl text-content">Connected Devices & Sensors</h2>
-              <p className="text-content-muted mt-1 text-sm">Passive context gathering from Apple Health and Smart Home.</p>
-            </div>
-            <DeviceManager />
-          </div>
-        )}
-
-        {/* Compliance */}
-        {activeTab === 'compliance' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-             <div className="border-b border-line pb-6">
-                <h2 className="font-display font-light text-3xl text-content">HIPAA & PHI Compliance</h2>
-                <p className="text-content-muted mt-1 text-sm">Live view of the zero-trust anonymization pipeline.</p>
-             </div>
-             <AnonymizationPipeline />
-          </div>
-        )}
-
-        {/* Reports Engine */}
-        {activeTab === 'reports' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 space-y-8 max-w-6xl">
-             <div className="border-b border-line pb-6">
-                <h2 className="font-display font-light text-3xl text-content">Reports Engine</h2>
-                <p className="text-content-muted mt-1 text-sm">Generate and export clinical PDFs.</p>
-             </div>
-             <ReportsEngine />
-          </div>
-        )}
-
-{/* Settings */}
-        {activeTab === 'settings' && (
-          <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 max-w-5xl">
-             <SettingsPage />
-          </div>
-        )}
-        
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-      {isCreating && (
-        <RoutineCreator 
-           onSave={(r) => { 
-             addRoutine(r);
-             setIsCreating(false); 
-             toast.success('Routine created successfully'); 
-           }}
-           onClose={() => setIsCreating(false)}
-        />
-      )}
-      </AnimatePresence>
+        <div className="cg-page">{renderActiveTab()}</div>
+      </main>
     </div>
   );
 }

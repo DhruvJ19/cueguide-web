@@ -1,7 +1,3 @@
-import { config } from '../config/env';
-
-const ELEVENLABS_BASE = 'https://api.elevenlabs.io/v1';
-
 export interface VoiceSettings {
   stability: number;
   similarity_boost: number;
@@ -17,11 +13,38 @@ export interface Voice {
   labels?: Record<string, string>;
 }
 
+export interface VoiceStatus {
+  ok: boolean;
+  selectedVoiceId: string;
+  selectedVoiceName: string;
+  message: string;
+}
+
+export type AudioPlaybackResult = 'elevenlabs' | 'browser' | 'blocked' | 'quota' | 'empty';
+
+interface ElevenLabsApiErrorPayload {
+  error?: string;
+  code?: string;
+  status?: string;
+}
+
+class ElevenLabsClientError extends Error {
+  code: string;
+  status: number;
+
+  constructor(message: string, code: string, status: number) {
+    super(message);
+    this.name = 'ElevenLabsClientError';
+    this.code = code;
+    this.status = status;
+  }
+}
+
 const GENTLE_SETTINGS: VoiceSettings = {
-  stability: 0.55,
-  similarity_boost: 0.85,
-  style: 0.3,
-  use_speaker_boost: true,
+  stability: 0.68,
+  similarity_boost: 0.78,
+  style: 0.18,
+  use_speaker_boost: false,
 };
 
 const DEFAULT_SETTINGS: VoiceSettings = {
@@ -30,56 +53,93 @@ const DEFAULT_SETTINGS: VoiceSettings = {
 };
 
 let cachedVoices: Voice[] | null = null;
+let cachedVoiceStatus: VoiceStatus | null = null;
+
+async function fetchVoicePayload(): Promise<{ voices: Voice[]; selectedVoiceId: string; selectedVoice: Voice | null }> {
+  const res = await fetch('/api/elevenlabs/voices');
+  if (!res.ok) throw await buildClientError(res, 'ElevenLabs voices unavailable');
+  const data = await res.json();
+  return {
+    voices: data.voices || [],
+    selectedVoiceId: data.selectedVoiceId || '',
+    selectedVoice: data.selectedVoice || null,
+  };
+}
+
+async function buildClientError(response: Response, fallbackMessage: string): Promise<ElevenLabsClientError> {
+  try {
+    const payload = await response.json() as ElevenLabsApiErrorPayload;
+    const message = payload.error || fallbackMessage;
+    const code = payload.code || payload.status || 'elevenlabs_request_failed';
+    return new ElevenLabsClientError(message, code, response.status);
+  } catch {
+    return new ElevenLabsClientError(fallbackMessage, 'elevenlabs_request_failed', response.status);
+  }
+}
+
+function isQuotaError(error: unknown): boolean {
+  if (!(error instanceof ElevenLabsClientError)) return false;
+  return error.code === 'quota_exceeded' || /quota|credit/i.test(error.message);
+}
 
 export async function fetchVoices(): Promise<Voice[]> {
   if (cachedVoices) return cachedVoices;
-  if (!config.elevenlabs.apiKey) return [];
-
   try {
-    const res = await fetch(`${ELEVENLABS_BASE}/voices`, {
-      headers: { 'xi-api-key': config.elevenlabs.apiKey },
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    cachedVoices = data.voices || [];
+    const data = await fetchVoicePayload();
+    cachedVoices = data.voices;
     return cachedVoices;
   } catch {
     return [];
   }
 }
 
+export async function getElevenLabsStatus(): Promise<VoiceStatus> {
+  if (cachedVoiceStatus) return cachedVoiceStatus;
+  try {
+    const data = await fetchVoicePayload();
+    cachedVoices = data.voices;
+    const selectedVoiceName = data.selectedVoice?.name || 'production voice';
+    cachedVoiceStatus = {
+      ok: Boolean(data.selectedVoiceId),
+      selectedVoiceId: data.selectedVoiceId,
+      selectedVoiceName,
+      message: `Voice library ready: ${selectedVoiceName}. Play a sample to confirm paid TTS audio.`,
+    };
+    return cachedVoiceStatus;
+  } catch (error) {
+    cachedVoiceStatus = {
+      ok: false,
+      selectedVoiceId: '',
+      selectedVoiceName: '',
+      message: error instanceof Error ? error.message : 'ElevenLabs status check failed',
+    };
+    return cachedVoiceStatus;
+  }
+}
+
 export async function speakWithElevenLabs(
   text: string,
-  voiceId: string,
-  gentle: boolean = false,
+  gentle: boolean,
   onEnd?: () => void,
-): Promise<void> {
-  if (!config.elevenlabs.apiKey) {
-    console.warn('ElevenLabs API key not configured, falling back to browser TTS');
-    speakWithBrowserTTS(text, gentle);
-    return;
-  }
-
+  voiceId?: string,
+): Promise<'elevenlabs' | 'quota' | 'blocked'> {
   try {
-    const response = await fetch(
-      `${ELEVENLABS_BASE}/text-to-speech/${voiceId}/stream`,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': config.elevenlabs.apiKey,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_monolingual_v1',
-          voice_settings: gentle ? GENTLE_SETTINGS : DEFAULT_SETTINGS,
-        }),
-      }
-    );
+    const response = await fetch('/api/elevenlabs/tts', {
+      method: 'POST',
+      headers: {
+        Accept: 'audio/mpeg',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        voiceId,
+        gentle,
+        voice_settings: gentle ? GENTLE_SETTINGS : DEFAULT_SETTINGS,
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+      throw await buildClientError(response, `ElevenLabs API error: ${response.status}`);
     }
 
     const arrayBuffer = await response.arrayBuffer();
@@ -94,18 +154,18 @@ export async function speakWithElevenLabs(
     };
     audio.onerror = () => {
       URL.revokeObjectURL(url);
-      speakWithBrowserTTS(text, gentle);
       onEnd?.();
     };
     await audio.play();
+    return 'elevenlabs';
   } catch (error) {
-    console.warn('ElevenLabs TTS failed, using browser fallback:', error);
-    speakWithBrowserTTS(text, gentle);
+    console.warn('ElevenLabs TTS failed:', error);
     onEnd?.();
+    return isQuotaError(error) ? 'quota' : 'blocked';
   }
 }
 
-export function speakWithBrowserTTS(text: string, gentle: boolean = false): void {
+export function speakWithBrowserTTS(text: string, gentle: boolean): void {
   if (!window.speechSynthesis) return;
 
   window.speechSynthesis.cancel();
@@ -139,11 +199,8 @@ export function isSpeaking(): boolean {
 }
 
 export async function testElevenLabs(): Promise<boolean> {
-  if (!config.elevenlabs.apiKey) return false;
   try {
-    const res = await fetch(`${ELEVENLABS_BASE}/voices`, {
-      headers: { 'xi-api-key': config.elevenlabs.apiKey },
-    });
+    const res = await fetch('/api/elevenlabs/voices');
     return res.ok;
   } catch {
     return false;

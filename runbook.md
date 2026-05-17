@@ -1,0 +1,146 @@
+---
+aliases: [runbook, release-runbook, demo-runbook]
+tags: [project, operations, qa, demo]
+created: 2026-05-14
+updated: 2026-05-17
+---
+
+# CueGuide Runbook
+
+> [!note]
+> Operational checklist for [[dashboard|CueGuide]]. Use this with [[qa-log]], [[todo]], and [[SECURITY]] before demos or deploys.
+
+## Local Verification
+
+Run from `/Users/dj/Downloads/Official-CueGuide`:
+
+```bash
+npm test
+npm run lint
+npm run build
+npm run security:all
+```
+
+Start CueGuide on its isolated local port:
+
+```bash
+npm run dev
+```
+
+Local URL:
+
+```text
+http://127.0.0.1:3006
+```
+
+For local browser smoke:
+
+```bash
+CUEGUIDE_SMOKE_URL=http://127.0.0.1:3006 CUEGUIDE_REQUIRE_ELEVENLABS=false npm run smoke:careflow
+```
+
+Do not reuse `3000` for CueGuide QA on this machine unless you first verify the page is actually CueGuide; other local projects have occupied that port.
+
+## Production Smoke
+
+After deploy:
+
+```bash
+npm run smoke:careflow
+```
+
+This uses `https://cueguide-web.vercel.app` by default and requires ElevenLabs `audio/mpeg`.
+
+## Store Readiness
+
+Use [[store-readiness]] before any native release claim.
+
+- Web acceptance comes first: medication loop, ElevenLabs voice, Supabase proof, security checks, and browser QA.
+- Native app work starts only after the Expo port matches the root web medication/session model.
+- Mobile must call `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` and server `/api/*` routes for AI and voice.
+- Never add `EXPO_PUBLIC_ELEVENLABS_API_KEY`, `EXPO_PUBLIC_OPENROUTER_API_KEY`, or similar provider secret names.
+- Remove unused health, camera, microphone, and notification permissions before TestFlight or Google Play internal testing.
+- Complete App Store privacy details, Google Play Data safety, and Google Play health app declaration before public submission.
+
+## First-Run QA
+
+- Open `/signup`.
+- Confirm `Continue local setup` is visible even when Supabase env is configured.
+- Complete caregiver, patient, and first medication steps.
+- Confirm the dashboard names the actual medication in the next session, for example `Morning Lisinopril`, not a generic medication label.
+- Confirm mobile width has no horizontal overflow.
+
+## Supabase Verification
+
+- `.mcp.json` points Codex to the Supabase MCP server in read-only mode for project `kueqtpekkqapclczvahc`.
+- User OAuth/auth is still required before Supabase MCP tools are available.
+- Until authenticated cloud save/load is verified, Settings and demo language must continue to treat cloud data proof as pending.
+- `npm run proof:supabase` is the release proof for authenticated cloud data.
+- Required local env for that proof:
+  - `VITE_SUPABASE_URL` or `SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY` or `SUPABASE_ANON_KEY`
+  - `CUEGUIDE_SUPABASE_TEST_EMAIL`
+  - `CUEGUIDE_SUPABASE_TEST_PASSWORD`
+- The proof must sign in as a normal caregiver, create/read/delete a patient, medication, completion, and care alert through the anon client, and verify anonymous reads cannot see the proof patient.
+- Do not use a service-role key for this proof; service-role bypasses RLS and does not prove production browser behavior.
+
+## Production Voice
+
+- Production voice must be ElevenLabs through `/api/elevenlabs/tts`.
+- Acceptance target is Som's exact email standard: Google Maps voice directions that sound human, soft, and gentle.
+- Current selected voice: `Bella - Professional, Bright, Warm` (`hpp4J3VqNfWAUOO0d1Us`).
+- Keep `ELEVENLABS_ENABLE_VOICE_SETTINGS=false` unless a strict smoke test proves forwarded `voice_settings` still returns `audio/mpeg`.
+- If strict voice smoke returns `400` or `401`, check for quoted env values or literal `\n` escapes before rotating the key.
+- If ElevenLabs returns `model_not_found`, verify `ELEVENLABS_MODEL_ID=eleven_flash_v2_5`; a one-character typo will block all TTS even with a valid funded key.
+- `ELEVENLABS_LOCAL_ADDRESS` is optional for local network routing. If that bound address fails, the server retries TTS once without it; production should normally leave it unset.
+- Settings must show the voice library/server key state from a live server check, then `Human voice review pending` until a person plays and accepts a real ElevenLabs sample.
+- If TTS returns `quota_exceeded`, the key is valid but the ElevenLabs account needs credits before voice acceptance or strict production smoke can pass.
+- Test the three Som-standard samples in Settings: small blue pill with water, yellow box location, and "Take your time. I can wait with you."
+- Only mark `Voice accepted` after a human hears the output as Google Maps-like: human, soft, gentle, and non-commanding.
+- Patient voice should play from explicit `Read aloud` actions, not automatic step transitions.
+- Browser TTS is only an emergency fallback; it is not production-ready voice quality.
+
+## Demo Walkthrough
+
+1. Open Today and show active medication schedule.
+2. Open Medications and create or edit one medication.
+3. Start a medication session.
+4. In Patient Focus Mode, tap Begin, Read aloud, Help, Skip, Done, then choose Okay.
+5. Return to Live Session and show action history.
+6. Open Reports and show adherence, help, skip, and mood metrics.
+7. Open Settings and show ElevenLabs, AI, Supabase/local fallback, alerts, and event readiness.
+
+## UI Review Standard
+
+- Today must show the next medication and `Start patient session` before explanatory content.
+- Mobile Today should reach `Today’s Schedule` in the first viewport.
+- Reports should explain caregiver review signals, not internal system readiness.
+- Settings can expose readiness, but copy should stay short and row-based.
+- If a surface needs more than one sentence to explain itself, simplify the surface before adding copy.
+
+## Self-Annealing Loop
+
+End meaningful project updates with:
+
+- Current product score.
+- Next bottleneck.
+- Exact next action.
+- Proof required.
+- App Store/GTM implication.
+
+Use this as a forcing function: every pass should either raise product quality, reduce risk, improve proof, or sharpen the route to mobile/App Store readiness.
+
+## Stop Conditions
+
+- ElevenLabs production smoke does not return `audio/mpeg`.
+- Settings does not show `ElevenLabs active`, `Human voice review pending`, or `Voice accepted` accurately.
+- Patient medication prompt includes caregiver-only instructions or command language such as `next take`.
+- Caregiver Session or Reports imply `Done` proves the medication was physically swallowed.
+- Browser console shows unhandled app errors.
+- Mobile-width smoke reports horizontal overflow.
+- Provider secrets appear in tracked files or `dist`.
+- Provider-secret-style env names use browser-public prefixes such as `VITE_*` or `EXPO_PUBLIC_*`.
+- Supabase RLS migration is incomplete when claiming production data readiness.
+- Supabase production env names exist but live migrations/RLS have not been verified with an authenticated Supabase session.
+
+Linked: [[plans#Quality Gates]], [[todo#P0 - Demo-Critical]], [[qa-log]], [[source-map]]

@@ -1,6 +1,7 @@
-import { PatientProfile, Routine, Completion, ScheduleAdjustment, SensorReading } from './types';
+import type { PatientProfile, Routine, Completion, ScheduleAdjustment, SensorReading, Medication, CareAlert, RoutineStatus, StepCompletion } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { subDays, format } from 'date-fns';
+import { buildMedicationRoutine } from './services/medicationRoutine';
 
 export const PATIENT_PROFILE: PatientProfile = {
   id: 'patient-1',
@@ -93,42 +94,157 @@ export const INITIAL_ROUTINES: Routine[] = [
   }
 ];
 
+export const INITIAL_MEDICATIONS: Medication[] = [
+  {
+    id: 'med-lisinopril',
+    patientId: 'patient-1',
+    name: 'Lisinopril',
+    purpose: 'helps keep your blood pressure steady',
+    dosage: '10 mg',
+    pillColor: 'blue',
+    pillShape: 'small round',
+    times: ['08:00'],
+    instructions: 'Take with breakfast and water.',
+    location: 'the yellow pill box on the kitchen counter',
+    refillDate: format(new Date(Date.now() + 1000 * 60 * 60 * 24 * 10), 'yyyy-MM-dd'),
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'med-vitamin-d',
+    patientId: 'patient-1',
+    name: 'Vitamin D',
+    purpose: 'helps keep your bones strong',
+    dosage: '1000 IU',
+    pillColor: 'white',
+    pillShape: 'round',
+    times: ['08:00'],
+    instructions: 'Take one tablet after breakfast.',
+    location: 'the yellow pill box on the kitchen counter',
+    refillDate: format(new Date(Date.now() + 1000 * 60 * 60 * 24 * 22), 'yyyy-MM-dd'),
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'med-melatonin',
+    patientId: 'patient-1',
+    name: 'Melatonin',
+    purpose: 'supports your bedtime routine',
+    dosage: '3 mg',
+    pillColor: 'white',
+    pillShape: 'oval',
+    times: ['21:00'],
+    instructions: 'Take with a small sip of water.',
+    location: 'the nightstand pill organizer',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+export const INITIAL_ALERTS: CareAlert[] = [];
+
 export const INITIAL_COMPLETIONS: Completion[] = (() => {
   const completions: Completion[] = [];
-  const routines = ['routine-1', 'routine-2', 'routine-3', 'routine-4'];
-  const moods = ['Great', 'Good', 'Okay', 'Confused', 'Tired'];
-  
-  for (let i = 0; i < 30; i++) {
-    const d = format(subDays(new Date(), i), 'yyyy-MM-dd');
-    routines.forEach(rId => {
-       // Randomize completion chance
-       const rand = Math.random();
-       let status: 'completed' | 'partial' | 'missed' = 'completed';
-       let stepsCompleted = 5;
-       let minutes = 15 + Math.floor(Math.random() * 10);
-       
-       if (rand > 0.85) {
-         status = 'missed';
-         stepsCompleted = 0;
-         minutes = 0;
-       } else if (rand > 0.7) {
-         status = 'partial';
-         stepsCompleted = Math.floor(Math.random() * 4) + 1;
-         minutes = 5 + Math.floor(Math.random() * 5);
-       }
+  const medicationRoutines = ['08:00', '21:00'].map((scheduledTime) =>
+    buildMedicationRoutine({
+      patient: PATIENT_PROFILE,
+      medications: INITIAL_MEDICATIONS,
+      scheduledTime,
+      nowIso: new Date().toISOString(),
+    })
+  );
+  const sampleRoutines = [
+    { id: 'routine-1', stepsTotal: 5 },
+    { id: medicationRoutines[0].id, stepsTotal: medicationRoutines[0].steps.length },
+    { id: 'routine-3', stepsTotal: 5 },
+    { id: medicationRoutines[1].id, stepsTotal: medicationRoutines[1].steps.length },
+    { id: 'routine-4', stepsTotal: 5 },
+  ];
+  const moods = ['Good', 'Okay', 'Good', 'Tired', 'Good'];
 
-completions.push({
-          id: uuidv4(),
+  function getSampleStatus(dayOffset: number, routineIndex: number): RoutineStatus {
+    if (dayOffset === 3 && routineIndex === 1) return 'partial';
+    if (dayOffset === 6 && routineIndex === 3) return 'partial';
+    if (dayOffset === 9 && routineIndex === 2) return 'missed';
+    return 'completed';
+  }
+
+  function getStepEvents({
+    status,
+    routineId,
+    stepsTotal,
+    dayOffset,
+  }: {
+    status: RoutineStatus;
+    routineId: string;
+    stepsTotal: number;
+    dayOffset: number;
+  }): StepCompletion[] | undefined {
+    if (status === 'completed') return undefined;
+    const eventDate = subDays(new Date(), dayOffset);
+    const startedAt = new Date(eventDate.setHours(8, 5, 0, 0)).toISOString();
+    const helpEvent: StepCompletion = {
+      stepId: `${routineId}-sample-help`,
+      routineId,
+      patientId: 'patient-1',
+      startedAt,
+      completedAt: new Date(new Date(startedAt).getTime() + 75_000).toISOString(),
+      status: 'help_requested',
+      elapsedSeconds: 75,
+      helpRequested: true,
+    };
+    if (status === 'partial') {
+      return [
+        helpEvent,
+        {
+          stepId: `${routineId}-sample-skip`,
+          routineId,
           patientId: 'patient-1',
-          date: d,
-          routineId: rId,
-          status,
-          minutes,
-          stepsCompleted,
-          stepsTotal: 5,
-          mood: status === 'completed' ? moods[Math.floor(Math.random() * 3)] : moods[2 + Math.floor(Math.random() * 3)],
-          createdAt: new Date().toISOString()
-        });
+          startedAt,
+          completedAt: new Date(new Date(startedAt).getTime() + 120_000).toISOString(),
+          status: 'skipped',
+          elapsedSeconds: 120,
+          skipped: true,
+        },
+      ];
+    }
+    return Array.from({ length: stepsTotal }, (_, index) => ({
+      stepId: `${routineId}-sample-missed-${index + 1}`,
+      routineId,
+      patientId: 'patient-1',
+      startedAt,
+      completedAt: new Date(new Date(startedAt).getTime() + (index + 1) * 60_000).toISOString(),
+      status: 'stuck',
+      elapsedSeconds: (index + 1) * 60,
+    }));
+  }
+
+  for (let dayOffset = 1; dayOffset <= 14; dayOffset += 1) {
+    const date = format(subDays(new Date(), dayOffset), 'yyyy-MM-dd');
+    sampleRoutines.forEach((routine, routineIndex) => {
+      const status = getSampleStatus(dayOffset, routineIndex);
+      const stepsCompleted = status === 'completed'
+        ? routine.stepsTotal
+        : status === 'partial'
+          ? Math.max(1, routine.stepsTotal - 1)
+          : 0;
+      const createdAt = new Date(Date.now() - (dayOffset * 24 + routineIndex + 1) * 60 * 60 * 1000).toISOString();
+      completions.push({
+        id: uuidv4(),
+        patientId: 'patient-1',
+        date,
+        routineId: routine.id,
+        status,
+        minutes: status === 'missed' ? 0 : 7 + routineIndex * 3,
+        stepsCompleted,
+        stepsTotal: routine.stepsTotal,
+        mood: status === 'completed' ? moods[routineIndex] : 'Unsure',
+        stepEvents: getStepEvents({ status, routineId: routine.id, stepsTotal: routine.stepsTotal, dayOffset }),
+        createdAt,
+      });
     });
   }
   return completions;

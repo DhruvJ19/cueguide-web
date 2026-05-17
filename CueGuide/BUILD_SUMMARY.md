@@ -1,20 +1,27 @@
-# CueGuide App - Production Build Summary
+# CueGuide Mobile Port Readiness Summary
 
-## ✅ Production-Ready
+> Status: mobile is a port target, not the production source of truth. The root web app at `https://cueguide-web.vercel.app` remains the release surface until the mobile app has the same medication/session loop, voice boundary, data proof, and store compliance evidence.
+
+## Current Release Surface
 
 ### Web App
+
 - **Live URL:** https://cueguide-web.vercel.app
-- **Title:** 'CueGuide | AI-Powered Dementia Companion & Caregiver Dashboard'
-- **Tested:** All 7 Playwright tests pass (no console errors, UI renders, navigation works)
+- **Role:** stakeholder alpha and product source of truth.
+- **Core loop:** caregiver medication setup -> patient Focus Mode -> Help/Skip/Done -> caregiver alerts/reports.
+- **Voice:** ElevenLabs is server-side only through `/api/elevenlabs/*`.
 
 ### Mobile App
-- **Android APK:** `CueGuide/android/app/build/outputs/apk/release/app-release.apk` (69MB)
-- **Min SDK:** Android 8+ (API 26)
-- **EAS Config:** dev/preview/production profiles configured
+
+- **Role:** later iOS/Android port target.
+- **Android package:** `com.cueguide.app`.
+- **iOS bundle:** `com.cueguide.app`.
+- **EAS profiles:** development, preview, production.
+- **Not store-ready yet:** native UX parity, real-device QA, privacy labels, health-data disclosures, TestFlight/internal track evidence, and release signing are still pending.
 
 ---
 
-## ✅ Features Deployed
+## Existing Mobile Capabilities
 
 ### Phase 1: Mobile Foundation
 - React Native (Expo) mobile app
@@ -24,9 +31,8 @@
 - Zustand stores with AsyncStorage persistence
 
 ### Phase 2: Voice & AI (OpenRouter)
-- OpenRouter AI integration (GPT-4o, GPT-4o-mini fallback)
-- Web: OpenRouter via REST API
-- Mobile: OpenRouter via fetch API
+- AI generation should call the root web/API proxy; provider secrets must never use `EXPO_PUBLIC_*`.
+- Mobile uses `EXPO_PUBLIC_CUEGUIDE_API_BASE_URL` to reach the CueGuide backend.
 - ElevenLabs TTS + expo-speech fallback
 - '🔊 Read aloud' button on each step
 - Gentle voice settings for dementia patients
@@ -45,12 +51,13 @@
 - Real-time subscriptions
 - Works offline-first (local + sync ready)
 
-### Phase 5: Health Integration
+### Phase 5: Health Integration Scaffold
 - Health store with metrics (steps, sleep, heart rate)
 - HealthScreen with today's summary
 - Weekly activity chart
 - Health-Routine correlation insights
 - Apple Health / Samsung Health integration scaffolding
+- Store requirement: ship only after clear consent, privacy disclosures, and proof that unused health/camera/microphone permissions are removed.
 
 ### Phase 6: Production Polish
 - **404 page** with navigation back
@@ -86,17 +93,25 @@
 
 ---
 
-## 🔜 Remaining for Production
+## Store-Readiness Blockers
 
 | Task | Requirement |
 |------|-------------|
-| iOS App Store build | Apple Developer account ($99/yr) |
-| HealthKit real data | Apple Developer + provisioning profile |
-| Push notification certs | Apple Developer account |
-| TestFlight beta | Apple Developer account |
-| App Store submission | Apple Developer account |
-| Samsung Health for Android | Samsung dev account |
-| Voice cloning (caregiver custom voice) | ElevenLabs voice lab |
-| Beta testing with real caregivers | Sign-up flow needed |
-| Auth flow end-to-end validation | Real Supabase + email OTP test |
-| Sentry/crash reporting | Add @sentry/react dependency |
+| Web loop accepted | Human-ear ElevenLabs review and Supabase cloud proof. |
+| iOS build | Apple Developer account, signing, provisioning, TestFlight. |
+| Android build | Play Console account, release signing, internal testing track. |
+| Native UX parity | Port root web medication/session model into Expo and remove stale demo screens. |
+| Voice/AI boundary | Mobile must call `/api/elevenlabs/*` and `/api/ai/cue`; no public provider keys. |
+| Health permissions | Keep HealthKit/Health Connect off unless the feature is real, consented, and disclosed. |
+| Privacy labels | App Store privacy details, Google Play Data safety, health app declaration, account deletion flow. |
+| Push notifications | Real notification provider, permission copy, quiet hours, and delivery QA. |
+| Monitoring | Sentry or equivalent project created for CueGuide web/native releases. |
+| Beta evidence | Real caregiver/patient-device testing, crash logs, and store screenshots. |
+
+## Hard Rules For The Mobile Port
+
+- Copy the proven root web product loop, not the older mobile UX wholesale.
+- Keep Som's voice standard: human, soft, gentle, and question-shaped.
+- Never claim `Done` proves medication was swallowed.
+- Do not expose ElevenLabs, OpenRouter, Gemini, Twilio auth, or service-role keys in Expo public env.
+- Remove unused permissions before store submission.
